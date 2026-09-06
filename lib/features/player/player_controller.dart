@@ -2900,25 +2900,43 @@ class PlayerCubit extends Cubit<PlayerState> {
 
   @override
   Future<void> close() async {
-    await _persist(flush: true);
-    // Leaving the player → drop Watching. Do not immediately restore a
-    // "Playing" browse status; that is what kept the profile occupied after
-    // the episode ended. Detail screens set browsing on their own init.
-    if (sl.isRegistered<DiscordRpc>()) {
-      sl<DiscordRpc>().clear(delay: DiscordRpc.playerExitClearDelay);
+    // SILENCE FIRST — before any of the teardown below, all of which can take
+    // real time: a history flush that writes to disk and may hit the network,
+    // and a torrent engine that stops a stream and deletes its buffered
+    // pieces. Until player.dispose() runs at the very end, the audio keeps
+    // playing over whatever screen the user backed out to. Pausing up front
+    // costs nothing and makes "leave the player" silent immediately.
+    try {
+      await player.pause();
+    } catch (_) {
+      // Already gone, or never opened — dispose below still runs.
     }
-    for (final s in _subs) {
-      s.cancel();
+    try {
+      await _persist(flush: true);
+      // Leaving the player → drop Watching. Do not immediately restore a
+      // "Playing" browse status; that is what kept the profile occupied after
+      // the episode ended. Detail screens set browsing on their own init.
+      if (sl.isRegistered<DiscordRpc>()) {
+        sl<DiscordRpc>().clear(delay: DiscordRpc.playerExitClearDelay);
+      }
+      for (final s in _subs) {
+        s.cancel();
+      }
+      _stallTimer?.cancel();
+      _toastTimer?.cancel();
+      _discordPauseTimer?.cancel();
+      // Stop any active torrent stream + delete its buffered pieces.
+      await _stopTorrent();
+    } catch (_) {
+      // Best-effort teardown. A failure here used to skip everything below it,
+      // stranding a LIVE player with no owner — the finally block makes
+      // releasing the player unconditional.
+    } finally {
+      toast.dispose();
+      subtitleStyleRev.dispose();
+      fillerEpisodes.dispose();
+      await player.dispose();
     }
-    _stallTimer?.cancel();
-    _toastTimer?.cancel();
-    _discordPauseTimer?.cancel();
-    // Stop any active torrent stream + delete its buffered pieces.
-    await _stopTorrent();
-    toast.dispose();
-    subtitleStyleRev.dispose();
-    fillerEpisodes.dispose();
-    await player.dispose();
     return super.close();
   }
 }

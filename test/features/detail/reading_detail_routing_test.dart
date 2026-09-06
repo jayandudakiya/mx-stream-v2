@@ -210,6 +210,8 @@ class _FakeTrailerService extends TrailerService {
     String? englishTitle,
     required ProviderType type,
     String? year,
+    int? tmdbId,
+    bool tmdbIsTv = false,
   }) async => null;
 }
 

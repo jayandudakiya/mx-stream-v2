@@ -188,6 +188,10 @@ const _testDetail = MediaDetail(
   url: 'http://test/show',
   type: ProviderType.anime,
   sourceId: 'test',
+  // A cast, so the full four-tab layout is what these tests exercise. The Cast
+  // tab is dropped for a title that has none — see the "hides the Cast tab"
+  // test below for that path.
+  cast: ['Some Actor'],
   episodes: [
     Episode(id: 'e1', title: 'Episode 1', url: '/e1', number: 1),
     Episode(id: 'e2', title: 'Episode 2', url: '/e2', number: 2),
@@ -218,6 +222,8 @@ const _testDetailWithRelations = MediaDetail(
   url: 'http://test/rel',
   type: ProviderType.anime,
   sourceId: 'test',
+  // Keeps Relations at tab index 2 — see [_testDetail].
+  cast: ['Some Actor'],
   episodes: [
     Episode(id: 'e1', title: 'Episode 1', url: '/e1', number: 1),
   ],
@@ -420,6 +426,70 @@ void main() {
       // Season 1 episodes are shown by default (3 total but only 2 in S1).
       expect(find.byKey(const ValueKey('tv-ep-0')), findsOneWidget);
       expect(find.byKey(const ValueKey('tv-ep-1')), findsOneWidget);
+    },
+  );
+
+  // ── Cast tab is dropped when there is nothing to put in it ────────────────
+
+  testWidgets(
+    'DetailScreenTv hides the Cast tab for a title with no cast, and keeps '
+    'the remaining tabs contiguous',
+    (tester) async {
+      // No cast from the source and none from a metadata provider — which is
+      // exactly what a native movie scraper produces when TMDB has no match.
+      const noCast = MediaDetail(
+        id: 'nocast-show',
+        title: 'No Cast Anime',
+        url: 'http://test/nocast',
+        type: ProviderType.anime,
+        sourceId: 'test',
+        episodes: [
+          Episode(id: 'e1', title: 'Episode 1', url: '/e1', number: 1),
+        ],
+      );
+      final noCastCubit = DetailCubit(
+        repo: _StubSourceRepository(noCast),
+        url: noCast.url,
+        sourceId: noCast.sourceId,
+        prefs: _FakeTitlePrefs(),
+      );
+      await noCastCubit.load();
+      addTearDown(noCastCubit.close);
+      expect(noCastCubit.state.cast, isEmpty);
+
+      await tester.pumpWidget(
+        BlocProvider<DetailCubit>.value(
+          value: noCastCubit,
+          child: MaterialApp(
+            home: DetailScreenTv(
+              item: const MediaItem(
+                id: 'nocast-show',
+                title: 'No Cast Anime',
+                url: 'http://test/nocast',
+                type: ProviderType.anime,
+                sourceId: 'test',
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // The tab is gone, not merely empty.
+      expect(find.text('Cast'), findsNothing);
+
+      // And the three that remain still occupy 0..2 with nothing skipped, so
+      // D-pad traversal never lands on a hole.
+      expect(find.byKey(const ValueKey('tv-detail-tab-0')), findsOneWidget);
+      expect(find.byKey(const ValueKey('tv-detail-tab-1')), findsOneWidget);
+      expect(find.byKey(const ValueKey('tv-detail-tab-2')), findsOneWidget);
+      expect(find.byKey(const ValueKey('tv-detail-tab-3')), findsNothing);
+
+      // Index 1 is now Relations — the tab that used to sit at 2.
+      final second = tester.widget<TvFocusable>(
+        find.byKey(const ValueKey('tv-detail-tab-1')),
+      );
+      expect(second.semanticLabel, 'Relations');
     },
   );
 

@@ -30,9 +30,13 @@ class DetailScreenTv extends StatefulWidget {
 
 class _DetailScreenTvState extends State<DetailScreenTv> {
   int _tab = 0;
-  List<String> _tabLabels(BuildContext context) {
+
+  /// Tab labels, index-aligned with the IndexedStack below. [showCast] drops
+  /// the Cast tab for a title no metadata provider matched — an empty Cast
+  /// tab claims the title has no cast, which is not what actually happened.
+  List<String> _tabLabels(BuildContext context, {bool showCast = true}) {
     final l = context.l10n;
-    return [l.episodes, l.cast, l.relations, l.details];
+    return [l.episodes, if (showCast) l.cast, l.relations, l.details];
   }
 
 
@@ -463,6 +467,21 @@ class _DetailScreenTvState extends State<DetailScreenTv> {
     final item = widget.item;
     final category = state.category;
     final eps = detail.episodes;
+
+    // Cast from the metadata provider when it resolved, the source's own list
+    // otherwise. Empty for a title nothing matched — see [_tabLabels]. Held
+    // open until the extras fetch has actually finished (extrasResolved, not
+    // extrasLoading — see the phone screen) so the tab does not appear, vanish
+    // and shift every tab index under the user mid-fetch.
+    final castList = state.cast.isNotEmpty
+        ? state.cast
+        : [for (final n in detail.cast) CastMember(name: n)];
+    final showCast = castList.isNotEmpty || !state.extrasResolved;
+    // Dropping a tab shortens the list, so a selection past the new end has to
+    // come back in range or IndexedStack reads off the end.
+    final tabCount = _tabLabels(context, showCast: showCast).length;
+    if (_tab >= tabCount) _tab = tabCount - 1;
+
     final store = sl<ResumeStore>();
     // Kick the (cached, once-per-malId) filler lookup for the FILLER badge.
     _ensureFiller(detail.malId ?? item.malId);
@@ -728,21 +747,21 @@ class _DetailScreenTvState extends State<DetailScreenTv> {
                             padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
                             child: Row(
                               children: [
-                                for (int i = 0; i < _tabLabels(context).length; i++)
+                                for (int i = 0; i < _tabLabels(context, showCast: showCast).length; i++)
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4),
                                     child: TvFocusable(
                                       key: ValueKey('tv-detail-tab-$i'),
                                       variant: TvFocusVariant.pill,
                                       onTap: () => setState(() => _tab = i),
-                                      semanticLabel: _tabLabels(context)[i],
+                                      semanticLabel: _tabLabels(context, showCast: showCast)[i],
                                       builder: (focused) => Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                         // Excluded — semanticLabel above
                                         // already announces the tab name.
                                         child: ExcludeSemantics(
                                           child: Text(
-                                            _tabLabels(context)[i],
+                                            _tabLabels(context, showCast: showCast)[i],
                                             style: AppText.headline.copyWith(
                                               fontSize: 15,
                                               // Active tab reads from bright
@@ -790,11 +809,7 @@ class _DetailScreenTvState extends State<DetailScreenTv> {
                                 onDownload: (ep) => _pickSourceAndDownload(ep, detail, category),
                               ),
                               // ── Cast ─────────────────────────────────────────
-                              _CastTab(
-                                cast: state.cast.isNotEmpty
-                                    ? state.cast
-                                    : [for (final n in detail.cast) CastMember(name: n)],
-                              ),
+                              if (showCast) _CastTab(cast: castList),
                               // ── Relations ──────────────────────────────────
                               _RelationsTab(relations: state.relations, onOpen: _openRelation, tvFocus: true),
                               // ── Details ────────────────────────────────────

@@ -372,12 +372,55 @@ class MetadataEnrichment {
     return (cast: cast, relations: relations);
   }
 
+  /// Maps an IMDb id (`tt1234567`) onto TMDB via `/find`, which is an exact
+  /// lookup rather than a search — no fuzzy matching, no year disambiguation,
+  /// no chance of landing on a remake. Returns the id AND whether TMDB files
+  /// it as TV, because `/find` answers both in one call: a hit lands in either
+  /// `movie_results` or `tv_results`, so the namespace comes back as fact
+  /// instead of being guessed from the release string.
+  ///
+  /// Null when the id is malformed, unknown to TMDB, or the call fails.
+  Future<({int id, bool isTv})?> resolveTmdbExternal(String imdbId) async {
+    final id = imdbId.trim();
+    if (!RegExp(r'^tt\d{7,9}$').hasMatch(id)) return null;
+    final res = await _get('$_tmdbBase/find/$id', const {
+      'external_source': 'imdb_id',
+    });
+    if (res == null) return null;
+    for (final entry in [
+      (key: 'tv_results', isTv: true),
+      (key: 'movie_results', isTv: false),
+    ]) {
+      final list = res[entry.key];
+      if (list is! List || list.isEmpty) continue;
+      final first = list.first;
+      if (first is! Map) continue;
+      final tmdbId = (first['id'] as num?)?.toInt();
+      if (tmdbId != null) return (id: tmdbId, isTv: entry.isTv);
+    }
+    return null;
+  }
+
   /// Resolves a TMDB id for a title that exposes none, by searching TMDB by
   /// [title] (+ [year] when known). Used as a fallback so id-less movie/TV
   /// titles (e.g. some CloudStream sources) can still track on Simkl and pull
   /// rich Cast/Relations. Conservative: prefers a year-constrained, exact-title
   /// match; returns null when nothing reasonable is found. Best-effort.
-  Future<int?> resolveTmdbId(String title, String? year, bool isTv) async {
+  ///
+  /// When [imdbId] is known (the native movie scrapers publish an IMDb link on
+  /// every detail page), [resolveTmdbExternal] runs first — it is an exact
+  /// mapping, so it beats any amount of title guessing and also settles the
+  /// movie/TV question that [isTv] can only guess at.
+  Future<int?> resolveTmdbId(
+    String title,
+    String? year,
+    bool isTv, {
+    String? imdbId,
+  }) async {
+    if (imdbId != null && imdbId.isNotEmpty) {
+      final found = await resolveTmdbExternal(imdbId);
+      if (found != null) return found.id;
+    }
     final q = _norm(title);
     if (q.isEmpty) return null;
     final kind = isTv ? 'tv' : 'movie';

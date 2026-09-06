@@ -108,6 +108,8 @@ release-v*/
 banner/
 poster/
 secrets.json
+*.env.json
+tmdb.env.json
 
 # Aniyomi loader test fixture APK — on-device validated instead of committed
 android/app/src/test/resources/aniyomi/*.apk

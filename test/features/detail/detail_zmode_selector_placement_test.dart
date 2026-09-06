@@ -17,7 +17,9 @@ import 'package:mxstream/core/download/chapter_download_store.dart';
 import 'package:mxstream/core/download/chapter_downloader.dart';
 import 'package:mxstream/core/download/download_manager.dart';
 import 'package:mxstream/core/download/download_record.dart';
+import 'package:mxstream/core/metadata/metadata_enrichment.dart';
 import 'package:mxstream/core/models/episode.dart';
+import 'package:mxstream/core/models/media_extras.dart';
 import 'package:mxstream/core/models/media_detail.dart';
 import 'package:mxstream/core/models/media_item.dart';
 import 'package:mxstream/core/models/provider_info.dart';
@@ -162,7 +164,39 @@ class _FakeTrailerService extends TrailerService {
     String? englishTitle,
     required ProviderType type,
     String? year,
+    int? tmdbId,
+    bool tmdbIsTv = false,
   }) async => null;
+}
+
+/// Enrichment that takes a beat to answer, so the screen renders ONCE with the
+/// extras still in flight and again after they settle. Without the delay the
+/// fetch completes before the first non-skeleton build, the tab count never
+/// changes, and the TabController-rebuild path is never exercised at all.
+class _SlowMetadataEnrichment extends MetadataEnrichment {
+  _SlowMetadataEnrichment() : super(Dio());
+
+  @override
+  Future<int?> resolveMalId(MediaDetail d) async {
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    return null;
+  }
+
+  @override
+  Future<int?> resolveTmdbId(
+    String title,
+    String? year,
+    bool isTv, {
+    String? imdbId,
+  }) async => null;
+
+  @override
+  Future<int?> promoteMovieToAnimeMalId(MediaDetail d) async => null;
+
+  @override
+  Future<({List<CastMember> cast, List<MediaRelation> relations})> fetch(
+    MediaDetail d,
+  ) async => (cast: const <CastMember>[], relations: const <MediaRelation>[]);
 }
 
 class _FakePlaybackPrefs extends PlaybackPrefs {
@@ -328,6 +362,45 @@ void main() {
 
     expect(find.byType(MatchLine), findsNothing);
   });
+
+  // Regression: the Cast tab is dropped once the extras fetch comes back
+  // empty, which changes the tab count and makes _ensureTabController build a
+  // second TabController. Under SingleTickerProviderStateMixin that threw
+  // "multiple tickers were created" — the mixin permits ONE ticker for the
+  // life of the State and never clears `_ticker`, so disposing the first
+  // controller does not buy a second. Opening a title with no cast crashed the
+  // page into the red error screen.
+  testWidgets(
+    'a title whose tab count changes rebuilds its TabController without '
+    'throwing (multiple tickers)',
+    (tester) async {
+      // Enrichment has to still be in flight at the first non-skeleton build,
+      // or the count is settled before a controller is ever made and the
+      // rebuild path goes untested.
+      sl.registerSingleton<MetadataEnrichment>(_SlowMetadataEnrichment());
+
+      await pumpDetail(tester, _plainItem, _plainDetail);
+
+      // Stage one: extras unresolved, so the Cast tab is held open.
+      expect(
+        find.text('Cast'),
+        findsOneWidget,
+        reason: 'the Cast tab must be present while extras are in flight, or '
+            'the tab count never changes and this test proves nothing',
+      );
+      expect(tester.takeException(), isNull);
+
+      // Stage two: extras come back empty, the tab is dropped, the count
+      // changes, and a second TabController is built.
+      await tester.pumpAndSettle();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'rebuilding the TabController must not throw',
+      );
+      expect(find.text('Cast'), findsNothing);
+    },
+  );
 }
 
 /// Empty [ReadStore] — the detail screen's resume-index lookup needs one

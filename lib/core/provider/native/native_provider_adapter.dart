@@ -189,6 +189,14 @@ abstract class NativeMovieAdapterBase implements BaseProvider {
       type: ProviderType.movie,
       sourceId: sourceId,
       imdbId: imdbId,
+      // The scraper already classified this page, so say so up front rather
+      // than leaving both fields at their movie defaults and hoping TMDB
+      // fills them in. `tmdbIsTv` is what EpisodeMetadataService.enrich gates
+      // on, so a series that TMDB has nothing for still reaches the season
+      // lookup once an id lands; `format` is what the Details tab and
+      // _isSeries read. Overwritten with TMDB's own answer when it matches.
+      format: isSeries ? 'TV' : 'Movie',
+      tmdbIsTv: isSeries,
     );
 
     // Hybrid metadata, exactly as MXStream v1 did it: the scraper decides what

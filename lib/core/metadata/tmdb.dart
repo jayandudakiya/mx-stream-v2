@@ -10,7 +10,20 @@ class Tmdb {
 
   static const String host = 'api.themoviedb.org';
   static const String base = 'https://$host/3';
-  static const String apiKey = 'fab792d6c5936a7332045ca4565c7353';
+
+  /// TMDB v3 API key. Override per build with
+  /// `--dart-define=TMDB_API_KEY=<your key>`, or point `--dart-define-from-file`
+  /// at a JSON file holding it — same arrangement [Environment.supabaseUrl]
+  /// uses, so a personal or staging key never has to be committed. The literal
+  /// below is only the fallback for a build that defines nothing.
+  ///
+  /// Everything TMDB-backed degrades to the provider's own data when this is
+  /// empty (see `NativeMetadataBridge.enrich`), so an unset key disables
+  /// enrichment rather than breaking playback.
+  static const String apiKey = String.fromEnvironment(
+    'TMDB_API_KEY',
+    defaultValue: 'fab792d6c5936a7332045ca4565c7353',
+  );
 
   /// TMDB image CDN (no key needed).
   static const String img = 'https://image.tmdb.org/t/p';

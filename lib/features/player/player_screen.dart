@@ -373,7 +373,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
   // Stored here so [PopScope] can gate it at the Scaffold level.
   bool _tvBarVisible = true;
 
-  bool _ready = false; // the player session (cubit) is built
+  bool _ready = false; // the session is built AND fully wired (drives the UI)
+
+  /// The cubit exists — set the instant [_startSession] assigns it, before any
+  /// of the wiring that follows.
+  ///
+  /// Distinct from [_ready], which is only set at the END of that wiring.
+  /// [PlayerCubit] constructs its `Player` eagerly and `init()` starts
+  /// playback, so between the two flags there is a live, playing player that
+  /// `_ready` says nothing about. dispose() gated its `_c.close()` on `_ready`
+  /// and so leaked a playing player whenever the user backed out in that
+  /// window, or when anything in the wiring threw before `_ready` was set —
+  /// audio then kept running over the home screen. Closing is gated on THIS.
+  bool _sessionStarted = false;
   // Set when a Watch Together join can't resolve the room's source on this
   // device — show a clear message instead of silently bouncing to a portrait
   // home screen.
@@ -827,6 +839,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       initialSource: widget.initialSource,
       onDrmSource: _handoffToNativeDrm,
     )..init(startIndex);
+    // Owned from here on: init() above has already started playback, so from
+    // this line dispose() MUST close it. Everything below can still throw.
+    _sessionStarted = true;
 
     // Bind the wake-lock to playback now that the player exists: on while
     // playing/buffering, released on pause. Set up here (not _initInApp) because
@@ -1044,7 +1059,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       FlutterVolumeController.updateShowSystemUI(true);
     }
     WakelockPlus.disable();
-    if (_ready) _c.close();
+    // Gated on _sessionStarted, NOT _ready: see the field docs. A player built
+    // but not yet fully wired is still a player that is playing.
+    if (_sessionStarted) _c.close();
     // Detach from the app-level party controller (nulls out player hooks and,
     // if this client is host, marks the room lobby). Does NOT leave the party —
     // closing the player keeps the party alive in the background.

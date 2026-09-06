@@ -40,6 +40,7 @@ This repo is the main Zangetsu app (Flutter/Dart, with native `android/` and `io
    ```bash
    flutter run
    ```
+   > For configuring API keys (such as TMDB via `--dart-define`), building split APKs, and release packaging, see [BUILD_GUIDE.md](BUILD_GUIDE.md).
 5. Create a new branch for your change:
    ```bash
    git checkout -b fix/short-description

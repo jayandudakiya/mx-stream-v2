@@ -399,8 +399,15 @@ class _DetailView extends StatefulWidget {
   State<_DetailView> createState() => _DetailViewState();
 }
 
+// TickerProviderStateMixin, NOT the Single variant: [_ensureTabController]
+// replaces the TabController whenever the tab count changes, and
+// SingleTickerProviderStateMixin permits exactly one ticker for the lifetime of
+// the State — it never clears its `_ticker` field, so the second controller
+// throws "multiple tickers were created" even though the first was disposed
+// first. The count is genuinely variable here (Episodes and Cast are both
+// conditional), so the plural mixin is the correct provider.
 class _DetailViewState extends State<_DetailView>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   static const double _expandedHeight = 320;
   bool _showAppBarTitle = false;
 
@@ -481,6 +488,19 @@ class _DetailViewState extends State<_DetailView>
   /// completes with a non-null id, store it in [_trailerId] and rebuild so the
   /// hero can mount the trailer player.
   void _resolveTrailer(MediaDetail detail) {
+    // Already resolved by the metadata provider (TMDB returns the trailer key
+    // in the same call as the overview and artwork). Nothing to look up — a
+    // search here could only find the same video, or the wrong one.
+    final known = detail.trailerId;
+    if (known != null && known.isNotEmpty) {
+      if (known != _trailerId) {
+        _trailerFuture ??= Future.value(known);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() => _trailerId = known);
+        });
+      }
+      return;
+    }
     if (_trailerFuture != null) return;
     _trailerFuture =
         sl<TrailerService>().youtubeId(
@@ -488,6 +508,8 @@ class _DetailViewState extends State<_DetailView>
           englishTitle: detail.englishTitle,
           type: detail.type,
           year: detail.year,
+          tmdbId: detail.tmdbId,
+          tmdbIsTv: detail.tmdbIsTv,
         )..then((id) {
           if (!mounted) return;
           if (id != null && id.isNotEmpty && id != _trailerId) {
@@ -1675,7 +1697,29 @@ class _DetailViewState extends State<_DetailView>
     final isReading =
         detail.type == ProviderType.novel || detail.type == ProviderType.manga;
     final showEpisodes = _isSeries(state);
-    _ensureTabController(showEpisodes ? 4 : 3);
+
+    // Cast, from the metadata provider when it resolved and the source's own
+    // list otherwise. The native movie scrapers publish neither, so on a TMDB
+    // miss this is genuinely empty.
+    final castList = state.cast.isNotEmpty
+        ? state.cast
+        : [for (final n in detail.cast) CastMember(name: n)];
+    // An empty Cast tab reads as "this title has no cast", which is a claim
+    // and a false one — the truth is that no metadata provider matched it. So
+    // the tab comes off entirely rather than showing an empty state.
+    //
+    // Gated on extrasResolved, NOT extrasLoading: the latter is false both
+    // before the fetch starts and after it ends, so the tab would appear,
+    // vanish and reappear on every open — and each flip rebuilds the
+    // TabController. Held open until the answer is final, then dropped once.
+    final showCast = castList.isNotEmpty || !state.extrasResolved;
+
+    // Tab indices, derived rather than hardcoded — two of the four tabs are
+    // conditional now, so a literal index is wrong for half the titles.
+    final castTabIndex = showEpisodes ? 1 : 0;
+    final relationsTabIndex = castTabIndex + (showCast ? 1 : 0);
+    final detailsTabIndex = relationsTabIndex + 1;
+    _ensureTabController(detailsTabIndex + 1);
     // Kick the (cached, once-per-malId) filler lookup for the "Filler" badge.
     _ensureFiller(detail.malId ?? item.malId);
     // Kick the (once-per-detail) tracker-progress lookup for grey-out.
@@ -1790,10 +1834,8 @@ class _DetailViewState extends State<_DetailView>
     );
 
     // ── Starring / Creators (Genres fallback) muted lines ───────────────────
-    // Prefer enriched cast (AniList/TMDB) when available, else the provider's.
-    final castNames = state.cast.isNotEmpty
-        ? state.cast.map((c) => c.name).toList()
-        : detail.cast;
+    // Same list the Cast tab shows — resolved once above.
+    final castNames = [for (final c in castList) c.name];
     final starring = castNames.isNotEmpty ? castNames.take(3).join(', ') : null;
     final starringMore = castNames.length > 3;
     final creators = detail.studios.isNotEmpty
@@ -1983,7 +2025,7 @@ class _DetailViewState extends State<_DetailView>
                 text: cleanSynopsis(detail.description) ?? '',
                 // "Read more" reveals the Details tab (full synopsis) rather
                 // than expanding inline; the header stays clamped to 3 lines.
-                onReadMore: () => _revealTab(showEpisodes ? 3 : 2),
+                onReadMore: () => _revealTab(detailsTabIndex),
               ),
             ),
           ),
@@ -2002,7 +2044,7 @@ class _DetailViewState extends State<_DetailView>
                       value: starring,
                       more: starringMore,
                       // Tapping the line (or its "… more") reveals the Cast tab.
-                      onMore: starringMore ? () => _revealTab(showEpisodes ? 1 : 0) : null,
+                      onMore: starringMore ? () => _revealTab(castTabIndex) : null,
                     ),
                   if (genresLine != null)
                     _CreditLine(label: context.l10n.genres, value: genresLine),
@@ -2125,9 +2167,12 @@ class _DetailViewState extends State<_DetailView>
                         ? context.l10n.chapters
                         : context.l10n.episodes,
                   ),
-                Tab(
-                  text: isReading ? context.l10n.characters : context.l10n.cast,
-                ),
+                if (showCast)
+                  Tab(
+                    text: isReading
+                        ? context.l10n.characters
+                        : context.l10n.cast,
+                  ),
                 Tab(text: context.l10n.relations),
                 Tab(text: context.l10n.details),
               ],
@@ -2181,11 +2226,10 @@ class _DetailViewState extends State<_DetailView>
             isReading: isReading,
           ),
           // ── Cast ────────────────────────────────────────────────────────────
+          if (showCast)
           _CastTab(
             loading: state.extrasLoading,
-            cast: state.cast.isNotEmpty
-                ? state.cast
-                : [for (final n in detail.cast) CastMember(name: n)],
+            cast: castList,
             onOpenPerson: (ref) => Navigator.of(
               context,
             ).push(PersonPage.route(ref, sourceId: widget.item.sourceId)),

@@ -80,6 +80,14 @@ class MediaDetail extends Equatable {
   /// Also drives Simkl tracking — Simkl accepts an `imdb` id in its ids object.
   final String? imdbId;
 
+  /// YouTube video key for the official trailer, when a metadata provider
+  /// resolved one alongside the rest of the record (TMDB returns it in the
+  /// same `append_to_response=videos` call that fetches the overview and
+  /// artwork). Carrying it here means the detail screen never has to run a
+  /// second, weaker title search for what the first call already knew.
+  /// Null for sources and titles that expose no trailer.
+  final String? trailerId;
+
   /// Rich cast (name + role + photo) supplied directly by the source, when it
   /// has one (e.g. CloudStream's `actors`). Runtime-only — never persisted.
   /// When present it feeds the Cast tab directly, skipping id-based enrichment.
@@ -161,6 +169,7 @@ class MediaDetail extends Equatable {
     this.tmdbId,
     this.tmdbIsTv = false,
     this.imdbId,
+    this.trailerId,
     this.castMembers = const [],
     this.relations = const [],
     this.score,
@@ -206,6 +215,7 @@ class MediaDetail extends Equatable {
     int? tmdbId,
     bool? tmdbIsTv,
     String? imdbId,
+    String? trailerId,
     List<CastMember>? castMembers,
     List<MediaRelation>? relations,
     int? score,
@@ -245,6 +255,7 @@ class MediaDetail extends Equatable {
     tmdbId: tmdbId ?? this.tmdbId,
     tmdbIsTv: tmdbIsTv ?? this.tmdbIsTv,
     imdbId: imdbId ?? this.imdbId,
+    trailerId: trailerId ?? this.trailerId,
     castMembers: castMembers ?? this.castMembers,
     relations: relations ?? this.relations,
     score: score ?? this.score,
@@ -287,6 +298,7 @@ class MediaDetail extends Equatable {
     tmdbId,
     tmdbIsTv,
     imdbId,
+    trailerId,
     castMembers,
     relations,
     score,

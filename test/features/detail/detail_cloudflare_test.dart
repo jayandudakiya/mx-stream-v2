@@ -33,7 +33,12 @@ class _FakeMetadataEnrichment extends MetadataEnrichment {
   _FakeMetadataEnrichment() : super(Dio());
 
   @override
-  Future<int?> resolveTmdbId(String title, String? year, bool isTv) async => null;
+  Future<int?> resolveTmdbId(
+    String title,
+    String? year,
+    bool isTv, {
+    String? imdbId,
+  }) async => null;
 
   @override
   Future<int?> resolveMalId(MediaDetail d) async => null;

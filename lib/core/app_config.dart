@@ -59,11 +59,9 @@ const String kDiscordInviteUrl = 'https://discord.gg/938JJBn44';
 /// simply means no announcements (AnnouncementService swallows the 404).
 const String kAnnouncementsUrl = '${kAppRepoRawBase}announcements.json';
 
-/// TMDB API key for movie/TV trailer lookups (TrailerService). Anime trailers
-/// use AniList and need no key. Supply via `--dart-define=TMDB_API_KEY=...`,
-/// or paste a literal default below. When empty, movie/TV trailers are
-/// gracefully disabled (the Trailer button simply never appears for them).
-const String kTmdbApiKey = String.fromEnvironment(
-  'TMDB_API_KEY',
-  defaultValue: '',
-);
+// The TMDB API key lives on `Tmdb.apiKey` (core/metadata/tmdb.dart), which is
+// what the Dio interceptor actually reads. A second `kTmdbApiKey` const used to
+// sit here declaring the SAME `TMDB_API_KEY` dart-define but defaulting to
+// empty, and nothing ever read it — so a build that set the define looked
+// configured from here while the real key came from somewhere else entirely.
+// One constant, in the file that owns the rest of the TMDB config.

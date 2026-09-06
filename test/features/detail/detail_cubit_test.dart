@@ -93,9 +93,19 @@ class _FakeMetadataEnrichment extends MetadataEnrichment {
   /// it ran and what type it ran for.
   final List<ProviderType> fetchedTypes = [];
 
+  /// The imdb id each `resolveTmdbId` call was given, so a test can assert the
+  /// cubit forwards the scraper's IMDb id rather than dropping it.
+  final List<String?> resolveTmdbIdImdbIds = [];
+
   @override
-  Future<int?> resolveTmdbId(String title, String? year, bool isTv) async {
+  Future<int?> resolveTmdbId(
+    String title,
+    String? year,
+    bool isTv, {
+    String? imdbId,
+  }) async {
     resolveTmdbIdCalls++;
+    resolveTmdbIdImdbIds.add(imdbId);
     return null;
   }
 

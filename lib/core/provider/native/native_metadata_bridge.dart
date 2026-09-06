@@ -57,8 +57,23 @@ class NativeMetadataBridge {
       if (parsed.cleanTitle.trim().isEmpty) return detail;
 
       final enrichment = sl<MetadataEnrichment>();
-      final isTv = parsed.isSeries;
-      final tmdbId = await enrichment.resolveTmdbId(
+      var isTv = parsed.isSeries;
+      int? tmdbId;
+
+      // The scrapers publish an IMDb link on every detail page, and `/find`
+      // maps it onto TMDB exactly — no fuzzy matching, no year tiebreak, no
+      // landing on a remake. It also reports the namespace as fact, which
+      // fixes the single-season series that the title alone reads as a movie.
+      final imdbId = detail.imdbId;
+      if (imdbId != null && imdbId.isNotEmpty) {
+        final found = await enrichment.resolveTmdbExternal(imdbId);
+        if (found != null) {
+          tmdbId = found.id;
+          isTv = found.isTv;
+        }
+      }
+      // No IMDb id, or TMDB does not know it: fall back to the title ladder.
+      tmdbId ??= await enrichment.resolveTmdbId(
         parsed.cleanTitle,
         parsed.year?.toString(),
         isTv,
@@ -71,14 +86,19 @@ class NativeMetadataBridge {
       final dio = sl<Dio>();
       final res = await dio.get<dynamic>(
         'https://api.themoviedb.org/3/${isTv ? 'tv' : 'movie'}/$tmdbId',
-        queryParameters: const {'append_to_response': 'credits'},
+        // `videos` rides along on the call we were already making, so the
+        // official trailer key arrives with the overview and artwork instead
+        // of costing a second, weaker search later.
+        queryParameters: const {'append_to_response': 'credits,videos'},
         options: Options(validateStatus: (s) => s != null && s < 500),
       );
       final data = res.data;
-      if (data is! Map) {
-        _misses.add(detail.url);
-        return detail;
-      }
+      // `validateStatus` lets every non-5xx through, and TMDB answers a 429
+      // rate limit with a JSON body — a Map, so a shape check alone treats it
+      // as a hit and merges an empty record. Requiring the id confirms this is
+      // an actual title payload; anything else is a failure, and a failure is
+      // NOT cached as a miss so it retries once the limit clears.
+      if (data is! Map || data['id'] == null) return detail;
       final m = Map<String, dynamic>.from(data);
 
       final merged = _merge(detail, m, parsed.cleanTitle, tmdbId, isTv);
@@ -149,9 +169,34 @@ class NativeMetadataBridge {
       format: isTv ? 'TV' : 'Movie',
       tmdbId: tmdbId,
       tmdbIsTv: isTv,
+      trailerId: _trailerKey(m) ?? detail.trailerId,
       // Nothing below is ours to change — playback depends on them.
       // url / sourceId / episodes / type stay as the provider set them.
     );
+  }
+
+  /// The official YouTube trailer key from an `append_to_response=videos`
+  /// payload, or null. Prefers a Trailer over a Teaser over any other YouTube
+  /// video, which is the same order [TrailerService] applies — a Teaser is
+  /// worth showing, a behind-the-scenes clip is not what the button promises.
+  static String? _trailerKey(Map<String, dynamic> m) {
+    final videos = m['videos'];
+    final results = (videos is Map) ? videos['results'] : null;
+    if (results is! List) return null;
+
+    final youtube = results
+        .whereType<Map>()
+        .where((v) => v['site']?.toString() == 'YouTube')
+        .where((v) => (v['key']?.toString() ?? '').isNotEmpty)
+        .toList();
+    if (youtube.isEmpty) return null;
+
+    for (final type in ['Trailer', 'Teaser']) {
+      for (final v in youtube) {
+        if (v['type']?.toString() == type) return v['key'].toString();
+      }
+    }
+    return youtube.first['key'].toString();
   }
 
   /// Drops the session caches. Exposed for tests and for a "refresh metadata"

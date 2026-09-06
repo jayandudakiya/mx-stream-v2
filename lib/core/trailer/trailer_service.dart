@@ -8,7 +8,7 @@ import '../models/provider_info.dart';
 /// Streaming sources (AllAnime / NetMirror) don't expose trailers, so we match
 /// the title against a free/keyed metadata API and pull its YouTube trailer:
 ///   • Anime  → AniList GraphQL (free, no key).
-///   • Movie/TV → TMDB (key-gated; gracefully disabled when [kTmdbApiKey] is
+///   • Movie/TV → TMDB (key-gated; gracefully disabled when `Tmdb.apiKey` is
 ///     empty).
 ///
 /// Best-effort and cheap: every lookup is wrapped so any network/parse failure
@@ -26,16 +26,26 @@ class TrailerService {
       'id title{romaji english} trailer{ id site } } }';
 
   /// Returns a YouTube video id for the title, or null. Cheap + best-effort.
+  ///
+  /// [tmdbId] / [tmdbIsTv] skip the search entirely when the caller already
+  /// knows which TMDB record this is — a search can pick the wrong film, a
+  /// known id cannot.
   Future<String?> youtubeId({
     required String title,
     String? englishTitle,
     required ProviderType type,
     String? year,
+    int? tmdbId,
+    bool tmdbIsTv = false,
   }) async {
     switch (type) {
       case ProviderType.anime:
         return _anilistTrailer(title: title, englishTitle: englishTitle);
       case ProviderType.movie:
+        if (tmdbId != null) {
+          final byId = await _tmdbVideos(tmdbIsTv ? 'tv' : 'movie', '$tmdbId');
+          if (byId != null) return byId;
+        }
         return _tmdbTrailer(
           title: title,
           englishTitle: englishTitle,
@@ -157,9 +167,28 @@ class TrailerService {
     String? englishTitle,
     String? year,
   }) async {
-    final query = (englishTitle != null && englishTitle.isNotEmpty)
-        ? englishTitle
-        : title;
+    // The CLEAN title, not englishTitle. For the native movie scrapers
+    // englishTitle is deliberately the raw release string ("Download Mutiny
+    // (2026) WEB-DL {English With Subtitles} Full Movie 720p [850MB] …"),
+    // which TMDB's search returns zero results for — so preferring it meant
+    // no movie ever resolved a trailer. It is still worth trying as a second
+    // pass for the sources where it IS a real alternate title.
+    final queries = <String>[
+      title,
+      if (englishTitle != null &&
+          englishTitle.isNotEmpty &&
+          englishTitle != title)
+        englishTitle,
+    ].where((q) => q.trim().isNotEmpty).toList();
+    for (final query in queries) {
+      final hit = await _tmdbSearchTrailer(query, year);
+      if (hit != null) return hit;
+    }
+    return null;
+  }
+
+  /// One TMDB multi-search + videos round-trip for [query]. Null on any miss.
+  Future<String?> _tmdbSearchTrailer(String query, String? year) async {
     try {
       final search = await _dio.get<dynamic>(
         '$_tmdbBase/search/multi',
@@ -193,6 +222,16 @@ class TrailerService {
       final id = picked['id']?.toString();
       if (id == null || id.isEmpty || mediaType == null) return null;
 
+      return _tmdbVideos(mediaType, id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The best YouTube trailer key on `/{mediaType}/{id}/videos`, or null.
+  /// Prefers Trailer, then Teaser, then any YouTube video.
+  Future<String?> _tmdbVideos(String mediaType, String id) async {
+    try {
       final videos = await _dio.get<dynamic>(
         '$_tmdbBase/$mediaType/$id/videos',
       );
@@ -200,10 +239,10 @@ class TrailerService {
           ?.map(_asMap)
           .whereType<Map<String, dynamic>>()
           .where((v) => v['site']?.toString() == 'YouTube')
+          .where((v) => (v['key']?.toString() ?? '').isNotEmpty)
           .toList();
       if (vids == null || vids.isEmpty) return null;
 
-      // Prefer Trailer, then Teaser, then any YouTube video.
       Map<String, dynamic>? best;
       for (final v in vids) {
         if (v['type']?.toString() == 'Trailer') {
@@ -215,9 +254,7 @@ class TrailerService {
         (v) => v['type']?.toString() == 'Teaser',
         orElse: () => vids.first,
       );
-      final key = best['key']?.toString();
-      if (key != null && key.isNotEmpty) return key;
-      return null;
+      return best['key']!.toString();
     } catch (_) {
       return null;
     }

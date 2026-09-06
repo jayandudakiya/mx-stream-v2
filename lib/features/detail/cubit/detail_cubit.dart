@@ -42,12 +42,20 @@ class DetailState extends Equatable {
     this.cloudflareUrl,
     this.episodesLoading = false,
     this.extrasLoading = false,
+    this.extrasResolved = false,
   });
 
   /// Cast + Relations are still being fetched. They arrive after the detail
   /// does, on their own request, so without this the tabs said "no cast" for
   /// a second before filling — an empty state is a claim, and it was wrong.
   final bool extrasLoading;
+
+  /// The extras fetch has finished — successfully, empty-handed, or failed.
+  /// [extrasLoading] cannot answer this on its own: it is false both BEFORE
+  /// the fetch starts and AFTER it ends, so a screen that hides a section for
+  /// "no cast" would hide it, show it, then hide it again. This says the
+  /// emptiness is now a fact rather than a gap.
+  final bool extrasResolved;
 
   final DetailStatus status;
   final MediaDetail? detail;
@@ -88,6 +96,7 @@ class DetailState extends Equatable {
     bool clearCloudflareUrl = false,
     bool? episodesLoading,
     bool? extrasLoading,
+    bool? extrasResolved,
   }) => DetailState(
     status: status ?? this.status,
     detail: detail ?? this.detail,
@@ -102,6 +111,7 @@ class DetailState extends Equatable {
         : (cloudflareUrl ?? this.cloudflareUrl),
     episodesLoading: episodesLoading ?? this.episodesLoading,
     extrasLoading: extrasLoading ?? this.extrasLoading,
+    extrasResolved: extrasResolved ?? this.extrasResolved,
   );
 
   @override
@@ -110,6 +120,7 @@ class DetailState extends Equatable {
     detail,
     episodesLoading,
     extrasLoading,
+    extrasResolved,
     category,
     selectedSeason,
     descExpanded,
@@ -378,12 +389,21 @@ class DetailCubit extends Cubit<DetailState> {
   /// once. Only [refresh] sets it, after a match change swaps the episode list
   /// out from under the metadata fetched for the previous one.
   Future<void> _enrich(MediaDetail detail, {bool force = false}) async {
-    if (!force && (state.cast.isNotEmpty || state.relations.isNotEmpty)) return;
+    if (!force && (state.cast.isNotEmpty || state.relations.isNotEmpty)) {
+      // Nothing to fetch because the extras are already here — which is a
+      // resolved state, not an unstarted one.
+      if (!state.extrasResolved) emit(state.copyWith(extrasResolved: true));
+      return;
+    }
     emit(state.copyWith(extrasLoading: true));
     try {
       await _enrichInner(detail, force: force);
     } finally {
-      if (!isClosed) emit(state.copyWith(extrasLoading: false));
+      // Resolved even when it threw or came back empty: the screen needs to
+      // know the answer is final, not that it was good.
+      if (!isClosed) {
+        emit(state.copyWith(extrasLoading: false, extrasResolved: true));
+      }
     }
   }
 
@@ -400,19 +420,30 @@ class DetailCubit extends Cubit<DetailState> {
     // Task 1 added those to ProviderType. Manga often shares its anime
     // adaptation's title, so that resolved a real TMDB id and displayed the
     // ANIME's Cast/Relations on the manga's own detail page.
-    if (d.malId == null &&
-        d.tmdbId == null &&
-        (d.imdbId == null || d.imdbId!.isEmpty) &&
-        d.type == ProviderType.movie) {
+    if (d.malId == null && d.tmdbId == null && d.type == ProviderType.movie) {
       try {
+        // An IMDb id is the BEST input here, not a disqualifier. This branch
+        // used to skip any title that had one, which is exactly the native
+        // movie scrapers (VegaMovies/RogMovies publish an IMDb link on every
+        // detail page) — so when the bridge's own lookup missed, nothing ever
+        // resolved a TMDB id and episode metadata could never load.
+        //
+        // `tmdbIsTv` is not usable as the isTv input either: it is false until
+        // something resolves a TMDB match, so a series that reached here after
+        // a miss would be searched in TMDB's movie namespace and miss again.
+        // The episode list is the reliable signal the provider already gave us.
         final id = await sl<MetadataEnrichment>().resolveTmdbId(
           d.title,
           d.year,
-          d.tmdbIsTv,
+          d.tmdbIsTv || d.episodes.length > 1,
+          imdbId: d.imdbId,
         );
         if (isClosed) return;
         if (id != null) {
-          d = d.copyWith(tmdbId: id);
+          d = d.copyWith(
+            tmdbId: id,
+            tmdbIsTv: d.tmdbIsTv || d.episodes.length > 1,
+          );
           emit(state.copyWith(detail: d));
         }
       } catch (_) {
