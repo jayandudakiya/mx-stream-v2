@@ -198,7 +198,6 @@ class _MyListViewState extends State<_MyListView> {
               children: [
                 _header(context),
                 if (_searching) _searchField(context),
-                if (widget.pinnedTracker == null) _kindTabs(context),
                 Expanded(
                   child: tlState.isMyList
                       ? _myListBody(context)
@@ -308,11 +307,7 @@ class _MyListViewState extends State<_MyListView> {
         // opened FOR one, so being vague about it helps nobody.
         final subtitle = pinned == null
             ? l10n.yourSavedTitles
-            : switch (widget.pinnedKind ?? sl<ContentModeCubit>().state) {
-                ContentMode.manga => l10n.yourSavedMangaList,
-                ContentMode.novel => l10n.yourSavedNovelList,
-                ContentMode.anime => l10n.yourSavedAnimeList,
-              };
+            : l10n.yourSavedAnimeList;
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
           child: DecoratedBox(
@@ -485,7 +480,7 @@ class _MyListViewState extends State<_MyListView> {
     final made = await promptCreateAniListList(
       context,
       service,
-      mode.isReading ? MediaKind.manga : MediaKind.anime,
+      MediaKind.anime,
     );
     if (made == null || !mounted) return;
     // The names are cached per tracker; creating one is the only thing that
@@ -710,73 +705,6 @@ class _MyListViewState extends State<_MyListView> {
     ),
   );
 
-  Widget _kindTabs(BuildContext context) {
-    const kinds = ContentMode.values;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final segW = (c.maxWidth - 8) / kinds.length;
-          return Container(
-            height: 46,
-            padding: const EdgeInsets.all(4),
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              color: AppColors.surface2,
-              borderRadius: BorderRadius.circular(23),
-            ),
-            child: Stack(
-              children: [
-                AnimatedAlign(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutCubic,
-                  alignment: Alignment(
-                    kinds.length == 1
-                        ? 0
-                        : -1 + 2 * (kinds.indexOf(_kind) / (kinds.length - 1)),
-                    0,
-                  ),
-                  child: Container(
-                    width: segW,
-                    decoration: BoxDecoration(
-                      color: AppColors.accent,
-                      borderRadius: BorderRadius.circular(19),
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    for (final k in kinds)
-                      Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => setState(() {
-                            _kind = k;
-                            _dropCategoryForeignTo(k);
-                          }),
-                          child: Center(
-                            child: Text(
-                              contentModeLabel(context.l10n, k),
-                              style: AppText.body.copyWith(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w700,
-                                color: _kind == k
-                                    ? Colors.white
-                                    : AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
 
   // ── Filter sheet (type) ────────────────────────────────────────────────────
 
@@ -874,21 +802,8 @@ class _MyListViewState extends State<_MyListView> {
       WatchStatus.paused,
       WatchStatus.dropped,
     ];
-    // Reading modes (manga/novel) see only their own items; anime mode's
-    // matchesProvider covers BOTH anime + movie types, so this is a no-op
-    // there — today's anime My List is unaffected.
-    //
-    // Narrow by mode FIRST: the status tabs' counts and which tabs even appear
-    // are both derived from this, so counting raw `entries` showed anime totals
-    // (and anime-only status tabs) while in manga/novel mode.
-    // The kind tab decides, not the app's current mode — the point of the
-    // tabs is seeing all three without leaving the mode you're browsing in.
-    // A tracker screen has no tabs and keeps following the app mode.
-    final mode = widget.pinnedTracker == null
-        ? _kind
-        : (widget.pinnedKind ?? sl<ContentModeCubit>().state);
     final modeEntries = entries
-        .where((e) => mode.matchesProvider(e.item.type))
+        .where((e) => e.item.type != ProviderType.manga && e.item.type != ProviderType.novel)
         .toList();
 
     final presentStatuses = tabOrder
@@ -926,7 +841,7 @@ class _MyListViewState extends State<_MyListView> {
           id: 'status:${st.name}',
           label: shortLabelFor(
             st,
-            reading: sl<ContentModeCubit>().state.isReading,
+            reading: false,
           ),
           count: modeEntries.where((e) => e.status == st).length,
           test: (e) => e.status == st,
@@ -986,7 +901,7 @@ class _MyListViewState extends State<_MyListView> {
         if (shown.isEmpty) {
           return EmptyState(
             icon: Icons.filter_list_off_rounded,
-            message: myListFilteredEmptyMessage(context.l10n, mode),
+            message: context.l10n.nothingHereInThisFilter,
           );
         }
         return GridView.builder(
@@ -1126,44 +1041,14 @@ class _MyListViewState extends State<_MyListView> {
     return entries.where((e) => cats.isIn(e.item, c.id)).length;
   }
 
-  /// Drop the selected category when it does not belong to [k].
-  ///
-  /// The mode row only ever changed the kind, and [_categoryFitsKind] keeps
-  /// the SELECTED category visible whatever the mode — so a category picked
-  /// under Streaming followed you into Manga as a selected, empty tab, and
-  /// defeated the mode a category is stamped with.
-  ///
-  /// Categories from before the stamp carry no mode and are genuinely shared,
-  /// so those keep their selection.
-  void _dropCategoryForeignTo(ContentMode k) {
-    final id = _categoryFilter;
-    if (id == null) return;
-    final made = _cats
-        ?.all()
-        .where((c) => c.id == id)
-        .map((c) => c.kind)
-        .firstOrNull;
-    if (made != null && made != k.name) _categoryFilter = null;
-  }
-
-  /// Whether [c] earns a tab for the kind currently on screen.
-  ///
-  /// A category made since categories started remembering belongs to the mode
-  /// it was made in, full stop — that is what stops a new Streaming list from
-  /// showing up as an empty tab under Manga and Novel.
-  ///
-  /// Older ones carry no mode and keep the rules they always had: kept if they
-  /// hold something of this kind, if you are looking at one right now, or if
-  /// they are empty everywhere. That last rule is why a new category used to
-  /// appear in all three modes, and it is left alone here so the categories
-  /// already on people's devices do not look deleted from two of them.
+  /// Whether [c] earns a tab on My List.
   bool Function(ListCategory) _categoryFitsKind(List<MyListEntry> entries) {
     final cats = _cats;
     return (c) {
       if (cats == null) return false;
       if (_categoryFilter == c.id) return true;
       final madeIn = c.kind;
-      if (madeIn != null) return madeIn == _kind.name;
+      if (madeIn != null && madeIn != 'anime' && madeIn != 'movie') return false;
       if (_categoryCount(entries, c) > 0) return true;
       return cats.countIn(c.id) == 0;
     };
@@ -1213,22 +1098,10 @@ class _MyListViewState extends State<_MyListView> {
   }
 }
 
-/// EmptyState message for My List's per-status/type filter turning up
-/// nothing (the mode filter itself is applied before this — see [_grid]).
-/// Anime mode's wording is unchanged; a reading mode names its own content
-/// type instead of the generic "Nothing".
+/// EmptyState message for My List's per-status/type filter turning up nothing.
 String myListFilteredEmptyMessage(AppLocalizations l10n, ContentMode mode) =>
-    switch (mode) {
-      ContentMode.anime => l10n.nothingHereInThisFilter,
-      ContentMode.manga => l10n.noMangaHereInThisFilter,
-      ContentMode.novel => l10n.noNovelsHereInThisFilter,
-    };
+    l10n.nothingHereInThisFilter;
 
-/// EmptyState message for a genuinely empty My List (nothing saved yet, of
-/// ANY type). Anime mode's wording is unchanged.
+/// EmptyState message for a genuinely empty My List (nothing saved yet).
 String myListEmptyMessage(AppLocalizations l10n, ContentMode mode) =>
-    switch (mode) {
-      ContentMode.anime => l10n.titlesYouAddAppearHere,
-      ContentMode.manga => l10n.mangaYouAddAppearHere,
-      ContentMode.novel => l10n.novelsYouAddAppearHere,
-    };
+    l10n.titlesYouAddAppearHere;

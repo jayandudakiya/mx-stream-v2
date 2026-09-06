@@ -429,10 +429,39 @@ class _DetailViewState extends State<_DetailView>
   late final ScrollController _scrollController = ScrollController()
     ..addListener(_onScroll);
 
-  late final TabController _tabController = TabController(
-    length: 4,
-    vsync: this,
-  );
+  TabController? _tabController;
+
+  void _ensureTabController(int count) {
+    if (_tabController == null || _tabController!.length != count) {
+      final old = _tabController?.index ?? 0;
+      _tabController?.dispose();
+      _tabController = TabController(
+        length: count,
+        initialIndex: old < count ? old : 0,
+        vsync: this,
+      );
+    }
+  }
+
+  bool _isSeries(DetailState state) {
+    final detail = state.detail;
+    if (detail == null) {
+      if (widget.item.type == ProviderType.movie && !widget.item.tmdbIsTv) {
+        return false;
+      }
+      return true;
+    }
+    if (detail.type == ProviderType.manga || detail.type == ProviderType.novel) {
+      return true;
+    }
+    if (detail.tmdbIsTv == true) return true;
+    if (detail.format?.toUpperCase() == 'TV') return true;
+    if (detail.episodes.length > 1) return true;
+    if (detail.format?.toUpperCase() == 'MOVIE') return false;
+    if (detail.tmdbIsTv == false && detail.tmdbId != null) return false;
+    if (detail.episodes.length <= 1) return false;
+    return true;
+  }
 
   // ── My List (status-organised library) ────────────────────────────────────
   final MyListStore _myList = sl<MyListStore>();
@@ -484,7 +513,7 @@ class _DetailViewState extends State<_DetailView>
     // Back to generic "Browsing" when leaving the detail.
     if (sl.isRegistered<DiscordRpc>()) sl<DiscordRpc>().setBrowsing();
     _scrollController.dispose();
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -521,7 +550,7 @@ class _DetailViewState extends State<_DetailView>
   /// that's still below the fold (feels like nothing happened). Animates both
   /// for a smooth transition into the Cast / Details tab.
   void _revealTab(int index) {
-    _tabController.animateTo(index);
+    _tabController?.animateTo(index);
     if (_scrollController.hasClients) {
       final target = _scrollController.position.maxScrollExtent;
       if (_scrollController.offset < target - 1) {
@@ -1218,6 +1247,10 @@ class _DetailViewState extends State<_DetailView>
     int currentSeason,
   ) {
     if (seasonEps.isEmpty) return l10n.download;
+    // A film is one synthetic episode, so "Download E1" was naming an episode
+    // that does not exist as far as the viewer is concerned — there is only
+    // the film. Same reasoning as the episode count in the meta line.
+    if (seasonEps.length == 1 && !hasMultipleSeasons) return l10n.download;
     final first = seasonEps.first;
     final epNum = first.number?.toInt() ?? 1;
     if (hasMultipleSeasons) {
@@ -1641,6 +1674,8 @@ class _DetailViewState extends State<_DetailView>
     // Play→Read relabel and hides the download affordances below.
     final isReading =
         detail.type == ProviderType.novel || detail.type == ProviderType.manga;
+    final showEpisodes = _isSeries(state);
+    _ensureTabController(showEpisodes ? 4 : 3);
     // Kick the (cached, once-per-malId) filler lookup for the "Filler" badge.
     _ensureFiller(detail.malId ?? item.malId);
     // Kick the (once-per-detail) tracker-progress lookup for grey-out.
@@ -1730,7 +1765,12 @@ class _DetailViewState extends State<_DetailView>
     }
     if (hasMultipleSeasons) {
       metaParts.add(context.l10n.seasonCount(seasonSet.length));
-    } else if (eps.isNotEmpty) {
+    } else if (eps.length > 1 || (isReading && eps.isNotEmpty)) {
+      // `> 1` for video on purpose. A film is carried as a single synthetic
+      // episode (that is how every source hands back something playable), and
+      // printing "1 Episode" next to a movie's runtime described the plumbing
+      // rather than the title. A one-chapter book is still worth counting, so
+      // reading keeps its old behaviour.
       metaParts.add(
         isReading
             ? context.l10n.chapterCount(eps.length)
@@ -1943,7 +1983,7 @@ class _DetailViewState extends State<_DetailView>
                 text: cleanSynopsis(detail.description) ?? '',
                 // "Read more" reveals the Details tab (full synopsis) rather
                 // than expanding inline; the header stays clamped to 3 lines.
-                onReadMore: () => _revealTab(3),
+                onReadMore: () => _revealTab(showEpisodes ? 3 : 2),
               ),
             ),
           ),
@@ -1962,7 +2002,7 @@ class _DetailViewState extends State<_DetailView>
                       value: starring,
                       more: starringMore,
                       // Tapping the line (or its "… more") reveals the Cast tab.
-                      onMore: starringMore ? () => _revealTab(1) : null,
+                      onMore: starringMore ? () => _revealTab(showEpisodes ? 1 : 0) : null,
                     ),
                   if (genresLine != null)
                     _CreditLine(label: context.l10n.genres, value: genresLine),
@@ -2079,11 +2119,12 @@ class _DetailViewState extends State<_DetailView>
                 fontWeight: FontWeight.w500,
               ),
               tabs: [
-                Tab(
-                  text: isReading
-                      ? context.l10n.chapters
-                      : context.l10n.episodes,
-                ),
+                if (showEpisodes)
+                  Tab(
+                    text: isReading
+                        ? context.l10n.chapters
+                        : context.l10n.episodes,
+                  ),
                 Tab(
                   text: isReading ? context.l10n.characters : context.l10n.cast,
                 ),
@@ -2098,7 +2139,8 @@ class _DetailViewState extends State<_DetailView>
         controller: _tabController,
         children: [
           // ── Episodes ──────────────────────────────────────────────────────
-          _EpisodesTab(
+          if (showEpisodes)
+            _EpisodesTab(
             loading: state.episodesLoading,
             eps: eps,
             seasonEps: seasonEps,

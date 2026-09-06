@@ -86,7 +86,7 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
   @override
   void initState() {
     super.initState();
-    _pages = widget.items.take(6).toList();
+    _pages = widget.items.take(10).toList();
     _index = _count > 1 ? _startIndex : 0;
     _pc = PageController(initialPage: _index);
     _startTimer();
@@ -118,7 +118,7 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
     super.didUpdateWidget(old);
     // The items change when the user switches source — rebuild the pages so the
     // banner reflects the new catalog (it used to cache the first source's items).
-    final next = widget.items.take(6).toList();
+    final next = widget.items.take(10).toList();
     final changed =
         next.length != _pages.length ||
         (next.isNotEmpty &&

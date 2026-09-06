@@ -177,8 +177,8 @@ class HomeCubit extends Cubit<HomeState> {
 
   /// The Z Mode browse kind for this load, or null when the home is
   /// source-backed. Read per load (not cached) because mode and stream kind
-  /// change under the cubit without a new registration.
   ZKind? get _browseKind {
+    if (_repo.sourceId.startsWith('native:')) return null;
     if (!ZModePrefs.enabled) return null;
     final mode = _sl.isRegistered<ContentModeCubit>()
         ? _sl<ContentModeCubit>().state

@@ -78,32 +78,26 @@ class BrowseSourcesList extends StatelessWidget {
   Widget _build(BuildContext context, List<String> pinnedIds) {
     final b = categorizedSources();
     final q = query.trim().toLowerCase();
-    bool matches(({String id, String label, String? repo}) s) =>
+    bool matches(SourceRow s) =>
         q.isEmpty ||
         s.label.toLowerCase().contains(q) ||
         (s.repo?.toLowerCase().contains(q) ?? false);
 
-    final showStreaming = kind == null || kind == SourceListKind.streaming;
-    final showManga = kind == null || kind == SourceListKind.manga;
-    final showNovel = kind == null || kind == SourceListKind.novel;
+    final rawList = [...b.anime, ...b.movies].where(matches).toList();
+    final seen = <String>{};
+    final allSources = <SourceRow>[];
+    for (final s in rawList) {
+      if (seen.add(s.id)) allSources.add(s);
+    }
 
-    var groups = <(String, List<({String id, String label, String? repo})>)>[
-      if (showStreaming) (context.l10n.anime, b.anime.where(matches).toList()),
-      if (showStreaming) (context.l10n.moviesSeries, b.movies.where(matches).toList()),
-      if (showManga) (context.l10n.modeManga, b.manga.where(matches).toList()),
-      if (showNovel) (context.l10n.modeNovel, b.novel.where(matches).toList()),
-    ].toList();
-
-    groups = groupWithPinned(groups, pinnedIds, context.l10n.pinned);
     final pinnedSet = pinnedIds.toSet();
+    final pinned = [
+      for (final id in pinnedIds) ...allSources.where((s) => s.id == id),
+    ];
+    final unpinned = allSources.where((s) => !pinnedSet.contains(s.id)).toList();
 
-    if (groups.isEmpty) {
-      // Empty regardless of the query — a real "nothing's installed for this
-      // tab", not just a query that matched nothing.
-      final nothingInstalled =
-          (!showStreaming || (b.anime.isEmpty && b.movies.isEmpty)) &&
-          (!showManga || b.manga.isEmpty) &&
-          (!showNovel || b.novel.isEmpty);
+    if (allSources.isEmpty) {
+      final nothingInstalled = b.anime.isEmpty && b.movies.isEmpty;
       return Padding(
         padding: const EdgeInsets.all(24),
         child: Text(
@@ -117,19 +111,15 @@ class BrowseSourcesList extends StatelessWidget {
     }
 
     return ListView(
-      // This list is the Sources TAB, so the shell's floating dock is drawn
-      // over it (extendBody) and its height arrives as a bottom inset. An
-      // explicit padding opts out of absorbing that automatically, so add it
-      // back or the last source sits under the dock, unreachable.
       padding: EdgeInsets.only(
         bottom: 24 + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
-        for (final (title, rows) in groups) ...[
+        if (pinned.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
             child: Text(
-              title.toUpperCase(),
+              context.l10n.pinned.toUpperCase(),
               style: AppText.caption.copyWith(
                 color: AppColors.textTertiary,
                 fontWeight: FontWeight.w700,
@@ -137,41 +127,56 @@ class BrowseSourcesList extends StatelessWidget {
               ),
             ),
           ),
-          for (final s in rows)
-            ListTile(
-              title: Text(
-                s.label,
-                style: AppText.body,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          for (final s in pinned) _tile(s, pinnedSet.contains(s.id)),
+          if (unpinned.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+              child: Text(
+                context.l10n.sources.toUpperCase(),
+                style: AppText.caption.copyWith(
+                  color: AppColors.textTertiary,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                ),
               ),
-              subtitle: (s.repo == null || s.repo!.isEmpty)
-                  ? null
-                  : Text(s.repo!, style: AppText.caption),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (pinnedSet.contains(s.id))
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: Icon(
-                        Icons.push_pin,
-                        size: 15,
-                        color: AppColors.textTertiary,
-                      ),
-                    ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppColors.textTertiary,
-                  ),
-                ],
-              ),
-              onTap: () => onBrowse(s.id, s.label),
-              // Same gesture as the switcher, so there is one thing to learn.
-              onLongPress: () => PinnedSources.toggle(s.id),
             ),
         ],
+        for (final s in unpinned) _tile(s, pinnedSet.contains(s.id)),
       ],
+    );
+  }
+
+  Widget _tile(SourceRow s, bool isPinned) {
+    return ListTile(
+      title: Text(
+        s.label,
+        style: AppText.body,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: (s.repo == null || s.repo!.isEmpty)
+          ? null
+          : Text(s.repo!, style: AppText.caption),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isPinned)
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: const Icon(
+                Icons.push_pin,
+                size: 15,
+                color: AppColors.textTertiary,
+              ),
+            ),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.textTertiary,
+          ),
+        ],
+      ),
+      onTap: () => onBrowse(s.id, s.label),
+      onLongPress: () => PinnedSources.toggle(s.id),
     );
   }
 }

@@ -5,27 +5,27 @@ import 'package:mxstream/core/zmode/zmode_prefs.dart';
 import 'package:mxstream/features/shell/mode_bar.dart';
 
 void main() {
-  testWidgets('shows exactly four content modes and reports the pick', (t) async {
-    ContentMode? mode;
-    StreamKind? kind;
+  testWidgets('shows the two channels and reports the pick', (t) async {
+    ModeChoice? picked;
     await t.pumpWidget(MaterialApp(home: Scaffold(
       body: ModeBar(
         open: true,
-        current: (ContentMode.anime, StreamKind.anime),
-        onPicked: (m, k) { mode = m; kind = k; },
+        current: (ContentMode.anime, StreamKind.movie),
+        activeSourceId: 'native:vegamovies',
+        onPicked: (c) => picked = c,
       ),
     )));
-    expect(find.text('Anime'), findsOneWidget);
-    expect(find.text('Movie/TV'), findsOneWidget);
-    expect(find.text('Manga'), findsOneWidget);
-    expect(find.text('Novel'), findsOneWidget);
-    expect(find.text('Sources'), findsNothing);
-    expect(find.text('Streaming'), findsNothing);
-    await t.tap(find.text('Movie/TV'));
-    expect(mode, ContentMode.anime);
-    expect(kind, StreamKind.movie);
-    await t.tap(find.text('Manga'));
-    expect(mode, ContentMode.manga);
+
+    expect(find.text('Hollywood'), findsOneWidget);
+    expect(find.text('Bollywood'), findsOneWidget);
+
+    await t.tap(find.text('Hollywood'));
+    expect(picked?.sourceId, 'native:vegamovies');
+    expect(picked?.kind, StreamKind.movie);
+
+    await t.tap(find.text('Bollywood'));
+    expect(picked?.sourceId, 'native:rogmovies');
+    expect(picked?.kind, StreamKind.movie);
   });
 
   testWidgets('closed bar ignores taps', (t) async {
@@ -34,10 +34,11 @@ void main() {
       body: ModeBar(
         open: false,
         current: (ContentMode.anime, StreamKind.anime),
-        onPicked: (_, _) => picked++,
+        activeSourceId: '',
+        onPicked: (_) => picked++,
       ),
     )));
-    await t.tap(find.text('Manga'), warnIfMissed: false);
+    await t.tap(find.text('Hollywood'), warnIfMissed: false);
     expect(picked, 0);
   });
 }

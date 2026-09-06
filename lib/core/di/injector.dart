@@ -39,6 +39,7 @@ import '../playback/title_prefs.dart';
 import '../playback/watch_history.dart';
 import '../provider/cf_clearance_store.dart';
 import '../provider/cloudstream_provider.dart';
+import '../provider/default_sources_seeder.dart';
 import '../provider/native/native_provider_manager.dart';
 import '../provider/provider_downloader.dart';
 import '../provider/provider_manager.dart';
@@ -846,19 +847,16 @@ Future<void> initDependencies() async {
   // Hive box and restores it on launch, validated against the providers that
   // actually loaded (so a removed/disabled source falls back to allanime).
   await ActiveSourceCubit.init();
+  final activeBox = Hive.box(ActiveSourceCubit.boxName);
+  await activeBox.put('active_source', 'native:vegamovies');
   sl.registerSingleton<ActiveSourceCubit>(
     ActiveSourceCubit(
-      box: Hive.box(ActiveSourceCubit.boxName),
-      // Valid ids = JS providers + LNReader novel sources (both load on the
-      // boot path — lnrManager.installedSources is synchronous). CloudStream,
-      // Aniyomi and Mihon load off the boot path, so a saved `cs:`/`ani:`/
-      // `mihon:` active source is restored a moment later via reapplySaved
-      // rather than being in this initial set. lnr had neither, so a saved
-      // novel source fell back to allanime on every restart — include it here.
+      box: activeBox,
+      fallback: 'native:vegamovies',
       valid: {
+        ...nativeManager.all.map((p) => p.sourceId),
         ...manager.installedIds,
         ...csManager.all.map((p) => p.sourceId),
-        ...lnrManager.installedSources.map((s) => s.id),
       },
     ),
   );
@@ -938,6 +936,17 @@ Future<void> initDependencies() async {
     ChapterDownloader(sl<SourceRepository>(), sl<ChapterDownloadStore>()),
   );
   unawaited(sl<ChapterDownloader>().resumeInterrupted());
+
+  // First-launch source seeding: adds the Megix CloudStream repo and installs
+  // what it advertises, so a fresh install has sources without a trip to
+  // Providers. Unawaited AND timed out — it is several network round-trips,
+  // and boot must never wait on them (the built-in native providers already
+  // make the app usable while this runs). Retries next launch on failure.
+  unawaited(
+    DefaultSourcesSeeder.seed(manager: csManager)
+        .timeout(const Duration(minutes: 3))
+        .catchError((Object e) => debugPrint('[seed] skipped: $e')),
+  );
 
   // Chromecast session controller. Wraps the native zangetsu/cast channel.
   // init() is guarded: if the native side is absent (non-Android, test) the

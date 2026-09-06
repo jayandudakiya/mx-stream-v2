@@ -12,6 +12,7 @@ import '../../core/di/injector.dart';
 import '../../core/mode/content_mode.dart';
 import '../../core/mode/content_mode_cubit.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/state/active_source_cubit.dart';
 import '../../core/zmode/zmode_prefs.dart';
 import '../../l10n/ui_strings.dart';
 import '../../l10n/l10n.dart';
@@ -271,23 +272,51 @@ class _RootShellState extends State<RootShell>
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (ZModePrefs.enabled)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: BlocBuilder<ContentModeCubit, ContentMode>(
+                  // Shown whether or not Z Mode is on: the bar is now the only
+                  // way back to the catalogue once a channel has turned Z Mode
+                  // off, so gating it on ZModePrefs.enabled would strand the
+                  // user on whichever channel they picked.
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: BlocBuilder<ActiveSourceCubit, String>(
+                      bloc: sl.isRegistered<ActiveSourceCubit>()
+                          ? sl<ActiveSourceCubit>()
+                          : null,
+                      builder: (_, activeSourceId) =>
+                          BlocBuilder<ContentModeCubit, ContentMode>(
                         bloc: sl<ContentModeCubit>(),
                         builder: (_, mode) => ModeBar(
                           open: _modeBarOpen,
                           current: (mode, ZModePrefs.streamKind),
-                          onPicked: (m, k) async {
-                            setState(() => _modeBarOpen = false);
-                            await ZModePrefs.setStreamKind(k);
-                            await sl<ContentModeCubit>().setMode(m);
-                            sl<HomeCubit>().load(reset: true);
-                          },
-                        ),
+                          activeSourceId: activeSourceId,
+                        onPicked: (choice) async {
+                          setState(() {
+                            _modeBarOpen = false;
+                            _tab = DockTab.home;
+                          });
+                          await ZModePrefs.setStreamKind(choice.kind);
+                          await sl<ContentModeCubit>().setMode(choice.mode);
+
+                          final channelSource = choice.sourceId;
+                          if (channelSource != null) {
+                            // A channel browses its provider's OWN shelves, the
+                            // way MXStream v1's home did: Z Mode off makes
+                            // HomeCubit source-backed (see its _browseKind),
+                            // and the active source decides whose shelves.
+                            if (ZModePrefs.enabled) {
+                              await ZModePrefs.setEnabled(false);
+                            }
+                            sl<ActiveSourceCubit>().setSource(channelSource);
+                          } else if (!ZModePrefs.enabled) {
+                            // Back to the metadata catalogue.
+                            await ZModePrefs.setEnabled(true);
+                          }
+                          sl<HomeCubit>().load(reset: true);
+                        },
                       ),
                     ),
+                  ),
+                ),
                   // Collapse the SLOT as well as sliding the dock out of it.
                   // The dock is this Scaffold's bottomNavigationBar and the
                   // shell sets extendBody, so its height lands in the body's
@@ -315,21 +344,22 @@ class _RootShellState extends State<RootShell>
                           tabs: _visibleTabs(),
                           active: _tab,
                           onSelected: _onTabSelected,
-                          centre: ZModePrefs.enabled
-                              ? BlocBuilder<ContentModeCubit, ContentMode>(
-                                  bloc: sl<ContentModeCubit>(),
-                                  builder: (_, mode) => ModeFab(
-                                    open: _modeBarOpen,
-                                    icon: iconForMode(
-                                      mode,
-                                      ZModePrefs.streamKind,
-                                    ),
-                                    onTap: () => setState(
-                                      () => _modeBarOpen = !_modeBarOpen,
-                                    ),
-                                  ),
-                                )
-                              : null,
+                          centre: BlocBuilder<ActiveSourceCubit, String>(
+                            bloc: sl.isRegistered<ActiveSourceCubit>()
+                                ? sl<ActiveSourceCubit>()
+                                : null,
+                            builder: (_, activeSourceId) => ModeFab(
+                              open: _modeBarOpen,
+                              icon: iconForMode(
+                                sl<ContentModeCubit>().state,
+                                ZModePrefs.streamKind,
+                                activeSourceId,
+                              ),
+                              onTap: () => setState(
+                                () => _modeBarOpen = !_modeBarOpen,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),

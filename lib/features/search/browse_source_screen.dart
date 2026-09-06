@@ -442,16 +442,19 @@ class _BrowseSourceViewState extends State<_BrowseSourceView> {
                       title: section.title,
                       itemWidth: 116,
                       itemHeight: 216,
-                      itemCount: items.length,
+                      items: items,
                       onSeeAll: () => _openSeeAll(context, section),
-                      itemBuilder: (c, j) => PosterCard(
-                        title: items[j].title,
-                        imageUrl: items[j].cover,
-                        headers: items[j].coverHeaders,
+                      onLoadMore: section.more == null
+                          ? null
+                          : (page) => sl<SourceRepository>().browseMore(section.more!, page),
+                      itemCardBuilder: (c, item) => PosterCard(
+                        title: item.title,
+                        imageUrl: item.cover,
+                        headers: item.coverHeaders,
                         cellWidth: 116,
-                        qualityBadge: items[j].quality,
-                        dubBadge: items[j].dubBadge,
-                        onTap: () => _openDetail(context, items[j]),
+                        qualityBadge: item.quality,
+                        dubBadge: item.dubBadge,
+                        onTap: () => _openDetail(context, item),
                       ),
                     );
                   },

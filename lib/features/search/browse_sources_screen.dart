@@ -26,24 +26,13 @@ class BrowseSourcesScreen extends StatefulWidget {
   State<BrowseSourcesScreen> createState() => _BrowseSourcesScreenState();
 }
 
-class _BrowseSourcesScreenState extends State<BrowseSourcesScreen>
-    with SingleTickerProviderStateMixin {
+class _BrowseSourcesScreenState extends State<BrowseSourcesScreen> {
   final _controller = TextEditingController();
   String _query = '';
-  late final TabController _tab = TabController(length: 3, vsync: this);
-
-  /// [SourceListKind] and [ContentMode] both split streaming/manga/novel the
-  /// same way; this just names the mapping for [SearchScreen.forceMode].
-  ContentMode _modeOf(SourceListKind kind) => switch (kind) {
-    SourceListKind.streaming => ContentMode.anime,
-    SourceListKind.manga => ContentMode.manga,
-    SourceListKind.novel => ContentMode.novel,
-  };
 
   @override
   void dispose() {
     _controller.dispose();
-    _tab.dispose();
     super.dispose();
   }
 
@@ -58,40 +47,16 @@ class _BrowseSourcesScreenState extends State<BrowseSourcesScreen>
           IconButton(
             icon: const Icon(Icons.search_rounded),
             tooltip: context.l10n.search,
-            // forceMode: the tab this was opened from, so the search fans out
-            // over that tab's sources instead of Home's global content mode —
-            // see [SearchScreen.forceMode].
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (_) => SearchScreen(
+                builder: (_) => const SearchScreen(
                   forceSources: true,
-                  forceMode: _modeOf(SourceListKind.values[_tab.index]),
+                  forceMode: ContentMode.anime,
                 ),
               ),
             ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tab,
-          // Drop the default full-width hairline under the bar — same
-          // treatment as History's tabs.
-          dividerColor: Colors.transparent,
-          dividerHeight: 0,
-          indicatorSize: TabBarIndicatorSize.label,
-          indicator: UnderlineTabIndicator(
-            borderRadius: const BorderRadius.all(Radius.circular(2)),
-            borderSide: BorderSide(width: 3, color: AppColors.accent),
-            insets: const EdgeInsets.symmetric(horizontal: -6),
-          ),
-          labelColor: AppColors.accent,
-          unselectedLabelColor: AppColors.textSecondary,
-          overlayColor: WidgetStateProperty.all(Colors.transparent),
-          tabs: [
-            Tab(text: context.l10n.modeStreaming),
-            Tab(text: context.l10n.modeManga),
-            Tab(text: context.l10n.modeNovel),
-          ],
-        ),
       ),
       body: Column(
         children: [
@@ -138,20 +103,13 @@ class _BrowseSourcesScreenState extends State<BrowseSourcesScreen>
             ),
           ),
           Expanded(
-            child: TabBarView(
-              controller: _tab,
-              children: [
-                for (final k in SourceListKind.values)
-                  BrowseSourcesList(
-                    kind: k,
-                    query: _query,
-                    onBrowse: (id, name) => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => BrowseSourceScreen(sourceId: id, title: name),
-                      ),
-                    ),
-                  ),
-              ],
+            child: BrowseSourcesList(
+              query: _query,
+              onBrowse: (id, name) => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => BrowseSourceScreen(sourceId: id, title: name),
+                ),
+              ),
             ),
           ),
         ],

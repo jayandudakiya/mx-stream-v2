@@ -493,7 +493,7 @@ class _HomeScreenTvState extends State<HomeScreenTv> {
           if (heroItem != null)
             SliverToBoxAdapter(
               child: _TvHero(
-                items: heroItems.take(6).toList(),
+                items: heroItems.take(10).toList(),
                 inListOf: _inList,
                 metaOf: _heroMeta,
                 onPlay: _play,

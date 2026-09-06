@@ -4,14 +4,12 @@ import 'package:intl/intl.dart';
 
 import '../../core/aniyomi/aniyomi_image_provider.dart';
 import '../../core/di/injector.dart';
-import '../../core/models/episode.dart';
 import '../../core/models/media_detail.dart';
 import '../../core/models/media_item.dart';
 import '../../core/models/provider_info.dart';
 import '../../core/playback/my_list.dart';
 import '../../core/playback/resume_store.dart';
 import '../../core/playback/watch_history.dart';
-import '../../core/reading/read_history.dart';
 import '../../core/repository/catalogue_repository.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
@@ -19,7 +17,6 @@ import '../../l10n/l10n.dart';
 import '../../core/ui/list_status_sheet.dart';
 import '../../core/ui/media_info_sheet.dart';
 import '../detail/detail_screen.dart';
-import '../home/home_screen.dart' show readerFor;
 import '../player/player_screen.dart';
 
 /// Full history, newest-first and grouped by day (Today / Yesterday / date),
@@ -47,47 +44,14 @@ class HistoryScreen extends StatefulWidget {
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen>
-    with SingleTickerProviderStateMixin {
+class _HistoryScreenState extends State<HistoryScreen> {
   final _watch = sl<WatchHistory>();
-  final _read = sl<ReadHistory>();
   final _repo = sl<CatalogueRepository>();
   final _myList = sl<MyListStore>();
 
-  late int _shownIndex = widget.initialIndex.clamp(0, 2);
-  late final TabController _tab = TabController(
-    length: 3,
-    vsync: this,
-    initialIndex: _shownIndex,
-  )..addListener(_onTabChanged);
-
-  /// Repaint so the "Clear all" action tracks the active tab — but only when
-  /// the selected tab actually changes, not on every frame of the slide.
-  void _onTabChanged() {
-    if (_tab.index != _shownIndex && mounted) {
-      setState(() => _shownIndex = _tab.index);
-    }
-  }
-
   late List<HistoryEntry> _anime = _watch.all();
-  late List<ReadEntry> _manga = _readOf(ProviderType.manga);
-  late List<ReadEntry> _novel = _readOf(ProviderType.novel);
-
-  List<ReadEntry> _readOf(ProviderType t) =>
-      _read.all().where((e) => e.type == t).toList();
 
   void _reloadAnime() => setState(() => _anime = _watch.all());
-  void _reloadReading() => setState(() {
-    final all = _read.all();
-    _manga = all.where((e) => e.type == ProviderType.manga).toList();
-    _novel = all.where((e) => e.type == ProviderType.novel).toList();
-  });
-
-  @override
-  void dispose() {
-    _tab.dispose();
-    super.dispose();
-  }
 
   // ── Anime (watch history) ─────────────────────────────────────────────────
 
@@ -188,110 +152,14 @@ class _HistoryScreenState extends State<HistoryScreen>
     _reloadAnime();
   }
 
-  // ── Manga / Novel (reading history) ───────────────────────────────────────
-
-  Future<void> _resumeRead(ReadEntry e) async {
+  Future<void> _clearHistory() async {
     final l10n = context.l10n;
-    final chapter = Episode(
-      id: e.chapterId,
-      title: e.chapterNumber != null
-          ? l10n.chapterLabel(e.chapterNumber!.toInt())
-          : l10n.chapter,
-      number: e.chapterNumber,
-      url: e.chapterUrl,
-    );
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => readerFor(e, chapter)),
-    );
-    _reloadReading();
-  }
-
-  Future<void> _removeRead(ReadEntry e) async {
-    await _read.remove(e.sourceId, e.showId);
-    _reloadReading();
-  }
-
-  /// Reading sources use `id == url` (both the series path), so a ReadEntry's
-  /// [showId] doubles as the detail URL — enough to build a real MediaItem.
-  MediaItem _readStub(ReadEntry e) => MediaItem(
-    id: e.showId,
-    title: e.title,
-    cover: e.cover,
-    url: e.showId,
-    type: e.type,
-    sourceId: e.sourceId,
-  );
-
-  void _openReadDetail(MediaItem item) {
-    Navigator.push(context, DetailScreen.route(item)).then((_) => _reloadReading());
-  }
-
-  /// Long-press info sheet for a manga/novel row — the reading twin of
-  /// [_showInfo] (cover hero, synopsis, Resume, My List, Details, Remove).
-  void _showReadInfo(ReadEntry e) {
-    final stub = _readStub(e);
-    final hasProgress = e.total > 0;
-    final progress = hasProgress ? (e.pos / e.total).clamp(0.0, 1.0) : 0.0;
-    final l10n = context.l10n;
-    final chap = e.chapterNumber != null
-        ? l10n.chapterLabel(e.chapterNumber!.toInt())
-        : null;
-    final pctLabel =
-        hasProgress ? l10n.percentRead((progress * 100).round()) : null;
-    showMediaInfoSheet(
-      context,
-      title: e.title,
-      cover: e.cover,
-      typeLabel: e.type == ProviderType.manga ? l10n.modeManga : l10n.modeNovel,
-      detail: _detailOf(e.showId, e.sourceId),
-      inMyList: _myList.contains(stub),
-      playLabel: l10n.resume,
-      progress: hasProgress ? progress : null,
-      progressLabel: [?chap, ?pctLabel].join('  ·  '),
-      onPlay: () => _resumeRead(e),
-      onOpenDetail: () => _openReadDetail(stub),
-      onToggleMyList: () async {
-        await showListStatusSheet(
-          context,
-          item: stub,
-          onChanged: () {
-            if (mounted) setState(() {});
-          },
-        );
-        return _myList.contains(stub);
-      },
-      onRemoveFromContinue: () async {
-        await _read.remove(e.sourceId, e.showId);
-        _reloadReading();
-      },
-    );
-  }
-
-  // ── Clear-all (acts on the active tab only) ───────────────────────────────
-
-  bool get _activeNotEmpty => switch (_tab.index) {
-    0 => _anime.isNotEmpty,
-    1 => _manga.isNotEmpty,
-    _ => _novel.isNotEmpty,
-  };
-
-  Future<void> _clearActiveTab() async {
-    final idx = _tab.index;
-    // Scoped to the active tab only — clearing one mode never touches the
-    // other two. The wording names the exact mode so that's unmistakable.
-    final l10n = context.l10n;
-    final (noun, kind) = switch (idx) {
-      0 => (l10n.historyNounShow, l10n.historyKindWatch),
-      1 => (l10n.historyNounMangaItem, l10n.historyKindManga),
-      _ => (l10n.historyNounNovelItem, l10n.historyKindNovel),
-    };
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text(l10n.clearKindHistoryTitle(kind)),
-        content: Text(l10n.clearKindHistoryBody(noun, kind)),
+        title: Text(l10n.clearKindHistoryTitle(l10n.historyKindWatch)),
+        content: Text(l10n.clearKindHistoryBody(l10n.historyNounShow, l10n.historyKindWatch)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -306,13 +174,8 @@ class _HistoryScreenState extends State<HistoryScreen>
       ),
     );
     if (ok != true) return;
-    if (idx == 0) {
-      await _watch.clearAll(); // local + cloud, so it can't sync back
-      _reloadAnime();
-    } else {
-      await _read.clearType(idx == 1 ? ProviderType.manga : ProviderType.novel);
-      _reloadReading();
-    }
+    await _watch.clearAll();
+    _reloadAnime();
   }
 
   @override
@@ -325,99 +188,28 @@ class _HistoryScreenState extends State<HistoryScreen>
         surfaceTintColor: Colors.transparent,
         title: Text(context.l10n.history),
         actions: [
-          if (_activeNotEmpty)
+          if (_anime.isNotEmpty)
             IconButton(
               tooltip: context.l10n.clearAll,
               icon: const Icon(Icons.delete_sweep_outlined),
-              onPressed: _clearActiveTab,
+              onPressed: _clearHistory,
             ),
         ],
-        bottom: TabBar(
-          controller: _tab,
-          // Drop the default full-width hairline under the bar — that's the
-          // "divider" that read badly; the sliding underline is the indicator.
-          dividerColor: Colors.transparent,
-          dividerHeight: 0,
-          // Rounded accent underline hugging the label. The TabController
-          // animates it between tabs and crossfades the label colour, so a tap
-          // or a swipe glides the underline across.
-          indicatorSize: TabBarIndicatorSize.label,
-          indicator: UnderlineTabIndicator(
-            borderRadius: const BorderRadius.all(Radius.circular(2)),
-            borderSide: BorderSide(width: 3, color: AppColors.accent),
-            insets: const EdgeInsets.symmetric(horizontal: -6),
-          ),
-          labelColor: AppColors.accent,
-          unselectedLabelColor: AppColors.textSecondary,
-          labelStyle: const TextStyle(
-            fontFamily: 'Inter',
-          fontFamilyFallback: AppText.fontFamilyFallback,
-            fontSize: 14.5,
-            fontWeight: FontWeight.w700,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontFamily: 'Inter',
-          fontFamilyFallback: AppText.fontFamilyFallback,
-            fontSize: 14.5,
-            fontWeight: FontWeight.w600,
-          ),
-          overlayColor: WidgetStateProperty.all(Colors.transparent),
-          tabs: [
-            Tab(text: context.l10n.modeStreaming),
-            Tab(text: context.l10n.modeManga),
-            Tab(text: context.l10n.modeNovel),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tab,
-        children: [
-          _list<HistoryEntry>(
-            entries: _anime,
-            tsMs: (e) => e.updatedAt,
-            row: (e) => _HistoryRow(
-              entry: e,
-              onTap: () => _resume(e),
-              onLongPress: () => _showInfo(e),
-              onRemove: () => _remove(e),
-            ),
-            empty: _EmptyState(
-              icon: Icons.history_rounded,
-              title: context.l10n.nothingWatchedYet,
-              subtitle: context.l10n.showsYouWatchWillAppearHere,
-            ),
-          ),
-          _list<ReadEntry>(
-            entries: _manga,
-            tsMs: (e) => e.updatedMs,
-            row: (e) => _ReadRow(
-              entry: e,
-              onTap: () => _resumeRead(e),
-              onLongPress: () => _showReadInfo(e),
-              onRemove: () => _removeRead(e),
-            ),
-            empty: _EmptyState(
-              icon: Icons.auto_stories_outlined,
-              title: context.l10n.nothingReadYet,
-              subtitle: context.l10n.mangaYouReadWillAppearHere,
-            ),
-          ),
-          _list<ReadEntry>(
-            entries: _novel,
-            tsMs: (e) => e.updatedMs,
-            row: (e) => _ReadRow(
-              entry: e,
-              onTap: () => _resumeRead(e),
-              onLongPress: () => _showReadInfo(e),
-              onRemove: () => _removeRead(e),
-            ),
-            empty: _EmptyState(
-              icon: Icons.menu_book_outlined,
-              title: context.l10n.nothingReadYet,
-              subtitle: context.l10n.novelsYouReadWillAppearHere,
-            ),
-          ),
-        ],
+      body: _list<HistoryEntry>(
+        entries: _anime,
+        tsMs: (e) => e.updatedAt,
+        row: (e) => _HistoryRow(
+          entry: e,
+          onTap: () => _resume(e),
+          onLongPress: () => _showInfo(e),
+          onRemove: () => _remove(e),
+        ),
+        empty: _EmptyState(
+          icon: Icons.history_rounded,
+          title: context.l10n.nothingWatchedYet,
+          subtitle: context.l10n.showsYouWatchWillAppearHere,
+        ),
       ),
     );
   }
@@ -542,43 +334,6 @@ class _HistoryRow extends StatelessWidget {
       cover: e.cover,
       headers: e.coverHeaders,
       progress: e.progress,
-      onTap: onTap,
-      onLongPress: onLongPress,
-      onRemove: onRemove,
-    );
-  }
-}
-
-class _ReadRow extends StatelessWidget {
-  const _ReadRow({
-    required this.entry,
-    required this.onTap,
-    required this.onLongPress,
-    required this.onRemove,
-  });
-
-  final ReadEntry entry;
-  final VoidCallback onTap;
-  final VoidCallback onLongPress;
-  final VoidCallback onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    final e = entry;
-    final time = _clockTime(context, DateTime.fromMillisecondsSinceEpoch(e.updatedMs));
-    final ch = e.chapterNumber != null
-        ? context.l10n.chapterLabel(e.chapterNumber!.toInt())
-        : null;
-    final subtitle = [?ch, time].join('  ·  ');
-    final progress = e.total > 0 ? (e.pos / e.total).clamp(0.0, 1.0) : 0.0;
-    return _RowShell(
-      title: e.title,
-      subtitle: subtitle,
-      cover: e.cover,
-      // ReadEntry stores only a plain cover URL (no per-source headers) — same
-      // as the Home Continue Reading card.
-      headers: null,
-      progress: progress,
       onTap: onTap,
       onLongPress: onLongPress,
       onRemove: onRemove,

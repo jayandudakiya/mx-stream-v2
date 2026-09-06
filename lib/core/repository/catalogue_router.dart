@@ -31,7 +31,10 @@ class CatalogueRouter implements CatalogueRepository {
   final CatalogueRepository _meta;
   final bool Function() _enabled;
 
-  CatalogueRepository get _browse => _enabled() ? _meta : _source;
+  CatalogueRepository get _browse {
+    if (_source.sourceId.startsWith('native:')) return _source;
+    return _enabled() ? _meta : _source;
+  }
   CatalogueRepository _forUrl(String url) =>
       ZmodeIds.isZ(url) ? _meta : _source;
 

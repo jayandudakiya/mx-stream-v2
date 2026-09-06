@@ -38,7 +38,6 @@ import '../downloads/downloads_screen.dart';
 import '../history/history_screen.dart';
 import 'appearance_screen.dart';
 import 'nav_tabs_screen.dart';
-import 'reader_settings_screen.dart';
 import 'discord_settings_screen.dart';
 import 'torrent_settings_screen.dart';
 import '../../core/provider/provider_downloader.dart';
@@ -911,16 +910,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         subtitle: l10n.playbackSubtitle,
         keywords: 'playback quality autoplay speed player decoder audio subtitle resume gesture',
         onTap: () => _push(const PlaybackSettingsScreen()),
-      ),
-      _SettingsEntry(
-        section: SettingsSection.reading,
-        id: LeafParent.reader,
-        icon: Icons.menu_book_outlined,
-        title: l10n.reader,
-        subtitle: l10n.readerSubtitle,
-        keywords:
-            'reader manga novel reading defaults fit direction fontsize theme orientation preload',
-        onTap: () => _push(const ReaderSettingsScreen()),
       ),
       _SettingsEntry(
         section: SettingsSection.history,

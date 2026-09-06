@@ -12,7 +12,7 @@ import 'package:hive/hive.dart';
 class ActiveSourceCubit extends Cubit<String> {
   ActiveSourceCubit({
     Box? box,
-    String fallback = 'allanime',
+    String fallback = 'native:vegamovies',
     Set<String>? valid,
   })  : _box = box,
         super(_restore(box, fallback, valid));
@@ -33,9 +33,11 @@ class ActiveSourceCubit extends Cubit<String> {
     final saved = box?.get(_key) as String?;
     if (saved != null &&
         saved.isNotEmpty &&
+        saved != 'allanime' &&
         (valid == null || valid.contains(saved))) {
       return saved;
     }
+    box?.put(_key, fallback);
     return fallback;
   }
 
@@ -54,7 +56,7 @@ class ActiveSourceCubit extends Cubit<String> {
   /// actual pick is honored instead of the fallback. Returns true if it changed.
   bool reapplySaved(bool Function(String id) isNowValid) {
     final saved = _box?.get(_key) as String?;
-    if (saved == null || saved.isEmpty || saved == state) return false;
+    if (saved == null || saved.isEmpty || saved == state || saved == 'allanime') return false;
     if (!isNowValid(saved)) return false;
     emit(saved);
     return true;

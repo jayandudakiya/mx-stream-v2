@@ -2,15 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../core/app_mode.dart';
-import '../../core/aniyomi/aniyomi_image_provider.dart';
 import '../../core/di/injector.dart';
 import '../../core/platform/apple_tv.dart';
 import '../../core/mihon/mihon_extension_service.dart';
-import '../../core/mihon/mihon_image_provider.dart';
 import '../../core/mode/content_mode.dart';
 import '../../core/mode/content_mode_cubit.dart';
 import '../../core/models/watch_status.dart';
@@ -72,14 +69,12 @@ import '../auth/reconnect.dart';
 import '../detail/detail_screen.dart';
 import '../history/history_screen.dart';
 import '../player/player_screen.dart';
-import '../schedule/schedule_screen.dart';
 import '../shell/dock_icons.dart';
 import '../../core/zmode/source_matcher.dart';
 import '../../core/zmode/metadata_repository.dart';
 import '../../core/zmode/zmode_ids.dart';
 import 'cubit/home_cubit.dart';
 import 'home_screen_tv.dart';
-import 'lists_hub_screen.dart';
 import 'search_screen.dart';
 import 'cubit/tracker_home_rows.dart' show releasedCount;
 import 'see_all_screen.dart';
@@ -570,7 +565,6 @@ class _HomeViewState extends State<_HomeView>
             _headerDownloadButton(),
             _notificationBell(context),
             const HomeSearchAction(),
-            const HomeSourceSwitcherSlot(),
           ],
         ),
       ),
@@ -652,17 +646,22 @@ class _HomeViewState extends State<_HomeView>
         title: section.title,
         itemWidth: 116,
         itemHeight: 216,
-        itemCount: items.length,
+        items: items,
         onSeeAll: () => _openSeeAll(section),
-        itemBuilder: (c, i) => PosterCard(
-          title: items[i].title,
-          imageUrl: items[i].cover,
-          headers: items[i].coverHeaders,
+        onLoadMore: section.more == null
+            ? null
+            : (page) => section.more!.sourceId == ZmodeIds.sourceId
+                  ? sl<MetadataRepository>().browseMore(section.more!, page)
+                  : sl<SourceRepository>().browseMore(section.more!, page),
+        itemCardBuilder: (c, item) => PosterCard(
+          title: item.title,
+          imageUrl: item.cover,
+          headers: item.coverHeaders,
           cellWidth: 116,
-          qualityBadge: items[i].quality,
-          dubBadge: items[i].dubBadge,
-          onTap: () => _openDetail(items[i]),
-          onLongPress: () => _showInfo(items[i]),
+          qualityBadge: item.quality,
+          dubBadge: item.dubBadge,
+          onTap: () => _openDetail(item),
+          onLongPress: () => _showInfo(item),
         ),
       ),
     );
@@ -886,245 +885,8 @@ class _HomeViewState extends State<_HomeView>
     );
   }
 
-  /// A row of cards under the banner, showing the modes you're NOT in plus —
-  /// in Anime mode only — a Schedule card (Schedule has nothing to show in a
-  /// reading mode; see [DockTab.isAnimeOnly]). Reactive to [ContentModeCubit]
-  /// so they re-label the instant a switch lands. Tapping a mode card runs
-  /// the sword-slash into that mode; Schedule opens the same [ScheduleScreen]
-  /// its dock tab does.
-  Widget _modeCards() {
-    return BlocBuilder<ContentModeCubit, ContentMode>(
-      bloc: sl<ContentModeCubit>(),
-      builder: (context, current) {
-        // Z Mode drives the mode from its own controls, so the switcher cards
-        // would duplicate them. The hub card stays in BOTH modes: with no
-        // Schedule dock tab and no tracker cards, it is the only way in.
-        final others = ZModePrefs.enabled
-            ? const <ContentMode>[]
-            : ContentMode.values.where((m) => m != current).toList();
-        // One row now. Schedule and the tracker libraries used to be a card
-        // each below this one, which meant a second row of near-identical
-        // slabs that grew with every tracker and had to be filtered per mode
-        // to stay a readable width. They live behind [ListsHubScreen] instead,
-        // so this row no longer changes shape with what you have connected.
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
-          child: Row(
-            children: [
-              for (final m in others) ...[
-                Expanded(child: _modeCard(m)),
-                const SizedBox(width: 12),
-              ],
-              // Twice the width of a switcher: its label is a phrase rather
-              // than a single word, and it would ellipsise at an even third.
-              Expanded(flex: 2, child: _hubCard()),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
-  Widget _modeCard(ContentMode m) {
-    final cover = _modeArt(m);
-    return GestureDetector(
-      onTap: _slashing ? null : () => _enterMode(m),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          height: 52,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Background: a cover from the user's recent content for this
-              // mode, else a themed gradient when they've nothing there yet.
-              _modeArtBg(cover),
-              // Scrim so the white icon + label stay legible over any art.
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [Color(0xCC000000), Color(0x55000000)],
-                  ),
-                ),
-              ),
-              Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(m.icon, size: 18, color: Colors.white),
-                    const SizedBox(width: 8),
-                    // Flexible, not bare: at three cards on a 320px phone the
-                    // label has ~68px and "Streaming" does not fit.
-                    Flexible(
-                      child: Text(
-                        m.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppText.body.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          shadows: const [
-                            Shadow(color: Colors.black, blurRadius: 6),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  /// Same card shell as [_modeCard], but for [ListsHubScreen] — Schedule plus
-  /// every connected tracker library. One door rather than a card each, so the
-  /// row keeps its shape whether you have no trackers or four.
-  Widget _hubCard() {
-    return GestureDetector(
-      key: const ValueKey('home_lists_hub_card'),
-      onTap: _slashing
-          ? null
-          : () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const ListsHubScreen()),
-            ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          height: 52,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Always the last thing you WATCHED, in every mode. Anime and
-              // movies share [WatchHistory], so this is a show cover whether
-              // you are browsing manga or not — and on the flat fallback
-              // gradient this card looked dead next to the switchers.
-              _modeArtBg(_modeArt(ContentMode.anime)),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [Color(0xCC000000), Color(0x55000000)],
-                  ),
-                ),
-              ),
-              Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const DockIcon(
-                      DockGlyph.calendar,
-                      color: Colors.white,
-                      filled: true,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        context.l10n.scheduleAndLists,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppText.body.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          shadows: const [
-                            Shadow(color: Colors.black, blurRadius: 6),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// A representative cover for [m] from the user's own history — last watched
-  /// show (streaming) or last read manga/novel. Null when there's nothing yet.
-  ({String? cover, Map<String, String>? headers}) _modeArt(ContentMode m) {
-    if (m == ContentMode.anime) {
-      if (!Hive.isBoxOpen(WatchHistory.boxName))
-        return (cover: null, headers: null);
-      for (final e in sl<WatchHistory>().all()) {
-        final c = e.thumbnail ?? e.cover;
-        if (c != null && c.isNotEmpty)
-          return (cover: c, headers: e.coverHeaders);
-      }
-      return (cover: null, headers: null);
-    }
-    if (!Hive.isBoxOpen(ReadHistory.boxName))
-      return (cover: null, headers: null);
-    final type = m == ContentMode.manga
-        ? ProviderType.manga
-        : ProviderType.novel;
-    for (final e in sl<ReadHistory>().all()) {
-      if (e.type == type && (e.cover?.isNotEmpty ?? false)) {
-        return (cover: e.cover, headers: e.coverHeaders);
-      }
-    }
-    return (cover: null, headers: null);
-  }
-
-  Widget _modeArtBg(({String? cover, Map<String, String>? headers}) art) {
-    final url = art.cover;
-    if (url == null || url.isEmpty) {
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppColors.surface2, AppColors.surface],
-          ),
-        ),
-      );
-    }
-    if (art.headers?['x-ani-src'] != null ||
-        art.headers?['x-mihon-src'] != null) {
-      return Image(
-        image: ResizeImage(
-          art.headers?['x-ani-src'] != null
-              ? AniyomiImage(int.parse(art.headers!['x-ani-src']!), url)
-              : MihonImage(int.parse(art.headers!['x-mihon-src']!), url),
-          width: 420,
-        ),
-        fit: BoxFit.cover,
-        alignment: const Alignment(0, -0.2),
-        errorBuilder: (_, _, _) => ColoredBox(color: AppColors.surface2),
-      );
-    }
-    return CachedNetworkImage(
-      imageUrl: url,
-      httpHeaders: art.headers,
-      memCacheWidth: 420,
-      fit: BoxFit.cover,
-      alignment: const Alignment(0, -0.2),
-      placeholder: (_, _) => ColoredBox(color: AppColors.surface2),
-      errorWidget: (_, _, _) => ColoredBox(color: AppColors.surface2),
-    );
-  }
-
-  /// Kicks off the slash transition into [m]. The actual mode swap happens
-  /// mid-animation via the controller listener wired in [initState].
-  void _enterMode(ContentMode m) {
-    if (_slashing) return;
-    setState(() {
-      _slashing = true;
-      _slashSwapped = false;
-      _slashTarget = m;
-    });
-    _slashCtrl.forward(from: 0);
-  }
 
   /// Full-screen logo-strike overlay: the mark springs in at centre behind a
   /// scrim (peaking at the midpoint to hide the content swap), a red glow pulses
@@ -1361,12 +1123,6 @@ class _HomeViewState extends State<_HomeView>
                           },
                         ),
                       ),
-
-                      // ── Mode cards, and Schedule ──────────────────────────────
-                      // Unconditional: _modeCards drops the mode switchers
-                      // itself under Z Mode and keeps Schedule, which has no
-                      // other entry point since it left the dock.
-                      SliverToBoxAdapter(child: _modeCards()),
 
                       // ── Reconnect banner (session lapsed → sync is off) ───────
                       if (needsReconnect)

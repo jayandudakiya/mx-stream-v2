@@ -6,22 +6,27 @@ import '../../core/mode/content_mode.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
 import '../../core/zmode/zmode_prefs.dart';
-import '../../l10n/l10n.dart';
 
-typedef ModeChoice = ({String Function(BuildContext) label, IconData icon, ContentMode mode, StreamKind kind});
+typedef ModeChoice = ({
+  String Function(BuildContext) label,
+  IconData icon,
+  ContentMode mode,
+  StreamKind kind,
+  String? sourceId,
+});
 
-/// The three things the centre button can switch to. Hollywood and Bollywood
-/// share `ContentMode.anime` + `StreamKind.movie` — the distinction is
-/// purely visual for now; both browse the same movie/TV catalogue.
+/// What the centre button can switch to: Hollywood and Bollywood channel hubs.
 final List<ModeChoice> modeChoices = [
-  (label: (c) => c.l10n.modeAnime, icon: Icons.play_circle_outline_rounded, mode: ContentMode.anime, kind: StreamKind.anime),
-  (label: (_) => 'Hollywood', icon: Icons.movie_outlined, mode: ContentMode.anime, kind: StreamKind.movie),
-  (label: (_) => 'Bollywood', icon: Icons.movie_creation_outlined, mode: ContentMode.anime, kind: StreamKind.movie),
+  (label: (_) => 'Hollywood', icon: Icons.movie_outlined, mode: ContentMode.anime, kind: StreamKind.movie, sourceId: 'native:vegamovies'),
+  (label: (_) => 'Bollywood', icon: Icons.movie_creation_outlined, mode: ContentMode.anime, kind: StreamKind.movie, sourceId: 'native:rogmovies'),
 ];
 
-IconData iconForMode(ContentMode mode, StreamKind kind) => modeChoices
-    .firstWhere((c) => c.mode == mode && (mode != ContentMode.anime || c.kind == kind))
-    .icon;
+IconData iconForMode(ContentMode mode, StreamKind kind, [String? activeSourceId]) {
+  if (activeSourceId == 'native:rogmovies') {
+    return Icons.movie_creation_outlined;
+  }
+  return Icons.movie_outlined;
+}
 
 /// The floating bar above the dock. Hidden (and untappable) when [open] is
 /// false; slides up when true.
@@ -30,13 +35,28 @@ class ModeBar extends StatelessWidget {
     super.key,
     required this.open,
     required this.current,
+    required this.activeSourceId,
     required this.onPicked,
   });
 
   final bool open;
   final (ContentMode, StreamKind) current;
 
-  final void Function(ContentMode mode, StreamKind kind) onPicked;
+  /// The active source id, so the two movie channels (which share a mode and a
+  /// stream kind) can tell which of them is the current one. Empty/unknown
+  /// selects neither channel.
+  final String activeSourceId;
+
+  final void Function(ModeChoice choice) onPicked;
+
+  /// Anime matches on mode+kind as before. A channel matches only when its own
+  /// source is active — otherwise both channel pills would light up together,
+  /// which is exactly what they did while they shared one mode.
+  bool _isSelected(ModeChoice c) {
+    if (c.sourceId != null) return c.sourceId == activeSourceId;
+    return c.mode == current.$1 &&
+        (c.mode != ContentMode.anime || c.kind == current.$2);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +89,8 @@ class ModeBar extends StatelessWidget {
                           child: _Choice(
                             label: c.label(context),
                             icon: c.icon,
-                            selected: c.mode == current.$1 &&
-                                (c.mode != ContentMode.anime || c.kind == current.$2),
-                            onTap: () => onPicked(c.mode, c.kind),
+                            selected: _isSelected(c),
+                            onTap: () => onPicked(c),
                           ),
                         ),
                     ],

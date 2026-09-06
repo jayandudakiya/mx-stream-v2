@@ -17,6 +17,7 @@ import '../models/video_source.dart';
 import '../playback/playback_prefs.dart';
 import '../playback/source_health_store.dart';
 import '../provider/base_provider.dart';
+import '../provider/native/native_provider_adapter.dart';
 import '../provider/native/native_provider_manager.dart';
 import '../i18n/source_languages.dart';
 import '../prefs/source_lang_prefs.dart';
@@ -544,6 +545,10 @@ class SourceRepository implements CatalogueRepository {
           return p.popular(page: page);
         case 'cs_mainpage':
           return (p is CloudStreamProvider && more.categoryId != null)
+              ? p.browseMainPage(more.categoryId!, page)
+              : const [];
+        case 'native_mainpage':
+          return (p is NativeMovieAdapterBase && more.categoryId != null)
               ? p.browseMainPage(more.categoryId!, page)
               : const [];
         default:
