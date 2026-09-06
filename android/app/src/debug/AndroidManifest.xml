@@ -1,0 +1,35 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- The INTERNET permission is required for development. Specifically,
+         the Flutter tool needs it to communicate with the running application
+         to allow setting breakpoints, to provide hot reload, etc.
+    -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Phone MAIN+LAUNCHER lives on MainActivity in the main manifest so
+         `flutter run` can parse it before any APK exists. Release strips that
+         filter (src/release/AndroidManifest.xml) so the activity-aliases stay
+         the only home-screen icons.
+
+         Debug can't strip it (that's the filter the tool needs), so it does the
+         opposite: the aliases are force-disabled here. Without this a debug
+         install shows TWO identical launcher icons — MainActivity's filter AND
+         the alias that ships android:enabled="true" — for one package, so
+         uninstalling either one removes "both".
+         Exactly one launcher entry per build type:
+           debug/profile → MainActivity   (aliases disabled here)
+           release        → the alias      (MainActivity's filter removed)
+         Consequence, debug only: Settings → Appearance can't switch the icon
+         (enabling an alias would bring the second icon back until reinstall),
+         and it reads as the default option regardless of what the launcher
+         shows. Release behaves normally. -->
+    <application>
+        <activity-alias
+            android:name=".MainActivityDefault"
+            android:enabled="false"
+            tools:replace="android:enabled" />
+        <activity-alias
+            android:name=".MainActivityClassic"
+            android:enabled="false"
+            tools:replace="android:enabled" />
+    </application>
+</manifest>

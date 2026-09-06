@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android TV home-screen banner (the 320x180 tile the leanback launcher
+     shows instead of an icon). Composed rather than a flat PNG so it carries
+     the MXStream mark at any density with no separate artwork to maintain:
+     the app's launch background, with the icon foreground centred and inset so
+     it keeps the banner's breathing room. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/launch_bg" />
+    <item
+        android:top="16dp"
+        android:bottom="16dp"
+        android:left="16dp"
+        android:right="16dp">
+        <bitmap
+            android:src="@mipmap/ic_launcher_fg"
+            android:gravity="center"
+            android:filter="true" />
+    </item>
+</layer-list>
