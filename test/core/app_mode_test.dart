@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/app_mode.dart';
+import 'package:orcabox/core/app_mode.dart';
 
 void main() {
   test('AppMode exposes the injected isTv value', () {

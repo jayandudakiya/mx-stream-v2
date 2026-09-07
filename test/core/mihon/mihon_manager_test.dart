@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/mihon/mihon_manager.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/mihon/mihon_source_info.dart';
-import 'package:mxstream/core/mihon/mihon_update.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/mihon/mihon_source_info.dart';
+import 'package:orcabox/core/mihon/mihon_update.dart';
 
 MihonProvider _src(int id, String pkg, int code) => MihonProvider(
       info: MihonSourceInfo(

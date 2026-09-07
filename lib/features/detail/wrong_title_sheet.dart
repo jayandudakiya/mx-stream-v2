@@ -16,7 +16,7 @@ import '../../core/zmode/source_matcher.dart';
 import '../../core/zmode/zmode_ids.dart';
 import '../../core/zmode/zmode_module.dart';
 import '../../l10n/l10n.dart';
-import '../sources/zangetsu_sources_screen.dart';
+import '../sources/orcabox_sources_screen.dart';
 import 'cubit/detail_cubit.dart';
 import 'cubit/source_select_cubit.dart';
 import 'cubit/wrong_title_cubit.dart';
@@ -84,7 +84,7 @@ class _MatchLineState extends State<MatchLine> {
       onChanged: (_) {},
       onInstallSources: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => const ZangetsuSourcesScreen(openToRepos: true),
+          builder: (_) => const OrcaBoxSourcesScreen(openToRepos: true),
         ),
       ),
     ).showPicker(
@@ -537,7 +537,7 @@ class _WrongTitleViewState extends State<_WrongTitleView> {
                     onInstallSources: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         builder: (_) =>
-                            const ZangetsuSourcesScreen(openToRepos: true),
+                            const OrcaBoxSourcesScreen(openToRepos: true),
                       ),
                     ),
                   ).showPicker(context, onPick: (id) => cubit.setSource(id)),

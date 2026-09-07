@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/playback/resume_store.dart';
+import 'package:orcabox/core/playback/resume_store.dart';
 
 void main() {
   late Directory tmp;

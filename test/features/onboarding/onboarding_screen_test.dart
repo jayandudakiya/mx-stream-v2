@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/features/onboarding/onboarding_screen.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/features/onboarding/onboarding_screen.dart';
 
 // Onboarding no longer downloads or installs anything — the app ships with
 // zero sources, and this screen's job is just to explain that and point the
@@ -22,7 +22,7 @@ import 'package:mxstream/features/onboarding/onboarding_screen.dart';
 // "I'll do it later" only touches Hive, so it's exercised directly to cover
 // the mark-onboarded behavior.
 //
-// Also a regression guard from Task E4: Part B's *recommended* Zangetsu repo
+// Also a regression guard from Task E4: Part B's *recommended* OrcaBox repo
 // suggestion lives inside the add-repo dialog only and must never leak into
 // this welcome copy.
 

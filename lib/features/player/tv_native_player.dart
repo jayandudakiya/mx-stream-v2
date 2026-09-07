@@ -32,7 +32,7 @@ import 'subtitle_font_service.dart';
 /// real-window ExoPlayer/SurfaceView) instead of the Flutter platform-view
 /// player, for TVs that black-screen the embedded surface.
 ///
-/// The channel is bidirectional on `zangetsu/tv_player`:
+/// The channel is bidirectional on `orcabox/tv_player`:
 ///  - Dart → native `launch`      : open the player with the first episode ready.
 ///  - native → Dart `resolveEpisode`: resolve a stream on demand (episode switch,
 ///                                     Next Episode) using the SAME resolver +
@@ -43,7 +43,7 @@ import 'subtitle_font_service.dart';
 /// Resolution and persistence stay entirely in Dart; nothing here touches the
 /// phone (media_kit) player.
 class TvNativePlayer {
-  static const _ch = MethodChannel('zangetsu/tv_player');
+  static const _ch = MethodChannel('orcabox/tv_player');
   static bool _handlerBound = false;
 
   // Current session context — set on [play], read by the native→Dart handlers.

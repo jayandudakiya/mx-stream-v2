@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
 
 void main() {
   group('AniyomiRepo.normalizeBase', () {

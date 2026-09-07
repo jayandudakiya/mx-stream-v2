@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/download/download_prefs.dart';
+import 'package:orcabox/core/download/download_prefs.dart';
 
 void main() {
   late Directory dir;

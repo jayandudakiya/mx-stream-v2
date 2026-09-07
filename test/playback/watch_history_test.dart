@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/playback/watch_history.dart';
-import 'package:mxstream/core/supabase/supabase_service.dart';
+import 'package:orcabox/core/playback/watch_history.dart';
+import 'package:orcabox/core/supabase/supabase_service.dart';
 
 // Logged-out callback → save() never touches the network (cloud push is
 // skipped when the user id is null), so these stay pure local-Hive tests.

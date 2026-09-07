@@ -12,10 +12,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/ui/source_switcher.dart';
-import 'package:mxstream/features/home/search_screen.dart';
-import 'package:mxstream/l10n/app_localizations.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/ui/source_switcher.dart';
+import 'package:orcabox/features/home/search_screen.dart';
+import 'package:orcabox/l10n/app_localizations.dart';
 
 SourceBuckets _buckets({
   List<({String id, String label, String? repo})> anime = const [],

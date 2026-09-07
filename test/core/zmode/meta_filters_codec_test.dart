@@ -3,7 +3,7 @@
 // silently drops what the user picked.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/zmode/metadata_filters.dart';
+import 'package:orcabox/core/zmode/metadata_filters.dart';
 
 void main() {
   test('a full selection survives the round trip', () {

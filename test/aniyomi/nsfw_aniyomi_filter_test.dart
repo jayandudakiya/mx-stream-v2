@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_source_info.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_downloader.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/provider/provider_registry.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_source_info.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_downloader.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
 
 // ---------------------------------------------------------------------------
 // Stubs

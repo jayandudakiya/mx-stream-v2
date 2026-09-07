@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 // The log-out confirm content is extracted as a top-level widget so it can be
 // tested without booting the whole shell/DI. See tvLogoutSheet() in
 // root_shell_tv.dart.
-import 'package:mxstream/features/shell/root_shell_tv.dart';
+import 'package:orcabox/features/shell/root_shell_tv.dart';
 
 void main() {
   testWidgets('log-out sheet fires the callback on OK', (tester) async {

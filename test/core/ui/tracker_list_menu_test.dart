@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_binding_store.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
-import 'package:mxstream/core/ui/tracker_list_sheet.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_binding_store.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/ui/tracker_list_sheet.dart';
 
 /// A connected tracker that hands back a canned entry and records what a
 /// removal was actually aimed at — the thing that matters when the user has

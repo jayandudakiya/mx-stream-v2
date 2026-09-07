@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_source_info.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_update.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/features/sources/sources_screen.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_source_info.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_update.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/features/sources/sources_screen.dart';
 
 AniyomiProvider _prov() => AniyomiProvider(
       info: const AniyomiSourceInfo(

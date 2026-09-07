@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/tracker/tracker_item_url.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/tracker/tracker_item_url.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 // A tracker entry opens Detail only if it can be re-keyed to a metadata
 // identity. Entries with no MAL id used to have none, so a tap fell back to

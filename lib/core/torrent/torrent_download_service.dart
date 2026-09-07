@@ -38,9 +38,9 @@ class TorrentDownloadProgress {
 /// from [TorrentService] (streaming) — different channels, different engine.
 class TorrentDownloadService {
   static const MethodChannel _method =
-      MethodChannel('com.spyou.watch_app/torrent_download');
+      MethodChannel('com.orcabox.app/torrent_download');
   static const EventChannel _events =
-      EventChannel('com.spyou.watch_app/torrent_download/events');
+      EventChannel('com.orcabox.app/torrent_download/events');
 
   /// Start (or queue) an offline download of [uri] (magnet/.torrent) under [id].
   /// [saveTreeUri] is the user's chosen SAF folder (null = app storage). Throws

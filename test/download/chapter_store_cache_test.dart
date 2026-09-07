@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/download/chapter_download.dart';
-import 'package:mxstream/core/download/chapter_download_store.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
+import 'package:orcabox/core/download/chapter_download.dart';
+import 'package:orcabox/core/download/chapter_download_store.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
 
 void main() {
   late Directory dir;

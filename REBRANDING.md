@@ -1,10 +1,13 @@
-# MXStream rebrand — what changed, and what only you can finish
+# OrcaBox rebrand — what changed, and what only you can finish
 
-This app began as **Zangetsu** and is now **MXStream 2.0.0**. The rename itself
-is done (identity, icons, labels, strings, version). What is **not** done is
-everything that lives on someone else's servers or accounts — a find/replace
-cannot move those, and quietly repointing them would have broken working
-features. Those are listed under [Before you publish](#before-you-publish).
+This app began as **Zangetsu**, briefly shipped as **MXStream**, and is now
+**OrcaBox**. The rename is done throughout the codebase — identity, package
+names, channels, deep links, strings, docs, tests. What is **not** done is
+everything that lives on someone else's servers or accounts. A find/replace
+cannot move those, and this pass deliberately did not fake them.
+
+Everything outstanding is listed under [Before you publish](#before-you-publish),
+ordered by how much damage it does if it ships as-is.
 
 ---
 
@@ -14,148 +17,188 @@ features. Those are listed under [Before you publish](#before-you-publish).
 
 | Thing | Was | Now |
 | --- | --- | --- |
-| Display name (Android/iOS/tvOS) | Zangetsu | MXStream |
-| Android `applicationId` | `com.spyou.watch_app` | `com.mxstream.app` |
-| iOS/tvOS bundle id | `com.spyou.zangetsu` | `com.mxstream.app` |
-| Dart package | `watch_app` | `mxstream` |
-| Version | `1.9.9+11105` | `2.0.0+11106` |
-| Launcher icon | Zangetsu katana / "Z" mark | MXStream mark (from v1) |
-| Android TV banner | Zangetsu PNG | composed drawable, MXStream mark |
-| In-app wordmark | `assets/icon/wordmark.png` | drawn as text (`core/ui/app_wordmark.dart`) |
-| Product name constant | `kAppName = 'Zangetsu'` | `kAppName = 'MXStream'` |
-| UI strings (8 locales) | "Zangetsu…" / "斬月" | "MXStream…" |
+| Display name (Android/iOS/tvOS) | MXStream | OrcaBox |
+| Android `applicationId` | `com.mxstream.app` | `com.orcabox.app` |
+| Android `namespace` | `com.spyou.watch_app` | `com.orcabox.app` |
+| Kotlin package tree | `com/spyou/watch_app/` | `com/orcabox/app/` |
+| iOS/tvOS bundle id | `com.mxstream.app` | `com.orcabox.app` |
+| Dart package | `mxstream` | `orcabox` |
+| Product name constant | `kAppName = 'MXStream'` | `kAppName = 'OrcaBox'` |
+| Method/event channels | `zangetsu/…`, `com.spyou.watch_app/…` | `orcabox/…`, `com.orcabox.app/…` |
+| Deep-link scheme | `mxstream://` + `zangetsu://` | `orcabox://` only |
+| UI strings (9 locales) | "MXStream…" | "OrcaBox…" |
+| Backup file name / token | `mxstream-backup-*.json` | `orcabox-backup-*.json` |
+| Download folder | `Download/MXStream` | `Download/OrcaBox` |
 
-The splash/loading animation itself is untouched — same glow, same wipe-reveal,
-same timings. Only the name it reveals changed, and it is now type rather than
-artwork, so it stays sharp at any size and follows a custom accent colour.
+### Original-author identity removed from the app
 
-### The duplicate-icon bug
+The upstream author's name, avatar and GitHub links are gone from everything
+that ships or runs:
 
-A debug install showed **two identical launcher icons**, and uninstalling either
-removed "both" — because they were one package with two launcher entries:
+* `_DeveloperRow` — the "Lead Developer" card on the About screen — is deleted.
+* `kCoreTeam` and `kFixedCommunity` (`core/ui/team_section.dart`) are now empty,
+  so the Contributors page is driven entirely by `kAppRepo`'s own GitHub
+  contributors. The "Team" heading hides itself when nothing is pinned.
+* `kExcludedFromCommunity` is empty; bots are still filtered on payload `type`.
+* `CLA.md` (a contributor agreement between the upstream author and
+  contributors) is deleted, along with the two `CONTRIBUTING.md` links to it.
+* `flows/Zangetsu_Adaptation_Roadmap.md` — fork-adaptation planning — deleted.
+* The upstream `*-providers` repo pointer is dropped from `CONTRIBUTING.md`.
 
-* `MainActivity` carries `MAIN` + `LAUNCHER` in the main manifest, because
-  `flutter run` parses *that file* (not the merged APK) to find a launch
-  activity, and it ignores `<activity-alias>`. Without it the tool fails with
-  "package identifier or launch activity not found" on a clean checkout.
-* `MainActivityClassic` (an `<activity-alias>`, the real home-screen entry that
-  the icon picker flips) also shipped `enabled="true"` with its own
-  `MAIN` + `LAUNCHER`.
+### Attribution kept, deliberately
 
-Release already stripped the first one (`src/release/AndroidManifest.xml`), so
-this only ever hit debug/profile builds. The fix does the opposite there: the
-aliases are force-disabled in `src/debug/` and `src/profile/`. Result — exactly
-one launcher entry per build type:
+`LICENSE` is **byte-identical to upstream** and must stay that way. It is
+GPL-3.0 plus additional terms under GPLv3 Section 7, and those terms are not
+optional for a fork:
 
-| Build | Launcher entry |
-| --- | --- |
-| debug / profile | `MainActivity` (aliases disabled) |
-| release | the enabled alias (`MainActivity`'s filter removed) |
+* **Term A** grants no right to use the Zangetsu name, logo, icon or branding —
+  which is why the rename was required, not merely wanted.
+* **Term B** requires this build be marked prominently as a modified, unofficial
+  fork, distinct from the original.
+* **Term C** requires a clearly visible credit to the original project and its
+  author, with a link to the original repository, in at least one of: the
+  About/Credits screen, the README, or the NOTICE file.
 
-Known debug-only consequence: Settings → Appearance can't switch the icon in a
-debug build (enabling an alias would bring the second icon back until you
-reinstall). Release behaves normally.
+Terms B and C are satisfied in **`NOTICE.md`** and the README's
+"License & Attribution" section — deliberately *not* in the app UI, so the
+running app carries no third-party personal identity. Do not delete those two
+blocks; everything else about the branding is yours.
+
+`LICENSE-Apache-2.0.txt` stays too — Aniyomi/Tachiyomi-derived extension-loading
+code under `android/app/src/main/kotlin/com/orcabox/app/aniyomi/` keeps its
+original Apache-2.0 headers.
+
+### Compatibility shims added
+
+Renames that would otherwise have broken existing installs:
+
+* `backup_payload.dart` accepts `mxstream` and `zangetsu` app tokens on **read**
+  (writes only emit `orcabox`), so backups users already hold still restore.
+* `backup_file.dart` also scans `Download/MXStream` and `Download/Zangetsu` when
+  listing local backups on TV.
 
 ### Deliberately left alone
 
-These look like brand strings but are not, and changing them breaks things:
-
-* **`kAppId = 'watch_app'`** (`lib/core/app_config.dart`) — every published
-  provider-repo manifest declares this token and the repo guard checks it.
-  Changing it makes the app reject every existing source repo. Never shown to
-  the user.
-* **Kotlin namespace `com.spyou.watch_app`** — the `applicationId` is what the
-  Play Store and the device show; the namespace is an internal Java package.
-  Android supports them differing. Renaming it means moving 100+ `.kt` files and
-  rewriting every `MethodChannel` name on both sides for zero user-visible gain.
-* **`MethodChannel` names (`zangetsu/…`, `com.spyou.watch_app/…`)** — private
-  Dart↔Kotlin wire names, matched literally on both sides.
-* **Hive box names, the backup format tag (`_kApp = 'zangetsu'`), cache dir
-  names** — storage identifiers. Changing the backup tag would make backups
-  exported from an older install unrestorable.
-* **`zangetsu://` URL scheme** — still registered *alongside* the new
-  `mxstream://` one. See below for why it can't just be swapped.
+* **`kAppId = 'watch_app'`** — not a brand string. Every published provider-repo
+  manifest declares this token and the repo guard checks it; changing it would
+  make the app reject every existing source repo. It is never shown to a user.
+* **`com.lagradost.cloudstream3`** namespace — CloudStream `.cs3` extensions
+  resolve these classes by name. Renaming it breaks every extension.
+* **`eu.kanade.tachiyomi`** namespace — same, for Aniyomi/Mihon extensions.
+* **`zmode` / `zmode_prefs`** — the internal token for what the UI calls
+  "OrcaBox Mode". The prefs keys are persisted user settings; renaming them
+  silently resets everyone's mode and source choices. Comments and UI strings
+  were rebranded; the storage keys were not. Rename them only behind a
+  migration.
 
 ---
 
 ## Before you publish
 
-Ordered by how much damage each one does if it ships as-is.
+### 1. The app still runs on the upstream author's backends
 
-### 1. The app runs on the upstream author's backends
-
-`lib/core/environment.dart` still points at infrastructure belonging to the
-original Zangetsu developer:
+`lib/core/environment.dart` points at infrastructure that is not yours:
 
 * **Appwrite** project `6a1ed44f0029b50bccde`
 * **Supabase** project `eogwzrlfoercfwcfwlmv` (+ its anon key)
-* **AniList** client `43052`, **MyAnimeList** client `ac00694…`,
-  **Simkl** client + **client secret**
-* **`zangetsu.online`** — the password-reset landing, the share "open" page and
-  the TV pairing page
+* **AniList** client `43052`, **MyAnimeList** client, **Simkl** client + secret
+* **`orcabox.online`** — a placeholder written by the rename. The real value was
+  `zangetsu.online`, which you do not own. **You do not own `orcabox.online`
+  either** — buy it, or point `siteBaseUrl` at a domain you do own.
 
-Shipping this means every MXStream account, watch history and backup is written
+Shipping this means every OrcaBox account, watch history and backup is written
 into someone else's database, and every tracker login runs under their OAuth
-apps. They can revoke or rotate any of it at any time, and the reset/share links
-say `zangetsu.online`. Stand up your own Appwrite/Supabase projects, register
-your own AniList/MAL/Simkl apps, and point `Environment` at a domain you own.
+apps, which they can revoke or rotate at any time. Stand up your own Appwrite
+and Supabase projects, register your own AniList/MAL/Simkl apps, and point
+`Environment` at your own domain.
 
-### 2. Then, and only then, retire the `zangetsu://` scheme
+### 2. Tracker sign-in is inert until step 1 is done
 
-`Environment.trackerRedirectScheme` is still `'zangetsu'` **on purpose**. That
-exact redirect URI is registered on the OAuth apps above, and the share/pair
-pages on `zangetsu.online` redirect to it. Changing the constant today would
-break tracker sign-in and every share link immediately.
+`Environment.trackerRedirectScheme` is now `'orcabox'`, and the `zangetsu://`
+intent filters are gone from `AndroidManifest.xml` and `Info.plist`. That is the
+correct end state, but the OAuth apps in step 1 still have `zangetsu://…`
+registered as their redirect URI — so **AniList / MAL / Simkl sign-in will fail
+until you register your own apps** with `orcabox://anilist-auth`,
+`orcabox://mal-auth` and `orcabox://simkl-auth`.
 
-`mxstream://` is already registered on Android and iOS, so once step 1 is done
-the switch is a one-line change: set `trackerRedirectScheme = 'mxstream'`, put
-`mxstream://anilist-auth` (etc.) in your own OAuth app settings, and have your
-own site redirect to `mxstream://open` / `mxstream://pair`. Keep the
-`zangetsu://` filters for one release so links already in the wild still open.
+Your share/pair pages must redirect to `orcabox://open` and `orcabox://pair` to
+match. If you would rather not break sign-in before the new OAuth apps exist,
+temporarily re-add the old `<data android:scheme="zangetsu" …>` filters — but
+that is a stopgap, and it puts the upstream brand back in your manifest.
 
-### 3. Repo-owned features now point at `kAppRepo`
+### 3. Repo-owned features point at `kAppRepo`
 
 `kAppRepo` in `lib/core/app_config.dart` is `jayandudakiya8100/mx-stream-app`,
-and five features derive from it — the **in-app updater** (GitHub Releases), the
+and five features derive from it: the **in-app updater** (GitHub Releases), the
 **announcements feed**, the **contributors list**, the **downloadable subtitle
-fonts** (`assets/fonts/`, already in this tree) and the **Discord presence
-icon**. Previously each hardcoded the upstream repo, which meant the upstream
-owner could push an APK and an on-launch message to every MXStream install.
+fonts** (`assets/fonts/`) and the **Discord presence icon**.
 
-Set `kAppRepo` to whichever repo you actually publish this from, and make sure
-that repo's default branch has `announcements.json` and `assets/fonts/`.
+Left pointing at the existing repo on purpose — it works today. If you rename
+the GitHub repo to `orcabox`, change `kAppRepo` in that one place and make sure
+the new repo's default branch still has `announcements.json` and `assets/fonts/`.
+Whoever owns this repo can push an APK and an on-launch message to every
+install, so it must always be a repo you control.
 
-### 4. Community links and the Discord application
+The README badges and clone URL were updated to this same repo; they will need
+the same one-line change if you rename it.
 
-* `kDiscordInviteUrl` (`app_config.dart`) — upstream's Discord invite.
-* `_telegramUrl` (`features/community/community_sheet.dart`,
-  `features/settings/settings_about.dart`) — upstream's Telegram.
-* `DiscordConfig.applicationId` — upstream's Discord application. Rich Presence
-  shows the name registered on *that application*, so it will say the old brand
-  no matter what `appName` says here. Create your own application and paste its
-  id.
-* `_websiteUrl` in `settings_about.dart` — `zangetsu.online`.
+### 4. Community links, donations and the Discord application
+
+The upstream project's endpoints have been **blanked, not renamed** — a
+find/replace would only have invented dead handles, and the originals sent real
+users and real money to someone else. Every entry point is gated on its value
+being non-empty, so filling one in switches its UI back on with no other change:
+
+| Constant | File | Gates |
+| --- | --- | --- |
+| `kDiscordInviteUrl` | `core/app_config.dart` | Settings → Discord tile, launch community sheet (via `kHasDiscord`) |
+| `_telegramUrl` | `features/settings/settings_about.dart` | Settings → Telegram tile |
+| `_telegramUrl` | `features/community/community_sheet.dart` | Launch sheet's Telegram button |
+| `_bmcUrl`, `_paypalUrl`, `_upiId` | `features/settings/donate_screen.dart` | Each donate button, and the whole Support entry (via `DonateScreen.isConfigured`) |
+
+The launch community sheet suppresses itself entirely while no link is set, so
+it won't burn its one-shot "seen" flag on an empty prompt.
+
+Still yours to do:
+
+* `DiscordConfig.applicationId` — **upstream's Discord application**. Rich
+  Presence shows the name registered on *that application*, so it will display
+  the old brand no matter what `kAppName` says. Create your own, paste its id.
+* `_websiteUrl` in `settings_about.dart` — `orcabox.online` placeholder.
 
 ### 5. Signing, stores and Firebase
 
-* **Same `applicationId` as MXStream v1 (`com.mxstream.app`)** — deliberate, so
-  2.0.0 upgrades v1 in place instead of installing beside it. That only works if
-  it is signed with **v1's keystore**; a different key gives users a
-  signature-mismatch install failure. On your own device, a debug build will not
-  install over a release-signed v1 — uninstall v1 first.
-* **Version code** — `+11106`, above both v1 (`+3`) and the last Zangetsu build
-  (`+11105`). Never reset this to `+1`: Android refuses an update whose version
-  code is not higher.
-* **Firebase** — no `google-services.json` is present, so the plugin is not
-  applied and Firebase is inert. If you add it, register `com.mxstream.app` (the
-  old id is not registered on any project you own).
-* **Licensing** — unchanged and still unresolved: this app is GPL-3.0 (it
-  bundles CloudStream) while the v1 code it now carries is CC BY-NC-SA 4.0
-  (a Mirarr fork). Those two cannot both be satisfied in one published binary.
+* Generate a new upload/signing key for `com.orcabox.app`; the old key is tied
+  to the previous identity.
+* `com.orcabox.app` becomes permanent on your first Play upload — it can never
+  be changed afterwards. Make sure it is what you want before you publish.
+* Regenerate `google-services.json` / `GoogleService-Info.plist` against a
+  Firebase project registered to `com.orcabox.app` if you use Firebase.
+* Play Console requires identity and address verification, and the developer
+  name is shown publicly on the listing. Decide personal vs organization
+  up front — switching later is painful.
+* The app is **GPL-3.0** (CloudStream is copyleft), so the source must remain
+  available to anyone you distribute a binary to.
 
-### 6. Cosmetic leftovers
+### 6. Assets — done, with one gap
 
-`README.md`, `CONTRIBUTING.md`, `CLA.md`, `NOTICE.md`, `AI_POLICY.md` and the
-`flows/` docs still describe Zangetsu, as do source-code comments. None of it
-ships in the APK. `NOTICE.md` in particular should *keep* its CloudStream and
-Aniyomi attribution — that is a license requirement, not branding.
+All launcher and branding artwork is now the OrcaBox orca mark, derived from
+`orcabox-logo/full-logo-no-bg.png` (the only supplied file with a real alpha
+channel) cropped to the mark alone, so no wordmark rides along into an icon.
+
+Replaced: `assets/icon/{app_icon,logo_mark,preview_default}.png` +
+`preview_classic.webp`, all 20 Android mipmaps across 5 densities, all 21 iOS
+AppIcon sizes, and the full tvOS brand set — which was still the **original
+Zangetsu katana artwork, wordmark included**, on both icon stacks and both Top
+Shelf images. `@color/ic_launcher_bg` moved from the old cream `#F4E9D3` to
+`#0B0B0F` to match the mark and the launch window.
+
+The old `assets/icon/*.png` files were JPEGs with a `.png` extension; the
+replacements are real PNGs.
+
+**Gap:** the Android 13+ themed-icon `<monochrome>` layer
+(`ic_launcher_classic_fg`) is a desaturated copy of the full mark. Android tints
+monochrome layers by alpha alone and ignores colour, so a detailed mark renders
+as a filled blob. A proper themed icon needs a purpose-drawn single-shape
+silhouette — that is design work, not a conversion, and was deliberately not
+faked here.

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mxstream/core/anilist/anilist_service.dart';
-import 'package:mxstream/core/tracker/mal_service.dart';
-import 'package:mxstream/core/tracker/relay/tracker_relay.dart';
-import 'package:mxstream/core/tracker/simkl_service.dart';
-import 'package:mxstream/features/auth/send_trackers_to_tv_screen.dart';
-import 'package:mxstream/features/auth/tv_pairing_service.dart';
+import 'package:orcabox/core/anilist/anilist_service.dart';
+import 'package:orcabox/core/tracker/mal_service.dart';
+import 'package:orcabox/core/tracker/relay/tracker_relay.dart';
+import 'package:orcabox/core/tracker/simkl_service.dart';
+import 'package:orcabox/features/auth/send_trackers_to_tv_screen.dart';
+import 'package:orcabox/features/auth/tv_pairing_service.dart';
 
 // ── Fakes (same pattern as test/features/shell/root_shell_tv_test.dart) ────
 

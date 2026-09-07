@@ -9,9 +9,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/prefs/source_lang_prefs.dart';
-import 'package:mxstream/features/sources/mihon_repo_tab.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/prefs/source_lang_prefs.dart';
+import 'package:orcabox/features/sources/mihon_repo_tab.dart';
 
 class _FakeMangaLangPrefs extends MangaLangPrefs {
   _FakeMangaLangPrefs(this._langs);

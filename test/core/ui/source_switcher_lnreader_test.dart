@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/lnreader/lnreader_extension_service.dart';
-import 'package:mxstream/core/lnreader/lnreader_manager.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_downloader.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/ui/source_switcher.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/lnreader/lnreader_extension_service.dart';
+import 'package:orcabox/core/lnreader/lnreader_manager.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_downloader.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/ui/source_switcher.dart';
 
 /// Task 6's fix: `categorizedSources()` enumerated ProviderRegistry,
 /// CloudStreamManager, AniyomiManager, and MihonManager, but never

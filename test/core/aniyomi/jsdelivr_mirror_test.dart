@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_extension_service.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_extension_service.dart';
 
 void main() {
   test('rewrites a github raw apk URL to the jsDelivr CDN mirror', () {

@@ -22,7 +22,7 @@ import 'source_matcher.dart';
 import 'tmdb_catalogue.dart';
 import 'zmode_ids.dart';
 
-/// The Zangetsu Mode catalogue: browsing comes from AniList/TMDB, playback
+/// The OrcaBox Mode catalogue: browsing comes from AniList/TMDB, playback
 /// from whichever installed source [SourceMatcher] pairs the title with.
 /// `sources()` is the one method that never answers from metadata.
 class MetadataRepository implements CatalogueRepository {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_filters.dart';
-import 'package:mxstream/features/aniyomi/aniyomi_filter_sheet.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_filters.dart';
+import 'package:orcabox/features/aniyomi/aniyomi_filter_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/share/local_video_link.dart';
+import 'package:orcabox/core/share/local_video_link.dart';
 
 // "Open with" support puts a new check at the FRONT of OpenLinkService._onLink,
 // ahead of the tracker-OAuth and share-link handlers that have always been
@@ -29,7 +29,7 @@ void main() {
     test('tracker OAuth redirects', () {
       for (final host in ['anilist-auth', 'mal-auth', 'simkl-auth']) {
         expect(
-          LocalVideoLink.matches(Uri.parse('zangetsu://$host?code=abc')),
+          LocalVideoLink.matches(Uri.parse('orcabox://$host?code=abc')),
           isFalse,
           reason: '$host must still reach its tracker service',
         );
@@ -38,10 +38,10 @@ void main() {
 
     test('share and pairing deep links', () {
       for (final u in [
-        'zangetsu://open?d=x&t=y',
-        'zangetsu://pair?code=1234',
-        'zangetsu://room?code=1234',
-        'https://zangetsu.online/pair/?code=1234',
+        'orcabox://open?d=x&t=y',
+        'orcabox://pair?code=1234',
+        'orcabox://room?code=1234',
+        'https://orcabox.online/pair/?code=1234',
       ]) {
         expect(LocalVideoLink.matches(Uri.parse(u)), isFalse, reason: u);
       }

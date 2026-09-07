@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 import '../../core/di/injector.dart';
 import '../../core/lnreader/lnreader_extension_service.dart';

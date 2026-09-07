@@ -10,14 +10,14 @@ import '../platform/app_paths.dart';
 
 // ── Pure helpers (tested) ─────────────────────────────────────────────────────
 
-/// Returns a file name like `zangetsu-backup-20260702-0905.json`.
+/// Returns a file name like `orcabox-backup-20260702-0905.json`.
 String backupFileName(DateTime now) {
   final y  = now.year.toString().padLeft(4, '0');
   final mo = now.month.toString().padLeft(2, '0');
   final d  = now.day.toString().padLeft(2, '0');
   final h  = now.hour.toString().padLeft(2, '0');
   final mi = now.minute.toString().padLeft(2, '0');
-  return 'mxstream-backup-$y$mo$d-$h$mi.json';
+  return 'orcabox-backup-$y$mo$d-$h$mi.json';
 }
 
 /// Decodes [raw] as JSON and asserts it is a JSON object.
@@ -39,7 +39,7 @@ Map<String, dynamic> parseBackupJson(String raw) {
 
 class BackupFile {
   /// Encodes [payload] as JSON and saves it into the public
-  /// **Downloads/Zangetsu** folder so the user can find it in their file
+  /// **Downloads/OrcaBox** folder so the user can find it in their file
   /// manager. Returns the saved public path, or `null` if the move to shared
   /// storage failed.
   Future<String?> export(
@@ -63,7 +63,7 @@ class BackupFile {
       } catch (_) {/* best-effort — never block the primary export */}
     }
 
-    // Move into public Downloads/Zangetsu for the user's file manager. On TV
+    // Move into public Downloads/OrcaBox for the user's file manager. On TV
     // boxes this often has no shared-storage target and returns null/throws —
     // in which case the app-private copy above is the saved backup, so report
     // its path (restore-from-file lists it) instead of failing. On a phone
@@ -73,7 +73,7 @@ class BackupFile {
       final shared = await FileDownloader().moveFileToSharedStorage(
         file.path,
         SharedStorage.downloads,
-        directory: 'MXStream',
+        directory: 'OrcaBox',
       );
       if (shared != null && shared.isNotEmpty) return shared;
     } catch (_) {/* shared storage unavailable (common on TV) */}
@@ -94,7 +94,7 @@ class BackupFile {
 
   /// Backup files this app can read back without a document picker, newest
   /// first. Scans the app-private backups dir plus a best-effort look at the
-  /// public Downloads/Zangetsu folder (readable on many TV boxes). Used by the
+  /// public Downloads/OrcaBox folder (readable on many TV boxes). Used by the
   /// TV restore flow in place of the (usually absent) system file picker.
   Future<List<File>> listLocalBackups() async {
     final found = <String, File>{}; // de-dupe by file name
@@ -110,7 +110,12 @@ class BackupFile {
     }
 
     await scan(await _localBackupDir());
-    await scan(Directory('/storage/emulated/0/Download/Zangetsu'));
+    await scan(Directory('/storage/emulated/0/Download/OrcaBox'));
+    // Pre-rename download folders, so backups a user already has on disk still
+    // show up in the TV restore list. Write only ever targets OrcaBox above.
+    for (final legacy in const ['MXStream', 'Zangetsu']) {
+      await scan(Directory('/storage/emulated/0/Download/$legacy'));
+    }
 
     final files = found.values.toList()
       ..sort((a, b) => b.path.compareTo(a.path)); // name embeds the timestamp
@@ -129,7 +134,7 @@ class BackupFile {
     // which makes the backup impossible to select — the #1 "restore doesn't
     // work" cause. The content is validated by parseBackupJson/unwrapPayload
     // right after reading, so allowing any file is safe (bad picks get a clear
-    // "isn't a Zangetsu backup" error).
+    // "isn't an OrcaBox backup" error).
     final picked = await FilePicker.pickFile();
     if (picked == null) return null;
 

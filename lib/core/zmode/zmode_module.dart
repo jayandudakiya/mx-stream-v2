@@ -26,7 +26,7 @@ import 'zmode_prefs.dart';
 /// Registered even when the toggle is off: the router reads the pref per call,
 /// so flipping the toggle never re-registers anything. Call once from
 /// `initDependencies`, after `SourceRepository` and `ContentModeCubit`.
-Future<void> registerZangetsuMode(GetIt sl) async {
+Future<void> registerOrcaBoxMode(GetIt sl) async {
   final matchStore = await MatchStore.open();
   sl.registerSingleton<MatchStore>(matchStore);
 

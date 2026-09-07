@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/features/home/see_all_screen.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/features/home/see_all_screen.dart';
 
 MediaItem _item(String id) => MediaItem(
   id: id,

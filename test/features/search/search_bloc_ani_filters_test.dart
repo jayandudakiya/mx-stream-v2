@@ -1,19 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_filters.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/video_source.dart';
-import 'package:mxstream/core/playback/search_history.dart';
-import 'package:mxstream/core/playback/search_prefs.dart';
-import 'package:mxstream/core/playback/source_health_store.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/search/title_suggestion_service.dart';
-import 'package:mxstream/features/search/bloc/search_bloc.dart';
-import 'package:mxstream/features/search/bloc/search_event.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_filters.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/video_source.dart';
+import 'package:orcabox/core/playback/search_history.dart';
+import 'package:orcabox/core/playback/search_prefs.dart';
+import 'package:orcabox/core/playback/source_health_store.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/search/title_suggestion_service.dart';
+import 'package:orcabox/features/search/bloc/search_bloc.dart';
+import 'package:orcabox/features/search/bloc/search_event.dart';
 
 // ---------------------------------------------------------------------------
 // Fakes — all use `extends`/`implements` to bypass native-plugin constructors

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 /// How a list/grid card enters. [rise] is the default — the fade + lift that
 /// reads as motion without being showy; the other two are for people who want

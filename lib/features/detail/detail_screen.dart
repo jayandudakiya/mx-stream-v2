@@ -139,7 +139,7 @@ String _sourceLabel(
   PreferredProvider? prefer,
   String? savedFrom,
 }) {
-  // Zangetsu Mode's pseudo source: the provider that answers for THIS title,
+  // OrcaBox Mode's pseudo source: the provider that answers for THIS title,
   // not the raw "zm" id — and keyed on the title's own kind, since the mode
   // you happen to be browsing in may be a different one entirely.
   if (sourceId == ZmodeIds.sourceId) {
@@ -753,8 +753,8 @@ class _DetailViewState extends State<_DetailView>
   );
 
   void _share(MediaDetail detail, String sourceName) {
-    // Native OS share sheet with a Zangetsu deep link: on tap it opens the app
-    // straight to this title (on its source) if installed, else the Zangetsu
+    // Native OS share sheet with an OrcaBox deep link: on tap it opens the app
+    // straight to this title (on its source) if installed, else the OrcaBox
     // site to download. The link carries the item, so sourceName is unused now.
     SharePlus.instance.share(
       ShareParams(text: ShareLink.shareText(widget.item)),
@@ -2261,7 +2261,7 @@ class _DetailViewState extends State<_DetailView>
 /// The bar shown when a detail page only half-loaded.
 ///
 /// Named after the service that actually failed, not the app: "couldn't load"
-/// on its own reads as Zangetsu being broken, when the usual causes are
+/// on its own reads as OrcaBox being broken, when the usual causes are
 /// AniList rate-limiting or a source being down. It sits over the page rather
 /// than replacing it — the row you tapped already had a cover and a title, and
 /// throwing those away to show an error helps nobody.

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/tracker/tracker_item_url.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/tracker/tracker_item_url.dart';
 
 MediaItem _stub({
   int? malId,

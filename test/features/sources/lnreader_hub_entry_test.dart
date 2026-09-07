@@ -14,18 +14,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/lnreader/lnreader_extension_service.dart';
-import 'package:mxstream/core/lnreader/lnreader_manager.dart';
-import 'package:mxstream/core/lnreader/novel_lang_prefs.dart';
-import 'package:mxstream/core/mihon/mihon_manager.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/provider/provider_repo_registry.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/features/sources/lnreader_sources_screen.dart';
-import 'package:mxstream/features/sources/providers_hub_screen.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/lnreader/lnreader_extension_service.dart';
+import 'package:orcabox/core/lnreader/lnreader_manager.dart';
+import 'package:orcabox/core/lnreader/novel_lang_prefs.dart';
+import 'package:orcabox/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/provider/provider_repo_registry.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/features/sources/lnreader_sources_screen.dart';
+import 'package:orcabox/features/sources/providers_hub_screen.dart';
 
 // ---------------------------------------------------------------------------
 // Fakes — same shape as mihon_hub_entry_test.dart's (private to that file,
@@ -203,7 +203,7 @@ void main() {
 
   testWidgets(
     'an lnr: active id badges the LNReader row ACTIVE and does not badge the '
-    'Zangetsu row',
+    'OrcaBox row',
     (tester) async {
       lnrService.seed(_pluginA);
       await sl.unregister<ActiveSourceCubit>();
@@ -222,7 +222,7 @@ void main() {
       lnrService.seed(_pluginA);
       await pump(tester);
 
-      // 2 Zangetsu entries + 1 LNReader source.
+      // 2 OrcaBox entries + 1 LNReader source.
       expect(find.text('3 sources ready'), findsOneWidget);
     },
   );

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/error/network_failure.dart';
+import 'package:orcabox/core/error/network_failure.dart';
 
 void main() {
   final req = RequestOptions(path: '/x');

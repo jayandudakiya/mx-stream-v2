@@ -29,11 +29,11 @@ Phase 3 into the wrong file.
    `NativeMetadataBridge` hook added in `native_provider_adapter.getDetail` is
    NOT on the path the screenshot took, and my earlier "one hook covers every
    screen" claim holds only for the source-first path.
-2. **Which ecosystem `CS.json` belongs to.** It is a *CloudStream* repo
+2. **Which ecosystem `CS.json` belongs to.** It is a _CloudStream_ repo
    (`manifestVersion: 2`, `pluginLists` → `plugins.json`), so it installs under
-   Providers → **CloudStream**, not under "MXStream providers" (which is the
+   Providers → **CloudStream**, not under "OrcaBox providers" (which is the
    built-in JS ecosystem and is legitimately empty now). The screenshot showing
-   "MXStream providers → No providers installed" may therefore be correct and
+   "OrcaBox providers → No providers installed" may therefore be correct and
    not the bug. Verify what `ProviderReposRegistry.addRepo` accepts vs what
    `CloudStreamManager` installs.
 3. **Whether `native:vegamovies` / `native:rogmovies` appear in the picker at
@@ -48,19 +48,19 @@ Phase 3 into the wrong file.
 
 **Goal:** a fresh install has working sources with no visit to Providers.
 
-* Add a first-launch seed step in `lib/core/di/injector.dart`, after
+- Add a first-launch seed step in `lib/core/di/injector.dart`, after
   `ProviderRegistry.init()` / `CloudStreamManager.init()`, guarded by a
   `seededDefaultRepo` flag in the `app_prefs` box so it runs once and a user who
   deliberately removes a repo does not get it re-added.
-* Seed order:
+- Seed order:
   1. `ProviderReposRegistry.addRepo('https://raw.githubusercontent.com/SaurabhKaperwan/CSX/builds/CS.json')`
      — resolves to `pluginLists: [.../builds/plugins.json]`.
   2. Fetch that `plugins.json` and install the Hindi/English plugins through the
      existing CloudStream install path (`CloudStreamManager` / `RepoManager`).
-* Do it **off the splash critical path** (fire-and-forget with a timeout, like
+- Do it **off the splash critical path** (fire-and-forget with a timeout, like
   the existing Aniyomi/Mihon boot steps) so a blocked network cannot trap the
   loading screen. Report progress into the Providers screen's own counter.
-* `native:vegamovies` / `native:rogmovies` need no install step — they are
+- `native:vegamovies` / `native:rogmovies` need no install step — they are
   compiled in. If the Providers screen's "sources ready" count ignores them,
   fix the count rather than adding a fake install record.
 
@@ -82,19 +82,19 @@ non-zero source count, and Home loads without the user opening Providers.
 Port from v1 `lib/homePage/homePage.dart` (channel state at line 79 onward) into
 `lib/features/home/home_screen.dart` + `cubit/home_cubit.dart`:
 
-* Channel state `'hollywood' | 'bollywood'` (the screenshot already shows
+- Channel state `'hollywood' | 'bollywood'` (the screenshot already shows
   Anime/Hollywood/Bollywood pills — keep Anime as-is).
-* Channel → source: **Hollywood → `native:vegamovies`**, **Bollywood →
+- Channel → source: **Hollywood → `native:vegamovies`**, **Bollywood →
   `native:rogmovies`**.
-* Per-channel shelves from v1's category keys, which the adapters already
+- Per-channel shelves from v1's category keys, which the adapters already
   expose via `homeSections`:
-  * Hollywood: Latest Releases, Netflix, Prime Video, Hotstar, Anime
-  * Bollywood: Latest Bollywood, Netflix, Prime Video, Zee5, JioHotstar
-* Keep v1's two in-memory caches (`_channelShelvesCache`, `_channelHeroCache`)
+  - Hollywood: Latest Releases, Netflix, Prime Video, Hotstar, Anime
+  - Bollywood: Latest Bollywood, Netflix, Prime Video, Zee5, JioHotstar
+- Keep v1's two in-memory caches (`_channelShelvesCache`, `_channelHeroCache`)
   so switching channels is instant and does not refetch.
-* Hero carousel per channel from `getTrendingSlider()` (already ported on both
+- Hero carousel per channel from `getTrendingSlider()` (already ported on both
   providers, currently unused by the adapter — expose it or call it directly).
-* Horizontal shelf pagination: v1's `MovieShelfSection` pattern —
+- Horizontal shelf pagination: v1's `MovieShelfSection` pattern —
   `maxScrollExtent - 200` triggers `popular(page: n+1)`.
 
 **Done when:** tapping Hollywood/Bollywood swaps the rows to that provider's
@@ -107,20 +107,20 @@ content instantly on second visit, and rows paginate horizontally.
 Today Play is disabled until the user picks a title in the **Pick the right
 title** sheet. It must play immediately, with that sheet as an override.
 
-* Depending on Phase 0's answer:
-  * **Source-first path:** the provider's detail already *is* the title, so no
+- Depending on Phase 0's answer:
+  - **Source-first path:** the provider's detail already _is_ the title, so no
     matching step should exist. Make Play resolve
     `getVideoSources(episode.url)` directly.
-  * **Z Mode path:** auto-bind the top provider search result instead of
+  - **Z Mode path:** auto-bind the top provider search result instead of
     waiting for a manual pick — reuse `bestTitleMatch()` in
     `lib/core/models/media_item.dart`, and record the binding in the existing
     binding store so it is remembered.
-* Consider porting v1's confidence scoring from
+- Consider porting v1's confidence scoring from
   `mx-stream-app/lib/services/metadata/metadata_resolver.dart`
   (`_tokenSetRatio` / `_levenshteinRatio`, accept ≥ 0.80, partial ≥ 0.65):
   auto-bind above the accept threshold, and only surface "Wrong title?" as a
   hint below it. That is exactly how v1 avoided a manual step.
-* **Keep the Wrong title? sheet.** It is genuinely good — it just must stop
+- **Keep the Wrong title? sheet.** It is genuinely good — it just must stop
   being mandatory. It is also the fallback when confidence is low.
 
 **Done when:** open any Home card → Play works on first tap, and Wrong title?
@@ -132,17 +132,17 @@ still lets the user re-bind.
 
 A movie renders "1 Episode", a "Download E1" button and an Episodes tab.
 
-* Cause is in my adapter: `native_provider_adapter.dart` `getDetail` synthesises
+- Cause is in my adapter: `native_provider_adapter.dart` `getDetail` synthesises
   a single `Episode(title: 'Movie')` for movies, because `getVideoSources` needs
   an episode url to resolve against and CloudStream's own host does the same.
-* Fix at the UI layer, not by removing the synthetic episode (playback needs
+- Fix at the UI layer, not by removing the synthetic episode (playback needs
   it): in `detail_screen.dart`, when the detail is a movie — single episode
   whose `url == detail.url`, or `format == 'Movie'` from the bridge — hide the
   Episodes tab and the episode count, and label the download "Download" rather
   than "Download E1".
-* Add a cheap `isMovie` signal to `MediaDetail` (or derive it in one helper used
+- Add a cheap `isMovie` signal to `MediaDetail` (or derive it in one helper used
   by both places) so the check is not duplicated per widget.
-* While there: the meta line reads "2026 · 95m · 1 Episode · Completed" —
+- While there: the meta line reads "2026 · 95m · 1 Episode · Completed" —
   "Completed" comes from `MediaStatus`, which the native adapter never sets.
   Either set it honestly or omit the segment for native sources.
 
@@ -153,23 +153,23 @@ unchanged.
 
 ## Phase 5 — Verify
 
-* `flutter analyze` — expect the 159-issue pre-existing baseline, no new errors.
-* `flutter test` — baseline is 117 failures on this desktop host, all from a
+- `flutter analyze` — expect the 159-issue pre-existing baseline, no new errors.
+- `flutter test` — baseline is 117 failures on this desktop host, all from a
   missing `quickjs_c_bridge.dll` plus stale expectations (`mode_bar_test` wants
   a "Movie/TV" mode the enum lacks, `source_languages_test` wants `eo`). Any
-  *new* failure is real.
-* On device: fresh install (uninstall first — `applicationId` is now
-  `com.mxstream.app`) → sources seeded → Hollywood/Bollywood rows load → card →
+  _new_ failure is real.
+- On device: fresh install (uninstall first — `applicationId` is now
+  `com.orcabox.app`) → sources seeded → Hollywood/Bollywood rows load → card →
   Play on first tap → a movie has no Episodes tab.
 
 ---
 
 ## Notes carried forward
 
-* `--dart-define=TMDB_API_KEY=…` is required for the metadata bridge to enrich
+- `--dart-define=TMDB_API_KEY=…` is required for the metadata bridge to enrich
   anything; with an empty key it silently no-ops and detail pages show scraper
   data only.
-* `REBRANDING.md` still lists the un-finished infrastructure items (Appwrite,
+- `REBRANDING.md` still lists the un-finished infrastructure items (Appwrite,
   Supabase, tracker OAuth apps, Discord/Telegram links, signing key) and the
   unresolved GPL-3.0 vs CC BY-NC-SA licence conflict. None of that is blocked by
   the work above, and all of it blocks release.

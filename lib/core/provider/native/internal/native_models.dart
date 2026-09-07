@@ -1,5 +1,5 @@
 /// Value types for the native (non-JS) movie provider engine, ported from
-/// MXStream's `functions/fetchers/providers/core/models.dart`.
+/// OrcaBox's `functions/fetchers/providers/core/models.dart`.
 ///
 /// `VideoSource` is renamed [NativeVideoSource] here — the ecosystem-facing
 /// `lib/core/models/video_source.dart` already owns that name, and these two

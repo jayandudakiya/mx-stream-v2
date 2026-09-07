@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mxstream/core/anilist/anilist_service.dart';
-import 'package:mxstream/core/tracker/mal_service.dart';
-import 'package:mxstream/core/tracker/simkl_service.dart';
-import 'package:mxstream/features/settings/connections_screen_tv.dart';
+import 'package:orcabox/core/anilist/anilist_service.dart';
+import 'package:orcabox/core/tracker/mal_service.dart';
+import 'package:orcabox/core/tracker/simkl_service.dart';
+import 'package:orcabox/features/settings/connections_screen_tv.dart';
 
 // Configurable fake trackers — mirrors the pattern in
 // test/features/shell/root_shell_tv_test.dart, minus the Hive/network guts.
@@ -115,11 +115,11 @@ void main() {
   testWidgets('shows Connected + viewer name and a Disconnect action',
       (tester) async {
     _register(sl,
-        aniConnected: true, aniName: 'krishna',
+        aniConnected: true, aniName: 'ada',
         malConnected: false, simklConnected: false);
     await tester.pumpWidget(const MaterialApp(home: ConnectionsScreenTv()));
     await tester.pumpAndSettle();
-    expect(find.textContaining('krishna'), findsOneWidget);
+    expect(find.textContaining('ada'), findsOneWidget);
     expect(find.text('Disconnect'), findsOneWidget);
   });
 }

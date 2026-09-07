@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mxstream/core/lnreader/lnreader_runtime.dart';
+import 'package:orcabox/core/lnreader/lnreader_runtime.dart';
 
 const _fakePlugin = '''
 exports.default = {

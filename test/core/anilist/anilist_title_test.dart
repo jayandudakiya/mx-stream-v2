@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/anilist/anilist_title.dart';
-import 'package:mxstream/core/zmode/metadata_provider_prefs.dart';
+import 'package:orcabox/core/anilist/anilist_title.dart';
+import 'package:orcabox/core/zmode/metadata_provider_prefs.dart';
 
 // One place decides which of AniList's three titles is shown. Before this the
 // browse rows took romaji and the library took english, so the same show read

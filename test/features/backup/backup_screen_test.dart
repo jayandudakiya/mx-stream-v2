@@ -5,20 +5,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/appwrite/appwrite_service.dart';
-import 'package:mxstream/core/backup/backup_service.dart';
-import 'package:mxstream/core/backup/library_backup.dart';
-import 'package:mxstream/core/backup/settings_backup.dart';
-import 'package:mxstream/core/backup/sources_backup.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/provider/provider_repo_registry.dart';
-import 'package:mxstream/core/supabase/supabase_service.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/auth/auth_cubit.dart';
-import 'package:mxstream/features/auth/migration_bridge.dart';
-import 'package:mxstream/features/backup/backup_screen.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/appwrite/appwrite_service.dart';
+import 'package:orcabox/core/backup/backup_service.dart';
+import 'package:orcabox/core/backup/library_backup.dart';
+import 'package:orcabox/core/backup/settings_backup.dart';
+import 'package:orcabox/core/backup/sources_backup.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/provider/provider_repo_registry.dart';
+import 'package:orcabox/core/supabase/supabase_service.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/auth/auth_cubit.dart';
+import 'package:orcabox/features/auth/migration_bridge.dart';
+import 'package:orcabox/features/backup/backup_screen.dart';
 
 MigrationBridge _fakeBridge() => MigrationBridge(
       invoke: (_, __) async => const {'ok': false},

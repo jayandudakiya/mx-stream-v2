@@ -39,13 +39,13 @@ String castMimeFor(SourceContainer c, String url) {
 // CastController
 // ---------------------------------------------------------------------------
 
-/// Thin Flutter wrapper around the `zangetsu/cast` native MethodChannel.
+/// Thin Flutter wrapper around the `orcabox/cast` native MethodChannel.
 ///
 /// Keeps the cast session state as listenable fields and serialises all
 /// channel calls so callers never need to catch [PlatformException].
 class CastController extends ChangeNotifier {
-  static const _method = MethodChannel('zangetsu/cast');
-  static const _events = EventChannel('zangetsu/cast/events');
+  static const _method = MethodChannel('orcabox/cast');
+  static const _events = EventChannel('orcabox/cast/events');
 
   // --- Exposed state -------------------------------------------------------
 

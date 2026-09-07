@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/features/sources/aniyomi_repo_tab.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/features/sources/aniyomi_repo_tab.dart';
 
 /// Wraps [child] in a minimal MaterialApp+Scaffold suitable for widget tests.
 Widget _wrap(Widget child) => MaterialApp(

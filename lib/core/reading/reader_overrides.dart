@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
-import 'package:mxstream/core/reading/reader_prefs.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
+import 'package:orcabox/core/reading/reader_prefs.dart';
 
 /// Per-series reading overrides for the manga reader — the "this title
 /// always reads this way, regardless of my global default" escape hatch.

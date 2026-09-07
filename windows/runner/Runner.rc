@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.mxstream" "\0"
-            VALUE "FileDescription", "mxstream" "\0"
+            VALUE "CompanyName", "com.orcabox" "\0"
+            VALUE "FileDescription", "orcabox" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "mxstream" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.mxstream. All rights reserved." "\0"
-            VALUE "OriginalFilename", "mxstream.exe" "\0"
-            VALUE "ProductName", "mxstream" "\0"
+            VALUE "InternalName", "orcabox" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.orcabox. All rights reserved." "\0"
+            VALUE "OriginalFilename", "orcabox.exe" "\0"
+            VALUE "ProductName", "orcabox" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

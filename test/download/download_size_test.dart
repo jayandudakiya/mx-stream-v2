@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/download/download_manager.dart';
-import 'package:mxstream/core/download/download_record.dart';
+import 'package:orcabox/core/download/download_manager.dart';
+import 'package:orcabox/core/download/download_record.dart';
 
 void main() {
   late Directory dir;

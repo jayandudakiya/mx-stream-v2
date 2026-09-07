@@ -1,5 +1,5 @@
 // Search no longer offers its own Library/Sources choice — no chips, no
-// persisted pref. The scope is DERIVED from Zangetsu Mode: Sources when Z
+// persisted pref. The scope is DERIVED from OrcaBox Mode: Sources when Z
 // Mode is off, Library when it's on — or Sources regardless, when the
 // caller passes forceSources (the sources destination's own search action).
 // Coverage lives entirely in the widget tests below, against the real
@@ -13,22 +13,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/my_list.dart';
-import 'package:mxstream/core/playback/search_history.dart';
-import 'package:mxstream/core/playback/search_prefs.dart';
-import 'package:mxstream/core/playback/search_source_prefs.dart';
-import 'package:mxstream/core/playback/source_health_store.dart';
-import 'package:mxstream/core/repository/catalogue_repository.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/search/title_suggestion_service.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/core/zmode/metadata_repository.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
-import 'package:mxstream/features/home/search_screen.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/my_list.dart';
+import 'package:orcabox/core/playback/search_history.dart';
+import 'package:orcabox/core/playback/search_prefs.dart';
+import 'package:orcabox/core/playback/search_source_prefs.dart';
+import 'package:orcabox/core/playback/source_health_store.dart';
+import 'package:orcabox/core/repository/catalogue_repository.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/search/title_suggestion_service.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/zmode/metadata_repository.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/features/home/search_screen.dart';
 
 import '../../support/picker_deps.dart';
 

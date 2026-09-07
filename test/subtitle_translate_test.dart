@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/subtitle_translate_service.dart';
+import 'package:orcabox/core/playback/subtitle_translate_service.dart';
 
 // Network-backed smoke test for the subtitle translator: verifies SRT/VTT
 // parsing, the keyless Google endpoint, and SRT rebuild end to end. Skips

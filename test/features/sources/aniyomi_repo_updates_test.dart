@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_update.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/features/sources/aniyomi_repo_tab.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_update.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/features/sources/aniyomi_repo_tab.dart';
 
 AniyomiRepoEntry _entry(String pkg, int code) => AniyomiRepoEntry(
       name: pkg, pkg: pkg, apk: '$pkg.apk', lang: 'en',

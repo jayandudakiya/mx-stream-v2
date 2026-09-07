@@ -9,10 +9,10 @@
 // translation, so a repository is registered here to pin that directly.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/repository/source_actions.dart' as source_actions;
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/repository/source_actions.dart' as source_actions;
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 /// Minimal [SourceRepository] stub — only [baseUrlFor] is used by
 /// [source_actions.webViewUrlFor], the rest just isn't called from these tests.
@@ -56,7 +56,7 @@ void main() {
     // Z Mode gate — drop that gate and this fails instead of quietly passing
     // on an unregistered-repository guard.
     sl.registerSingleton<SourceRepository>(
-      _FakeSourceRepository(const {ZmodeIds.sourceId: 'https://zangetsu.online'}),
+      _FakeSourceRepository(const {ZmodeIds.sourceId: 'https://orcabox.online'}),
     );
     expect(
       source_actions.webViewUrlFor('not-zm'),

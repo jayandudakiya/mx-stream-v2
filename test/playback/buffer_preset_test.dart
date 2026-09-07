@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
 
 void main() {
   group('buffer presets', () {

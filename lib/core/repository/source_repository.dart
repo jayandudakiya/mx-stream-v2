@@ -164,7 +164,7 @@ class SourceRepository implements CatalogueRepository {
   static bool _isLnReader(String id) => id.startsWith('lnr:');
 
   /// True for the built-in native movie source ids (`native:vegamovies`,
-  /// `native:rogmovies`) — MXStream's ported Dart scraper engine, routed to
+  /// `native:rogmovies`) — OrcaBox's ported Dart scraper engine, routed to
   /// [_nativeManager] instead of the JS runtime.
   static bool _isNative(String id) => id.startsWith('native:');
 

@@ -1,12 +1,12 @@
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 /// Whether a stored download path is a SAF content:// URI (vs a plain file
 /// path). Used to route delete through UriUtils instead of dart:io File.
 bool isUriPath(String path) => path.startsWith('content://');
 
 /// Persists the user's chosen download folder (a SAF tree URI) for MP4
-/// downloads. Null = the default Downloads/Zangetsu location.
+/// downloads. Null = the default Downloads/OrcaBox location.
 class DownloadPrefs {
   static const String boxName = 'download_prefs';
 

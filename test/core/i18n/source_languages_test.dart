@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/i18n/source_languages.dart';
+import 'package:orcabox/core/i18n/source_languages.dart';
 
 void main() {
   // defaultSourceLangs reads the device locale via WidgetsBinding.instance.

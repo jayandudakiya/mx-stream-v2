@@ -4,18 +4,18 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_extension_service.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/backup/sources_backup.dart';
-import 'package:mxstream/core/lnreader/lnreader_extension_service.dart';
-import 'package:mxstream/core/mihon/mihon_extension_service.dart';
-import 'package:mxstream/core/mihon/mihon_manager.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/provider/provider_manager.dart'
+import 'package:orcabox/core/aniyomi/aniyomi_extension_service.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/backup/sources_backup.dart';
+import 'package:orcabox/core/lnreader/lnreader_extension_service.dart';
+import 'package:orcabox/core/mihon/mihon_extension_service.dart';
+import 'package:orcabox/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/provider/provider_manager.dart'
     show AniyomiManager;
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/provider/provider_repo_registry.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/provider/provider_repo_registry.dart';
 
 // ── Stubs ──────────────────────────────────────────────────────────────────────
 

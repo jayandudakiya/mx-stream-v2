@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/backup/settings_backup.dart';
+import 'package:orcabox/core/backup/settings_backup.dart';
 
 void main() {
   _driftGuard();

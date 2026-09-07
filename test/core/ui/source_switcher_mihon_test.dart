@@ -2,20 +2,20 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_source_info.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/mihon/mihon_manager.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/mihon/mihon_source_info.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_downloader.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/ui/source_switcher.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_source_info.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/mihon/mihon_source_info.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_downloader.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/ui/source_switcher.dart';
 
 /// M7 wiring net for `source_switcher.dart`: a `mihon:` id must type as MANGA
 /// in both [sourceTypeOf] and its precomputed-map twin, and `ani:` must still

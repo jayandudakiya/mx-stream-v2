@@ -300,7 +300,7 @@ class _RootShellState extends State<RootShell>
                           final channelSource = choice.sourceId;
                           if (channelSource != null) {
                             // A channel browses its provider's OWN shelves, the
-                            // way MXStream v1's home did: Z Mode off makes
+                            // way OrcaBox v1's home did: Z Mode off makes
                             // HomeCubit source-backed (see its _browseKind),
                             // and the active source decides whose shelves.
                             if (ZModePrefs.enabled) {

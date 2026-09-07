@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'package:hive/hive.dart';
 
 /// Source IDs the user pinned to the top of the source picker. Device-local,

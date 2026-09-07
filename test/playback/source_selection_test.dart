@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/video_source.dart';
-import 'package:mxstream/core/playback/source_selection.dart';
+import 'package:orcabox/core/models/video_source.dart';
+import 'package:orcabox/core/playback/source_selection.dart';
 
 VideoSource _s(String q, AudioKind k) =>
     VideoSource(url: 'https://x/$q', quality: q, container: SourceContainer.hls, kind: k);

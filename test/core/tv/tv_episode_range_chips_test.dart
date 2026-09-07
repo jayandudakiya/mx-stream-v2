@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/theme/app_colors.dart';
-import 'package:mxstream/core/tv/tv_episode_range_chips.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
+import 'package:orcabox/core/theme/app_colors.dart';
+import 'package:orcabox/core/tv/tv_episode_range_chips.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
 
 void main() {
   testWidgets('TvEpisodeRangeChips uses accent fill for selected chip', (tester) async {

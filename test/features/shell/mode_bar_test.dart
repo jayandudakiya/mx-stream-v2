@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
-import 'package:mxstream/features/shell/mode_bar.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/features/shell/mode_bar.dart';
 
 void main() {
   testWidgets('shows the two channels and reports the pick', (t) async {

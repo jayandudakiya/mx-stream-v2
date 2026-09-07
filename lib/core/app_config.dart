@@ -1,6 +1,6 @@
 /// Single source of truth for the product name — shown wherever the UI names
 /// the app, and the value to change if the product is ever renamed again.
-const String kAppName = 'MXStream';
+const String kAppName = 'OrcaBox';
 
 /// Running app version shown in Settings/About. Populated from the real build
 /// (PackageInfo) at boot so it never goes stale; this literal is just the
@@ -11,7 +11,7 @@ String kAppVersion = '2.0.0';
 /// checked by the repo guard so a manga-only (Sozo) repo can't be added.
 ///
 /// NOT a brand string — deliberately left at its original value through the
-/// MXStream rename. Every published provider-repo manifest declares this token,
+/// OrcaBox rename. Every published provider-repo manifest declares this token,
 /// so changing it makes the repo guard reject every existing repo (users could
 /// no longer install any source). It is never shown to the user.
 const String kAppId = 'watch_app';
@@ -44,16 +44,21 @@ const String kAppRepoRawBase =
 /// and Settings → About) and drifted — the sheet's copy went stale and expired.
 /// One const now, so refreshing the invite is a single edit here.
 ///
-/// REBRAND TODO (see REBRANDING.md): this is still the upstream project's
-/// invite. Replace it with MXStream's own server before release — shipping it
-/// as-is points MXStream users at someone else's community.
-const String kDiscordInviteUrl = 'https://discord.gg/938JJBn44';
+/// Empty until OrcaBox has its own server. It previously held the upstream
+/// project's invite, which would have pointed OrcaBox users at someone else's
+/// community. Every Discord entry point checks [kHasDiscord] first, so setting
+/// this one constant turns them all back on.
+const String kDiscordInviteUrl = '';
+
+/// Whether a community Discord is configured — gates the Settings tile and the
+/// launch community sheet.
+bool get kHasDiscord => kDiscordInviteUrl.isNotEmpty;
 
 /// Developer announcements feed (a plain JSON file in the public app repo).
 /// The app READS this on launch to show in-app announcements — never writes.
 /// Edit + push that file to broadcast a message to every user.
 ///
-/// Points at MXStream's own repo: whoever controls this file controls what
+/// Points at OrcaBox's own repo: whoever controls this file controls what
 /// every install shows on launch, so it must never be a repo we don't own.
 /// `announcements.json` in the repo root is the file it serves; a missing file
 /// simply means no announcements (AnnouncementService swallows the 404).

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/core/ui/source_switcher.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
-import 'package:mxstream/features/home/home_screen.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/ui/source_switcher.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/features/home/home_screen.dart';
 
 /// [SourceSwitcher]'s closed-chip render (this suite never taps it open)
 /// only touches [ProviderRegistry.entryFor] for an unprefixed id — a bare

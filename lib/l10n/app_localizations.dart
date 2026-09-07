@@ -730,7 +730,7 @@ abstract class AppLocalizations {
   /// No description provided for @logsShareSubject.
   ///
   /// In en, this message translates to:
-  /// **'MXStream logs'**
+  /// **'OrcaBox logs'**
   String get logsShareSubject;
 
   /// No description provided for @signInSubtitle.
@@ -1690,7 +1690,7 @@ abstract class AppLocalizations {
   /// No description provided for @bootErrorTitle.
   ///
   /// In en, this message translates to:
-  /// **'MXStream didn\'t finish starting'**
+  /// **'OrcaBox didn\'t finish starting'**
   String get bootErrorTitle;
 
   /// No description provided for @bootErrorBody.
@@ -1714,13 +1714,13 @@ abstract class AppLocalizations {
   /// No description provided for @resetAppDataBody.
   ///
   /// In en, this message translates to:
-  /// **'This clears what MXStream has saved on this device so it can start fresh.\n\nYour account and anything synced to the cloud are not touched — sign in again and your library comes back.'**
+  /// **'This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour account and anything synced to the cloud are not touched — sign in again and your library comes back.'**
   String get resetAppDataBody;
 
   /// No description provided for @resetAppDataDone.
   ///
   /// In en, this message translates to:
-  /// **'Close MXStream completely and open it again.'**
+  /// **'Close OrcaBox completely and open it again.'**
   String get resetAppDataDone;
 
   /// No description provided for @detailsCopied.
@@ -2587,11 +2587,11 @@ abstract class AppLocalizations {
   /// **'Turn off Material You to pick a colour yourself'**
   String get turnOffMaterialYouToPickAColourYourself;
 
-  /// No description provided for @downloadsZangetsu.
+  /// No description provided for @downloadsOrcaBox.
   ///
   /// In en, this message translates to:
-  /// **'Downloads › MXStream'**
-  String get downloadsZangetsu;
+  /// **'Downloads › OrcaBox'**
+  String get downloadsOrcaBox;
 
   /// No description provided for @removableDrive.
   ///
@@ -3848,11 +3848,11 @@ abstract class AppLocalizations {
   /// **'Have the app?'**
   String get haveTheApp;
 
-  /// No description provided for @openZangetsuOnYourNphoneAndScan.
+  /// No description provided for @openOrcaBoxOnYourNphoneAndScan.
   ///
   /// In en, this message translates to:
-  /// **'Open MXStream on your\\nphone and scan'**
-  String get openZangetsuOnYourNphoneAndScan;
+  /// **'Open OrcaBox on your\\nphone and scan'**
+  String get openOrcaBoxOnYourNphoneAndScan;
 
   /// No description provided for @noApp.
   ///
@@ -3962,11 +3962,11 @@ abstract class AppLocalizations {
   /// **'Sign in with your phone'**
   String get signInWithYourPhone;
 
-  /// No description provided for @onTheZangetsuAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR.
+  /// No description provided for @onTheOrcaBoxAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR.
   ///
   /// In en, this message translates to:
-  /// **'On the MXStream app on your phone, open\\n\"Pair a TV\" and enter this code — or scan the QR.'**
-  String get onTheZangetsuAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR;
+  /// **'On the OrcaBox app on your phone, open\\n\"Pair a TV\" and enter this code — or scan the QR.'**
+  String get onTheOrcaBoxAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR;
 
   /// No description provided for @signingIn.
   ///
@@ -4010,11 +4010,11 @@ abstract class AppLocalizations {
   /// **'Enter the code from your TV'**
   String get enterTheCodeFromYourTV;
 
-  /// No description provided for @openZangetsuOnYourTVAndSignInWithYourPhoneToSeeIt.
+  /// No description provided for @openOrcaBoxOnYourTVAndSignInWithYourPhoneToSeeIt.
   ///
   /// In en, this message translates to:
-  /// **'Open MXStream on your TV and sign in with your phone to see it.'**
-  String get openZangetsuOnYourTVAndSignInWithYourPhoneToSeeIt;
+  /// **'Open OrcaBox on your TV and sign in with your phone to see it.'**
+  String get openOrcaBoxOnYourTVAndSignInWithYourPhoneToSeeIt;
 
   /// No description provided for @abcd2345.
   ///
@@ -4088,11 +4088,11 @@ abstract class AppLocalizations {
   /// **'Restore complete'**
   String get restoreComplete;
 
-  /// No description provided for @reopenZangetsuToSeeRestoredLibrarySources.
+  /// No description provided for @reopenOrcaBoxToSeeRestoredLibrarySources.
   ///
   /// In en, this message translates to:
-  /// **'Reopen MXStream to see restored library & sources.'**
-  String get reopenZangetsuToSeeRestoredLibrarySources;
+  /// **'Reopen OrcaBox to see restored library & sources.'**
+  String get reopenOrcaBoxToSeeRestoredLibrarySources;
 
   /// No description provided for @saveToAFile.
   ///
@@ -4508,11 +4508,11 @@ abstract class AppLocalizations {
   /// **'No sources in this repo.'**
   String get noSourcesInThisRepo;
 
-  /// No description provided for @zangetsuProviders.
+  /// No description provided for @orcaboxProviders.
   ///
   /// In en, this message translates to:
-  /// **'MXStream providers'**
-  String get zangetsuProviders;
+  /// **'OrcaBox providers'**
+  String get orcaboxProviders;
 
   /// No description provided for @addRepo.
   ///
@@ -4688,11 +4688,11 @@ abstract class AppLocalizations {
   /// **'Open this source\'s own settings (e.g. server, language)'**
   String get openThisSourceSOwnSettingsEGServerLanguage;
 
-  /// No description provided for @addZangetsuRepo.
+  /// No description provided for @addOrcaBoxRepo.
   ///
   /// In en, this message translates to:
-  /// **'Add MXStream repo'**
-  String get addZangetsuRepo;
+  /// **'Add OrcaBox repo'**
+  String get addOrcaBoxRepo;
 
   /// No description provided for @theProviderWillBeRemovedFromYourInstalledSources.
   ///
@@ -6461,7 +6461,7 @@ abstract class AppLocalizations {
   /// No description provided for @appIconBlurb.
   ///
   /// In en, this message translates to:
-  /// **'The icon on your home screen. MXStream closes when you change it — Android has to swap the launcher entry.'**
+  /// **'The icon on your home screen. OrcaBox closes when you change it — Android has to swap the launcher entry.'**
   String get appIconBlurb;
 
   /// No description provided for @useTheIcon.
@@ -6473,7 +6473,7 @@ abstract class AppLocalizations {
   /// No description provided for @useTheIconBody.
   ///
   /// In en, this message translates to:
-  /// **'MXStream will close so Android can apply the new icon. Open it again from your home screen afterwards.\n\nIf you have MXStream in a folder or dock, you may need to add it again.'**
+  /// **'OrcaBox will close so Android can apply the new icon. Open it again from your home screen afterwards.\n\nIf you have OrcaBox in a folder or dock, you may need to add it again.'**
   String get useTheIconBody;
 
   /// No description provided for @animRise.
@@ -6602,11 +6602,11 @@ abstract class AppLocalizations {
   /// **'Cloud backup failed. Check you\'re online — if it keeps failing, the cloud backup store may not be set up yet.'**
   String get cloudBackupFailed;
 
-  /// No description provided for @savedToDownloadsZangetsu.
+  /// No description provided for @savedToDownloadsOrcaBox.
   ///
   /// In en, this message translates to:
-  /// **'Saved to Downloads › MXStream'**
-  String get savedToDownloadsZangetsu;
+  /// **'Saved to Downloads › OrcaBox'**
+  String get savedToDownloadsOrcaBox;
 
   /// No description provided for @restoreFailed.
   ///
@@ -6623,7 +6623,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupScreenBlurb.
   ///
   /// In en, this message translates to:
-  /// **'Save your sources, list and settings — to a file on your device or to your MXStream account. Restoring only adds things back; it never deletes what you already have.'**
+  /// **'Save your sources, list and settings — to a file on your device or to your OrcaBox account. Restoring only adds things back; it never deletes what you already have.'**
   String get backupScreenBlurb;
 
   /// No description provided for @includeInTheBackup.
@@ -6725,7 +6725,7 @@ abstract class AppLocalizations {
   /// No description provided for @couldnTOpenInstaller.
   ///
   /// In en, this message translates to:
-  /// **'Couldn\'t open the installer. Enable \"Install unknown apps\" for MXStream in system settings, then try again.'**
+  /// **'Couldn\'t open the installer. Enable \"Install unknown apps\" for OrcaBox in system settings, then try again.'**
   String get couldnTOpenInstaller;
 
   /// No description provided for @downloadFailedCheckConnection.
@@ -6980,11 +6980,11 @@ abstract class AppLocalizations {
   /// **'LNReader'**
   String get lnreader;
 
-  /// No description provided for @zangetsu.
+  /// No description provided for @orcabox.
   ///
   /// In en, this message translates to:
-  /// **'MXStream'**
-  String get zangetsu;
+  /// **'OrcaBox'**
+  String get orcabox;
 
   /// No description provided for @cloudStream.
   ///

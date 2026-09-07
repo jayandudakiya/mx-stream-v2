@@ -10,23 +10,23 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/notify/subscription_checker.dart';
-import 'package:mxstream/core/notify/subscription_store.dart';
-import 'package:mxstream/core/repository/catalogue_router.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/zmode/anilist_catalogue.dart';
-import 'package:mxstream/core/zmode/match_store.dart';
-import 'package:mxstream/core/zmode/metadata_repository.dart';
-import 'package:mxstream/core/zmode/source_matcher.dart';
-import 'package:mxstream/core/zmode/tmdb_catalogue.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
-import 'package:mxstream/core/zmode/zmode_source_prefs.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/notify/subscription_checker.dart';
+import 'package:orcabox/core/notify/subscription_store.dart';
+import 'package:orcabox/core/repository/catalogue_router.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/zmode/anilist_catalogue.dart';
+import 'package:orcabox/core/zmode/match_store.dart';
+import 'package:orcabox/core/zmode/metadata_repository.dart';
+import 'package:orcabox/core/zmode/source_matcher.dart';
+import 'package:orcabox/core/zmode/tmdb_catalogue.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/zmode/zmode_source_prefs.dart';
 
 /// The source that actually owns the episodes. Everything above this is real.
 class _Src implements SourceRepository {

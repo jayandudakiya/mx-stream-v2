@@ -1,6 +1,6 @@
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/reading/tap_zones.dart';
+import 'package:orcabox/core/reading/tap_zones.dart';
 
 const topLeft = Offset(0.1, 0.1);
 const centre = Offset(0.5, 0.5);

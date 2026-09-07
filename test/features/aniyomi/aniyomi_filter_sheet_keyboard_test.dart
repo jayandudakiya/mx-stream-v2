@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_filters.dart';
-import 'package:mxstream/features/aniyomi/aniyomi_filter_sheet.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_filters.dart';
+import 'package:orcabox/features/aniyomi/aniyomi_filter_sheet.dart';
 
 /// A filter list long enough that the sheet wants more room than a
 /// keyboard-reduced viewport leaves it — the condition that used to crush the

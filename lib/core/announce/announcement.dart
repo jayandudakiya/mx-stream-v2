@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 /// A developer announcement fetched from the app's public announcements.json.
 ///

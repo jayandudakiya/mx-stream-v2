@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 /// Centralized configuration for the native movie-provider engine —
 /// endpoints, fallback domains, and the live domain resolver.
 ///
-/// Ported verbatim from MXStream's
+/// Ported verbatim from OrcaBox's
 /// `functions/fetchers/providers/provider_config.dart`.
 class ProviderConfig {
   // ---------------------------------------------------------------------------

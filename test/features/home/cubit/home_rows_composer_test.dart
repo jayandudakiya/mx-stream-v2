@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/home_row.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
-import 'package:mxstream/features/home/cubit/home_rows_composer.dart';
+import 'package:orcabox/core/models/home_row.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
+import 'package:orcabox/features/home/cubit/home_rows_composer.dart';
 
 MediaItem _item(String t) => MediaItem(
   id: t,

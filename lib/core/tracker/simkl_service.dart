@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 import 'package:app_links/app_links.dart';
 import 'package:dio/dio.dart';

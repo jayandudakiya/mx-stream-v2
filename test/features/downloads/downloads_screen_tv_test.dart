@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/download/download_manager.dart';
-import 'package:mxstream/core/download/download_record.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/video_source.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/downloads/downloads_screen.dart' show DownloadTile;
-import 'package:mxstream/features/downloads/downloads_screen_tv.dart';
+import 'package:orcabox/core/download/download_manager.dart';
+import 'package:orcabox/core/download/download_record.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/video_source.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/downloads/downloads_screen.dart' show DownloadTile;
+import 'package:orcabox/features/downloads/downloads_screen_tv.dart';
 
 // ── Minimal fakes ─────────────────────────────────────────────────────────────
 

@@ -55,7 +55,6 @@ import '../update/update_dialog.dart';
 import '../../core/ui/settings_widgets.dart';
 import '../../core/tv/tv_list_focusable.dart';
 import '../../core/ui/dock_visibility.dart';
-import '../../core/ui/team_section.dart';
 import 'contributors_screen.dart';
 import 'donate_screen.dart';
 import '../auth/auth_cubit.dart';
@@ -67,7 +66,7 @@ import '../notify/subscriptions_screen.dart';
 import 'tracker_settings_screen.dart';
 import '../sources/source_health_screen.dart';
 import '../sources/sources_screen.dart';
-import '../sources/zangetsu_sources_screen.dart';
+import '../sources/orcabox_sources_screen.dart';
 import 'player_controls_screen.dart';
 import 'settings_screen_tv.dart';
 import 'settings_search_index.dart';
@@ -128,7 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     context,
   ).push(MaterialPageRoute<void>(builder: (_) => screen));
 
-  /// The metadata provider store is registered by `registerZangetsuMode`,
+  /// The metadata provider store is registered by `registerOrcaBoxMode`,
   /// which runs late in boot — and this screen is built eagerly as the dock's
   /// Profile tab. Guarded so it reads as the default rather than throwing if
   /// it is built first. Same guard `SourceRepository._domainOverride` uses.
@@ -308,7 +307,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
     await SharePlus.instance.share(
-      ShareParams(files: [XFile(file.path)], subject: 'Zangetsu logs'),
+      ShareParams(files: [XFile(file.path)], subject: 'OrcaBox logs'),
     );
   }
 
@@ -527,7 +526,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
       onInstallSources: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => const ZangetsuSourcesScreen(openToRepos: true),
+          builder: (_) => const OrcaBoxSourcesScreen(openToRepos: true),
         ),
       ),
     ).showPicker(context);

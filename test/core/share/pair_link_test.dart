@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/environment.dart';
-import 'package:mxstream/core/share/pair_link.dart';
+import 'package:orcabox/core/environment.dart';
+import 'package:orcabox/core/share/pair_link.dart';
 
 void main() {
   const code = 'ABCD2345';
@@ -29,7 +29,7 @@ void main() {
     expect(uri.queryParameters['trackers'], '1');
   });
 
-  test('parse round-trips the QR URL and the zangetsu:// deep link', () {
+  test('parse round-trips the QR URL and the orcabox:// deep link', () {
     final web = Uri.parse(PairLink.qrData(code: code, nonce: nonce));
     final fromWeb = PairLink.parse(web);
     expect(fromWeb, isNotNull);
@@ -38,7 +38,7 @@ void main() {
     expect(fromWeb.trackers, isFalse);
 
     final deep = Uri.parse(PairLink.deepLink(code: code, nonce: nonce, trackers: true));
-    expect(deep.scheme, 'zangetsu');
+    expect(deep.scheme, 'orcabox');
     expect(deep.host, 'pair');
     final fromDeep = PairLink.parse(deep);
     expect(fromDeep, isNotNull);
@@ -48,8 +48,8 @@ void main() {
   });
 
   test('parse ignores unrelated links', () {
-    expect(PairLink.parse(Uri.parse('zangetsu://open?s=x&u=y')), isNull);
-    expect(PairLink.parse(Uri.parse('https://zangetsu.online/open/?s=x&u=y')), isNull);
+    expect(PairLink.parse(Uri.parse('orcabox://open?s=x&u=y')), isNull);
+    expect(PairLink.parse(Uri.parse('https://orcabox.online/open/?s=x&u=y')), isNull);
     expect(PairLink.parse(Uri.parse('https://example.com/pair/?code=$code')), isNull);
   });
 }

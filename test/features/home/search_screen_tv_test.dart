@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/search_history.dart';
-import 'package:mxstream/core/playback/search_prefs.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/search/title_suggestion_service.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/home/search_screen_tv.dart';
-import 'package:mxstream/features/search/bloc/search_bloc.dart';
-import 'package:mxstream/features/search/bloc/search_state.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/search_history.dart';
+import 'package:orcabox/core/playback/search_prefs.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/search/title_suggestion_service.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/home/search_screen_tv.dart';
+import 'package:orcabox/features/search/bloc/search_bloc.dart';
+import 'package:orcabox/features/search/bloc/search_state.dart';
 
 // ── Minimal stubs ─────────────────────────────────────────────────────────────
 

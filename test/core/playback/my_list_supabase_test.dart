@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/my_list.dart';
-import 'package:mxstream/core/supabase/supabase_service.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/my_list.dart';
+import 'package:orcabox/core/supabase/supabase_service.dart';
 
 /// In-memory fake for [MyListRemote] so the store's pending-queue and
 /// pull-merge logic can be tested without a live Supabase project.

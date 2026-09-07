@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/watch_status.dart';
+import 'package:orcabox/core/models/watch_status.dart';
 
 // Task 12 Part B: labelFor() is a reading-aware display mapping beside the
 // existing WatchStatusX.label getter — display only, the persisted `.name`

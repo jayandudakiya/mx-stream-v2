@@ -10,23 +10,23 @@
 //
 // Hive must already be initialised by the caller.
 import 'package:dio/dio.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_source_info.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/hive/safe_box.dart';
-import 'package:mxstream/core/mihon/mihon_manager.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/mihon/mihon_source_info.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/mode/content_mode_cubit.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_downloader.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/provider/provider_repo_registry.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_source_info.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/hive/safe_box.dart';
+import 'package:orcabox/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/mihon/mihon_source_info.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/mode/content_mode_cubit.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_downloader.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/provider/provider_repo_registry.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
 
 class _FakeManager implements ProviderRuntimeLoader {
   @override

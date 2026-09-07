@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/features/player/tv_playback_launch.dart';
+import 'package:orcabox/features/player/tv_playback_launch.dart';
 
 void main() {
   group('tvPlayerKind', () {

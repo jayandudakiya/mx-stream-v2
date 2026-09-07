@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/core/tv/tv_poster_tile.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/core/tv/tv_poster_tile.dart';
 
 void main() {
   testWidgets(

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/search_quality.dart';
+import 'package:orcabox/core/models/search_quality.dart';
 
 // CloudStream reports an anime listing's DubStatus as a set. `None` is its
 // "not applicable" member rather than a real state, so a source that only

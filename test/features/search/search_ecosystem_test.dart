@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/features/search/bloc/search_state.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/features/search/bloc/search_state.dart';
 
 MediaItem _item(String sourceId, {String title = 'Demon Slayer'}) => MediaItem(
   id: 'id-$sourceId',
@@ -31,13 +31,13 @@ void main() {
       expect(ecosystemOf('cs:MovieBox@cncverse'), SearchEcosystem.cloudstream);
     });
 
-    test('maps anything else to Zangetsu', () {
-      expect(ecosystemOf('allanime'), SearchEcosystem.zangetsu);
-      expect(ecosystemOf('netmirror'), SearchEcosystem.zangetsu);
-      // No colon → not an Aniyomi/CloudStream id, so it stays Zangetsu.
-      expect(ecosystemOf('anilist'), SearchEcosystem.zangetsu);
-      expect(ecosystemOf('csfd'), SearchEcosystem.zangetsu);
-      expect(ecosystemOf(''), SearchEcosystem.zangetsu);
+    test('maps anything else to OrcaBox', () {
+      expect(ecosystemOf('allanime'), SearchEcosystem.orcabox);
+      expect(ecosystemOf('netmirror'), SearchEcosystem.orcabox);
+      // No colon → not an Aniyomi/CloudStream id, so it stays OrcaBox.
+      expect(ecosystemOf('anilist'), SearchEcosystem.orcabox);
+      expect(ecosystemOf('csfd'), SearchEcosystem.orcabox);
+      expect(ecosystemOf(''), SearchEcosystem.orcabox);
     });
 
     test('never returns the All sentinel', () {
@@ -52,10 +52,10 @@ void main() {
       expect(ecosystemTabsFor(const []), [SearchEcosystem.all]);
     });
 
-    test('only Zangetsu sources → All + Zangetsu (no CS/Ani tabs)', () {
+    test('only OrcaBox sources → All + OrcaBox (no CS/Ani tabs)', () {
       expect(ecosystemTabsFor(const ['allanime', 'netmirror']), [
         SearchEcosystem.all,
-        SearchEcosystem.zangetsu,
+        SearchEcosystem.orcabox,
       ]);
     });
 
@@ -63,7 +63,7 @@ void main() {
       final tabs = ecosystemTabsFor(const ['allanime', 'cs:AnimePahe']);
       expect(tabs, [
         SearchEcosystem.all,
-        SearchEcosystem.zangetsu,
+        SearchEcosystem.orcabox,
         SearchEcosystem.cloudstream,
       ]);
       expect(tabs, isNot(contains(SearchEcosystem.aniyomi)));
@@ -77,7 +77,7 @@ void main() {
     test('all three ecosystems present → All + all three, in fixed order', () {
       expect(ecosystemTabsFor(const ['allanime', 'cs:AnimePahe', 'ani:1']), [
         SearchEcosystem.all,
-        SearchEcosystem.zangetsu,
+        SearchEcosystem.orcabox,
         SearchEcosystem.cloudstream,
         SearchEcosystem.aniyomi,
       ]);
@@ -88,14 +88,14 @@ void main() {
         ecosystemTabsFor(const ['ani:2', 'ani:1', 'cs:b', 'cs:a', 'zjs']),
         [
           SearchEcosystem.all,
-          SearchEcosystem.zangetsu,
+          SearchEcosystem.orcabox,
           SearchEcosystem.cloudstream,
           SearchEcosystem.aniyomi,
         ],
       );
     });
 
-    test('only an Aniyomi source → All + Aniyomi (no Zangetsu/CS tabs)', () {
+    test('only an Aniyomi source → All + Aniyomi (no OrcaBox/CS tabs)', () {
       expect(ecosystemTabsFor(const ['ani:1']), [
         SearchEcosystem.all,
         SearchEcosystem.aniyomi,
@@ -105,7 +105,7 @@ void main() {
 
   group('SearchState group filtering by ecosystem', () {
     final groups = [
-      _group('allanime', arrival: 0), // Zangetsu
+      _group('allanime', arrival: 0), // OrcaBox
       _group('cs:AnimePahe', arrival: 1), // CloudStream
       _group('ani:1', arrival: 2), // Aniyomi
     ];
@@ -129,8 +129,8 @@ void main() {
       expect(base.visibleResults, hasLength(3));
     });
 
-    test('Zangetsu tab shows only Zangetsu groups', () {
-      final s = base.copyWith(ecosystem: SearchEcosystem.zangetsu);
+    test('OrcaBox tab shows only OrcaBox groups', () {
+      final s = base.copyWith(ecosystem: SearchEcosystem.orcabox);
       expect(s.sortedVisibleGroups.map((g) => g.sourceId), ['allanime']);
       expect(s.visibleGroups.map((g) => g.sourceId), ['allanime']);
       expect(s.visibleResults.map((i) => i.sourceId), ['allanime']);

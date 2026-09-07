@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mihon/mihon_pb_index.dart';
+import 'package:orcabox/core/mihon/mihon_pb_index.dart';
 
 // Minimal proto3 encoders so the test builds its own NetworkExtensionStore
 // bytes — decoded against the real keiyoushi index.pb during development, this

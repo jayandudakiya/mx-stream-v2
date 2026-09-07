@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/subtitle_language.dart';
-import 'package:mxstream/core/models/video_source.dart';
+import 'package:orcabox/core/playback/subtitle_language.dart';
+import 'package:orcabox/core/models/video_source.dart';
 
 Language _lang(String iso1) => languageByPref(iso1)!;
 Subtitle _sub(String lang, [String? label]) =>

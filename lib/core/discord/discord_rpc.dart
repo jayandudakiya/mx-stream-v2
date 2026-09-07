@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'package:hive/hive.dart';
 
 import '../privacy/incognito_mode.dart';
@@ -180,7 +180,7 @@ class DiscordRpc {
     final logo = await _appLogoKey();
     _current = DiscordActivity(
       name: DiscordConfig.appName,
-      type: 0, // Playing → "Playing Zangetsu"
+      type: 0, // Playing → "Playing OrcaBox"
       details: title != null ? 'Looking at $title' : 'Browsing',
       largeImage: large ?? logo,
       largeText: title ?? DiscordConfig.appName,

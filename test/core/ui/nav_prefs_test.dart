@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/ui/nav_prefs.dart';
+import 'package:orcabox/core/ui/nav_prefs.dart';
 
 // The dock used to be five hardcoded tabs addressed by position. Letting the
 // user reorder and hide them means the stored list is now the source of truth,

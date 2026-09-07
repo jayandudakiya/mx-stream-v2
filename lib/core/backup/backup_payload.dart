@@ -7,8 +7,16 @@ class BackupFormatException implements Exception {
   String toString() => 'BackupFormatException: $message';
 }
 
-const _kApp = 'zangetsu';
+const _kApp = 'orcabox';
 const _kVersion = 1;
+
+/// App tokens this build still restores, beyond its own [_kApp].
+///
+/// The token is stamped into every backup file, so a rename would otherwise
+/// make every backup a user already holds unreadable ("This isn't an OrcaBox
+/// backup"). Reads accept the old names; writes only ever emit [_kApp], so the
+/// set stops growing and old files convert on the next backup.
+const _kLegacyApps = {'mxstream', 'zangetsu'};
 
 Map<String, dynamic> wrapPayload(
   Map<BackupBundle, Map<String, dynamic>> bundles, {
@@ -21,11 +29,12 @@ Map<String, dynamic> wrapPayload(
     };
 
 Map<BackupBundle, Map<String, dynamic>> unwrapPayload(Map<String, dynamic> raw) {
-  if (raw['app'] != _kApp) {
-    throw const BackupFormatException("This isn't an MXStream backup.");
+  final app = raw['app'];
+  if (app != _kApp && !_kLegacyApps.contains(app)) {
+    throw const BackupFormatException("This isn't an OrcaBox backup.");
   }
   if ((raw['version'] as num? ?? 0) > _kVersion) {
-    throw const BackupFormatException('Made by a newer version of MXStream.');
+    throw const BackupFormatException('Made by a newer version of OrcaBox.');
   }
   final bundles = (raw['bundles'] as Map?) ?? const {};
   final out = <BackupBundle, Map<String, dynamic>>{};

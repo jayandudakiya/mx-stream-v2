@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/subtitle_encode_skew.dart';
+import 'package:orcabox/core/playback/subtitle_encode_skew.dart';
 
 void main() {
   test('subtitleSkewFromPackIntros uses intro.end only', () {

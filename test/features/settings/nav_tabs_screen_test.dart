@@ -14,10 +14,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/ui/nav_prefs.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
-import 'package:mxstream/features/settings/nav_tabs_screen.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/ui/nav_prefs.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/features/settings/nav_tabs_screen.dart';
 
 void main() {
   late Directory dir;

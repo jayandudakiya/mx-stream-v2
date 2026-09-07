@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/models/episode.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/models/episode.dart';
 
 Episode _ep(double n) => Episode(id: 'e$n', title: 'Ep $n', number: n, url: 'u$n');
 Episode _epNoNum(String u) => Episode(id: u, title: u, url: u);

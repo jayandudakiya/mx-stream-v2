@@ -37,9 +37,9 @@ class SettingsBackup {
     'novel_lang_prefs', // novel language filter
     'torrent_prefs', // torrent settings
     'locale_prefs', // app language override
-    'zmode_prefs', // Zangetsu Mode toggle + stream kind
+    'zmode_prefs', // OrcaBox Mode toggle + stream kind
     'source_domain_overrides', // per-source domain the user set by hand
-    'zmode_source', // which source plays each kind in Zangetsu Mode
+    'zmode_source', // which source plays each kind in OrcaBox Mode
     'metadata_provider', // AniList vs MAL for anime metadata
     'home_rows_prefs', // per-layout home row order + visibility
   ];

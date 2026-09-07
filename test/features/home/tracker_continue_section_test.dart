@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/ui/continue_card.dart';
-import 'package:mxstream/core/ui/poster_card.dart';
-import 'package:mxstream/features/home/tracker_continue_section.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/ui/continue_card.dart';
+import 'package:orcabox/core/ui/poster_card.dart';
+import 'package:orcabox/features/home/tracker_continue_section.dart';
 
 // The tracker-driven home rows render what the cubit sliced — titles, progress
 // badges, reading relabels, taps — without fetching anything of their own.

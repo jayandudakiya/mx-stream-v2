@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/mihon/mihon_extension_service.dart';
-import 'package:mxstream/features/sources/mihon_repo_tab.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/mihon/mihon_extension_service.dart';
+import 'package:orcabox/features/sources/mihon_repo_tab.dart';
 
 /// Widget tests for the Mihon repo add/browse/install UI. Structural twin of
 /// `test/aniyomi/aniyomi_repo_ui_test.dart` — deliberately duplicated per

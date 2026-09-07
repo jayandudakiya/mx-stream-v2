@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:mxstream/core/app_config.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/app_config.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
@@ -154,7 +154,7 @@ class UpdateService {
     void Function(double progress)? onProgress,
   }) async {
     final dir = await getTemporaryDirectory();
-    final path = '${dir.path}/zangetsu-update.apk';
+    final path = '${dir.path}/orcabox-update.apk';
     final file = File(path);
     if (await file.exists()) await file.delete(); // drop any stale partial
     await _dio.download(

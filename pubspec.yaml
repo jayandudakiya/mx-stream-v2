@@ -1,5 +1,5 @@
-name: mxstream
-description: "MXStream — the ultimate streaming experience."
+name: orcabox
+description: "OrcaBox — the ultimate streaming experience."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
@@ -16,11 +16,11 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-# MXStream 2.0.0 — the rebranded successor to MXStream 1.0.2 (v1) merged with
+# OrcaBox 2.0.0 — the rebranded successor to OrcaBox 1.0.2 (v1) merged with
 # this app's UI. The build number keeps climbing rather than resetting: both
-# lines now ship under applicationId com.mxstream.app, and Android/Play only
+# lines now ship under applicationId com.orcabox.app, and Android/Play only
 # accept an update whose versionCode is HIGHER than what's installed (v1 was
-# +3, this app's last Zangetsu build was +11105), so a reset to +1 would make
+# +3, this app's last OrcaBox build was +11105), so a reset to +1 would make
 # 2.0.0 uninstallable as an update over either one.
 version: 2.0.0+11106
 
@@ -54,7 +54,7 @@ dependencies:
   # Network
   dio: ^5.8.0+1
   # Used by the native movie-provider engine (core/provider/native/), ported
-  # from MXStream — plain http + HTML parsing, no QuickJS involved.
+  # from OrcaBox — plain http + HTML parsing, no QuickJS involved.
   http: ^1.2.2
   html: ^0.15.4
 
@@ -151,7 +151,7 @@ dependencies:
   web_socket_channel: ^3.0.1
   flutter_secure_storage: ^10.3.1
   webview_flutter: ^4.10.0
-  # Capture the OAuth redirect (zangetsu://anilist-auth) back into the app for
+  # Capture the OAuth redirect (orcabox://anilist-auth) back into the app for
   # AniList account linking.
   app_links: ^6.3.2
   # Render the QR on the TV device-pairing screen (pure Dart).
@@ -247,14 +247,22 @@ dependency_overrides:
   # forcing 0.7.1 unblocks resolution without affecting the Android build.
   js: ^0.7.1
 
-# App launcher icon (Zangetsu logo). Regenerate with:
+# App launcher icon (OrcaBox orca mark). Regenerate with:
 #   dart run flutter_launcher_icons
+#
+# The adaptive_icon_* pair matters: without it the generator emits a plain
+# square icon and drops the adaptive layers, so re-running it would undo the
+# mipmap-anydpi-v26 setup. `adaptive_foreground.png` is pre-padded to 66% of
+# the canvas — Android's adaptive safe zone — so launcher masks never clip the
+# mark. Background matches @color/ic_launcher_bg and the native launch window.
 flutter_launcher_icons:
   image_path: "assets/icon/app_icon.png"
   android: true
   ios: true
+  adaptive_icon_background: "#0B0B0F"
+  adaptive_icon_foreground: "assets/icon/adaptive_foreground.png"
   remove_alpha_ios: true
-  background_color_ios: "#000000"
+  background_color_ios: "#0B0B0F"
   min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
@@ -265,7 +273,7 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    # No built-in providers — sources are installed from the Zangetsu repo.
+    # No built-in providers — sources are installed from the OrcaBox repo.
     # Extractors stay bundled (shared video-host helpers, not providers).
     - extractors/example_embed.js
     - extractors/okru.js
@@ -285,7 +293,7 @@ flutter:
     # reachable from Dart, so the choices are bundled as normal assets).
     - assets/icon/preview_default.png
     - assets/icon/preview_classic.webp
-    # MXStream mark — for the mode-switch transition.
+    # OrcaBox mark — for the mode-switch transition.
     - assets/icon/logo_mark.png
 
   fonts:

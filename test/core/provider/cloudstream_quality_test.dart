@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
 
 // CloudStream's `Qualities.Unknown` is the number 400, and its own UI renders
 // that as blank. We used to pass any non-zero value straight through as

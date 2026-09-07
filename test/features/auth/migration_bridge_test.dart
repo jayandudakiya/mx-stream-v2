@@ -1,6 +1,6 @@
 // test/features/auth/migration_bridge_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/features/auth/migration_bridge.dart';
+import 'package:orcabox/features/auth/migration_bridge.dart';
 
 void main() {
   test('password migration: ok response then successful sign-in -> true', () async {

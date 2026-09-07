@@ -9,7 +9,7 @@ import 'provider_config.dart';
 import 'extractors/vcloud_extractor.dart';
 
 /// Hollywood / OTT / anime native scraper, ported verbatim (behaviour-for-
-/// behaviour) from MXStream's
+/// behaviour) from OrcaBox's
 /// `functions/fetchers/providers/VegaMovies/vega_movies_provider.dart`.
 ///
 /// Wrapped for this app's `BaseProvider` contract by

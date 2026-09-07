@@ -744,7 +744,7 @@ class _RootShellTvState extends State<RootShellTv> with WidgetsBindingObserver {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 12),
-            _brand(), // Zangetsu wordmark, revealed when open
+            _brand(), // OrcaBox wordmark, revealed when open
             const SizedBox(height: 8),
             _avatarBlock(), // profile
             const SizedBox(height: 6),

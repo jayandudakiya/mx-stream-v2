@@ -4,20 +4,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/repository/catalogue_repository.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
-import 'package:mxstream/core/ui/home_rows_prefs.dart';
-import 'package:mxstream/core/zmode/anilist_catalogue.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
-import 'package:mxstream/features/home/cubit/home_cubit.dart';
-import 'package:mxstream/features/settings/home_rows_screen.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/repository/catalogue_repository.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/ui/home_rows_prefs.dart';
+import 'package:orcabox/core/zmode/anilist_catalogue.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/features/home/cubit/home_cubit.dart';
+import 'package:orcabox/features/settings/home_rows_screen.dart';
 
 // The editor edits the CURRENT layout through the same composer the cubit
 // merges with (pure functions covered by home_rows_composer_test). These pump

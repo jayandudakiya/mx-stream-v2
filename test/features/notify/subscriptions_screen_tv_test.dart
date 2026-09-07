@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mxstream/core/notify/subscription_store.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/notify/subscriptions_screen_tv.dart';
+import 'package:orcabox/core/notify/subscription_store.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/notify/subscriptions_screen_tv.dart';
 
 // ── Minimal fakes ─────────────────────────────────────────────────────────────
 

@@ -3,30 +3,26 @@
 /// sessions; the server API key is never embedded here.
 class Environment {
   static const String appwriteProjectId = '6a1ed44f0029b50bccde';
-  static const String appwriteProjectName = 'MXStream';
-  static const String appwritePublicEndpoint = 'https://sgp.cloud.appwrite.io/v1';
+  static const String appwriteProjectName = 'OrcaBox';
+  static const String appwritePublicEndpoint =
+      'https://sgp.cloud.appwrite.io/v1';
 
   // Supabase project URL + anon (public) key — safe to embed, same as the
   // Appwrite project id/endpoint above. Override with --dart-define if a
   // build needs a different project (e.g. staging).
-  static const String supabaseUrl = String.fromEnvironment(
-    'SUPABASE_URL',
-    defaultValue: 'https://eogwzrlfoercfwcfwlmv.supabase.co',
-  );
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvZ3d6cmxmb2VyY2Z3Y2Z3bG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNjgzODIsImV4cCI6MjA5OTk0NDM4Mn0.qr-nHnB9vb7BodP55XJ9-6Rwp__eOGCS6txhLiuWVZw',
   );
 
   /// Where Appwrite sends the password-recovery link. Appwrite appends
   /// Password-reset landing. Supabase now drives reset (via the auth `site_url`,
   /// which points at this same page); kept for reference. Not used by the
   /// Supabase AuthCubit, which calls `resetPasswordForEmail`.
-  static const String passwordResetUrl = 'https://zangetsu.online/';
+  static const String passwordResetUrl = 'https://orcabox.online/';
 
-  /// Base of the Zangetsu website (landing + reset + the share "open" page).
-  static const String siteBaseUrl = 'https://zangetsu.online';
+  /// Base of the OrcaBox website (landing + reset + the share "open" page).
+  static const String siteBaseUrl = 'https://orcabox.online';
 
   /// Share links point here. The page opens the app if installed (via the
   /// [openLinkScheme] scheme below), otherwise offers the download. Its domain
@@ -35,12 +31,12 @@ class Environment {
 
   /// TV pairing page on the website. Used when someone opens a shared/https
   /// pair link in a browser; the page can hand off to the app via
-  /// `zangetsu://pair`. App-facing TV QRs encode the deeplink directly.
+  /// `orcabox://pair`. App-facing TV QRs encode the deeplink directly.
   static const String sitePairUrl = '$siteBaseUrl/pair/';
 
-  /// The "open" page redirects to `zangetsu://open?…`; an installed app catches
+  /// The "open" page redirects to `orcabox://open?…`; an installed app catches
   /// it (see [OpenLinkService] + the Android manifest intent-filter).
-  static const String openLinkScheme = trackerRedirectScheme; // 'zangetsu'
+  static const String openLinkScheme = trackerRedirectScheme; // 'orcabox'
   static const String openLinkHost = 'open';
   static const String pairLinkHost = 'pair';
 
@@ -55,27 +51,34 @@ class Environment {
   static const String backupsCollectionId = 'backups';
 
   // ── Tracker OAuth ──────────────────────────────────────────────────────────
-  // All redirects share the zangetsu:// scheme; each has its own host with a
+  // All redirects share the orcabox:// scheme; each has its own host with a
   // matching Android intent-filter. Client secrets are embedded where the
   // provider's token exchange requires it (MAL = PKCE, no secret; Simkl needs
   // one) — standard for these APIs and low-risk.
-  static const String trackerRedirectScheme = 'zangetsu';
+  static const String trackerRedirectScheme = 'orcabox';
 
   // AniList — implicit grant (token in URL fragment, 1-year, no secret).
-  static const String anilistClientId = '43052';
+  static const String anilistClientId = String.fromEnvironment(
+    'ANILIST_CLIENT_ID',
+  );
   static const String anilistRedirectHost = 'anilist-auth';
-  static String get anilistRedirectUri => '$trackerRedirectScheme://$anilistRedirectHost';
+  static String get anilistRedirectUri =>
+      '$trackerRedirectScheme://$anilistRedirectHost';
 
   // MyAnimeList — OAuth2 PKCE (plain), no client secret.
   static const String malClientId = 'ac006943589381143c4c4e54eac93a89';
   static const String malRedirectHost = 'mal-auth';
-  static String get malRedirectUri => '$trackerRedirectScheme://$malRedirectHost';
+  static String get malRedirectUri =>
+      '$trackerRedirectScheme://$malRedirectHost';
 
   // Simkl — OAuth2 authorization-code (needs the secret to exchange the code).
-  static const String simklClientId = '8b847b09206ccdb0b3de4cc1293d6dd7d355821f5c179c57315da8ba9030eb53';
-  static const String simklClientSecret = '34ba8e5ac7c8a5c27926dfdf78205e5b913de9928361cb5a243558239298c96d';
+  static const String simklClientId =
+      '8b847b09206ccdb0b3de4cc1293d6dd7d355821f5c179c57315da8ba9030eb53';
+  static const String simklClientSecret =
+      '34ba8e5ac7c8a5c27926dfdf78205e5b913de9928361cb5a243558239298c96d';
   static const String simklRedirectHost = 'simkl-auth';
-  static String get simklRedirectUri => '$trackerRedirectScheme://$simklRedirectHost';
+  static String get simklRedirectUri =>
+      '$trackerRedirectScheme://$simklRedirectHost';
 
   // Back-compat alias (older AniList code referenced this name).
   static const String anilistRedirectScheme = trackerRedirectScheme;

@@ -17,9 +17,23 @@ import '../../core/tv/tv_list_focusable.dart';
 class DonateScreen extends StatelessWidget {
   const DonateScreen({super.key});
 
-  static const String _bmcUrl = 'https://buymeacoffee.com/krishna069';
-  static const String _paypalUrl = 'https://paypal.me/SpyTheSaviour';
-  static const String _upiId = 'krishnavishwakarma9136@okaxis';
+  // OrcaBox's own payout endpoints. Empty until they are set, and every option
+  // below hides itself while its value is blank — the previous values pointed
+  // at the upstream author's Buy Me a Coffee, PayPal and UPI accounts, so
+  // shipping them would have sent OrcaBox donations to someone else. Fill these
+  // in (and only these) to turn the Support screen back on.
+  static const String _bmcUrl = '';
+  static const String _paypalUrl = '';
+  static const String _upiId = '';
+
+  static bool get _hasBmc => _bmcUrl.isNotEmpty;
+  static bool get _hasPaypal => _paypalUrl.isNotEmpty;
+  static bool get _hasUpi => _upiId.isNotEmpty;
+
+  /// Whether any payout endpoint is configured. Settings hides the "Support
+  /// the app" entry point while this is false, so the screen is never reached
+  /// with nothing to show.
+  static bool get isConfigured => _hasBmc || _hasPaypal || _hasUpi;
 
   Future<void> _open(String url) async {
     final uri = Uri.parse(url);
@@ -92,21 +106,25 @@ class DonateScreen extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 28),
-          _DonateButton(
-            label: context.l10n.buyMeACoffee,
-            icon: Icons.coffee_rounded,
-            bg: const Color(0xFFFFDD00),
-            fg: const Color(0xFF13110A),
-            onTap: () => _open(_bmcUrl),
-          ),
-          const SizedBox(height: 12),
-          _DonateButton(
-            label: context.l10n.donateWithPayPal,
-            icon: Icons.account_balance_wallet_rounded,
-            bg: const Color(0xFF003087),
-            fg: Colors.white,
-            onTap: () => _open(_paypalUrl),
-          ),
+          if (_hasBmc) ...[
+            _DonateButton(
+              label: context.l10n.buyMeACoffee,
+              icon: Icons.coffee_rounded,
+              bg: const Color(0xFFFFDD00),
+              fg: const Color(0xFF13110A),
+              onTap: () => _open(_bmcUrl),
+            ),
+            const SizedBox(height: 12),
+          ],
+          if (_hasPaypal)
+            _DonateButton(
+              label: context.l10n.donateWithPayPal,
+              icon: Icons.account_balance_wallet_rounded,
+              bg: const Color(0xFF003087),
+              fg: Colors.white,
+              onTap: () => _open(_paypalUrl),
+            ),
+          if (_hasUpi) ...[
           const SizedBox(height: 20),
           // UPI — India. Separate little block with a copyable ID so it works
           // even when the deep link can't open an app.
@@ -177,6 +195,7 @@ class DonateScreen extends StatelessWidget {
                     ),
                   ),
           ),
+          ],
         ],
       ),
     );

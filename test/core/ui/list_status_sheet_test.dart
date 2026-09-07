@@ -9,16 +9,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/playback/list_status_store.dart';
-import 'package:mxstream/core/playback/my_list.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
-import 'package:mxstream/core/ui/list_status_sheet.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/playback/list_status_store.dart';
+import 'package:orcabox/core/playback/my_list.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/ui/list_status_sheet.dart';
 
 /// Minimal in-memory [MyListStore] stand-in — no Hive box needed.
 class _FakeMyListStore implements MyListStore {

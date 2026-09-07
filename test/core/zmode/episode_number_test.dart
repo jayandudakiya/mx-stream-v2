@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/zmode/episode_number.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/zmode/episode_number.dart';
 
 // Asking a source for "episode 5" by taking its 5th entry breaks the moment it
 // slips a recap into the list — every episode after shifts, and the tracker is

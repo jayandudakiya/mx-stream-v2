@@ -21,7 +21,7 @@ class AppLogger {
   Future<void> init() async {
     try {
       final dir = await getWritableAppDirectory();
-      _file = File('${dir.path}/mxstream.log');
+      _file = File('${dir.path}/orcabox.log');
       if (await _file!.exists()) {
         final tail = (await _file!.readAsLines());
         _buffer
@@ -58,8 +58,8 @@ class AppLogger {
   Future<File?> exportFile() async {
     try {
       final dir = await getTemporaryDirectory();
-      final f = File('${dir.path}/mxstream-logs.txt');
-      await f.writeAsString('MXStream logs\n\n$contents\n');
+      final f = File('${dir.path}/orcabox-logs.txt');
+      await f.writeAsString('OrcaBox logs\n\n$contents\n');
       return f;
     } catch (_) {
       return null;

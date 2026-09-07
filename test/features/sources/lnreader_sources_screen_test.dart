@@ -61,11 +61,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/lnreader/lnreader_extension_service.dart';
-import 'package:mxstream/core/lnreader/lnreader_manager.dart';
-import 'package:mxstream/core/lnreader/novel_lang_prefs.dart';
-import 'package:mxstream/features/sources/lnreader_sources_screen.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/lnreader/lnreader_extension_service.dart';
+import 'package:orcabox/core/lnreader/lnreader_manager.dart';
+import 'package:orcabox/core/lnreader/novel_lang_prefs.dart';
+import 'package:orcabox/features/sources/lnreader_sources_screen.dart';
 
 const _repoUrl = 'https://repo.test/plugins.min.json';
 

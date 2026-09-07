@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/features/detail/episode_filter.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/features/detail/episode_filter.dart';
 
 Episode ep(String id, String title, double? number) =>
     Episode(id: id, title: title, number: number, url: 'u$id');

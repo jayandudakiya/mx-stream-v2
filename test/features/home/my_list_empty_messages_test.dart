@@ -8,9 +8,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/features/home/my_list_screen.dart';
-import 'package:mxstream/l10n/app_localizations.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/features/home/my_list_screen.dart';
+import 'package:orcabox/l10n/app_localizations.dart';
 
 AppLocalizations get _l10n =>
     lookupAppLocalizations(const Locale('en'));

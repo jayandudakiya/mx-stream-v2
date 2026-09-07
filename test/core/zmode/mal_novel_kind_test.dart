@@ -7,9 +7,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/mal_catalogue.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/mal_catalogue.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 Map<String, dynamic> _node(int id, String title, String mediaType) => {
   'node': {

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -43,7 +43,7 @@ class DownloadManager extends ChangeNotifier {
   final Map<String, TorrentDownloadProgress> torrentProgress = {};
 
   static const String boxName = 'downloads';
-  static const String _sharedDir = 'MXStream';
+  static const String _sharedDir = 'OrcaBox';
 
   static Future<void> init() async {
     if (!Hive.isBoxOpen(boxName)) {
@@ -590,7 +590,7 @@ class DownloadManager extends ChangeNotifier {
 
   /// Native TS→MP4 remux channel (Android only). See MainActivity + TsRemuxer.
   static const MethodChannel _downloadChannel =
-      MethodChannel('zangetsu/download');
+      MethodChannel('orcabox/download');
 
   /// Remux the concatenated-TS file at [input] into a real MP4 at [output] via
   /// the native MediaMuxer (stream-copy). Returns true on success; false on
@@ -896,7 +896,7 @@ class DownloadManager extends ChangeNotifier {
     }
     // Delete the actual media file on disk. Two cases:
     //  • SAF custom folder → a content:// URI, removed via UriUtils.
-    //  • Default download (public Download/Zangetsu) → a plain file path the
+    //  • Default download (public Download/OrcaBox) → a plain file path the
     //    app owns. Previously ONLY the content:// case was handled, so default
     //    downloads left the file on disk (the "still in the folder" bug). Delete
     //    it directly; if scoped storage blocks the raw delete, fall back to the
@@ -926,7 +926,7 @@ class DownloadManager extends ChangeNotifier {
   }
 
   static const MethodChannel _deviceChannel = MethodChannel(
-    'com.spyou.watch_app/device',
+    'com.orcabox.app/device',
   );
 
   /// Does a SAF `content://` download still exist? Checked natively via
@@ -1191,7 +1191,7 @@ class DownloadManager extends ChangeNotifier {
 
   /// Delete a downloaded media file. Two cases:
   ///  • SAF custom folder → a content:// URI, removed via UriUtils.
-  ///  • Default download (public Download/Zangetsu) → a plain file path the
+  ///  • Default download (public Download/OrcaBox) → a plain file path the
   ///    app owns. Previously ONLY the content:// case was handled, so default
   ///    downloads left the file on disk (the "still in the folder" bug). Delete
   ///    it directly; if scoped storage blocks the raw delete, fall back to the

@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 /// Persists solved Cloudflare clearances (the cf_clearance cookie + the exact
 /// User-Agent that solved it) per host, so a JS source that was cleared once

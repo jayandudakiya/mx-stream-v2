@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/features/search/bloc/search_state.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/features/search/bloc/search_state.dart';
 
 MediaItem _item(String sourceId, ProviderType type) => MediaItem(
   id: '$sourceId-${type.name}',

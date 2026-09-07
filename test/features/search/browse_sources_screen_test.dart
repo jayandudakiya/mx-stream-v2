@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/provider/provider_repo_registry.dart';
-import 'package:mxstream/features/search/browse_sources_screen.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/provider/provider_repo_registry.dart';
+import 'package:orcabox/features/search/browse_sources_screen.dart';
 
 import '../../support/picker_deps.dart';
 

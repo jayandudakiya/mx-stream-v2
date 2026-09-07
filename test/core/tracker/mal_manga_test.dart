@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/tracker/mal_service.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/tracker/mal_service.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
 
 // Golden strings: the EXACT path text mal_service.dart sent for anime before
 // this file existed — copied verbatim (not retyped) from the pre-refactor

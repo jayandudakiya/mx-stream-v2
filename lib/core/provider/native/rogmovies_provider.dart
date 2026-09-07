@@ -10,7 +10,7 @@ import 'provider_config.dart';
 import 'extractors/vcloud_extractor.dart';
 
 /// Bollywood / desi OTT native scraper — same architecture as
-/// [VegaMoviesProvider], ported verbatim from MXStream's
+/// [VegaMoviesProvider], ported verbatim from OrcaBox's
 /// `functions/fetchers/providers/RogMovies/rogmovies_provider.dart`.
 class RogMoviesProvider implements NativeBaseProvider {
   @override

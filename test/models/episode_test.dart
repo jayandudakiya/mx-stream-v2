@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/episode.dart';
+import 'package:orcabox/core/models/episode.dart';
 
 void main() {
   test('Episode parses number, thumbnail, and filler flag', () {

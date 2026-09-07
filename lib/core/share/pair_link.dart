@@ -1,7 +1,7 @@
 import '../environment.dart';
 
 /// Encodes TV pairing links and parses incoming pair URLs from either the
-/// website (`https://zangetsu.online/pair/…`) or the `zangetsu://pair` deeplink.
+/// website (`https://orcabox.online/pair/…`) or the `orcabox://pair` deeplink.
 class PairLink {
   const PairLink({this.code, this.nonce, this.trackers = false});
 
@@ -47,7 +47,7 @@ class PairLink {
         if (trackers) 'trackers': '1',
       };
 
-  /// Accepts `zangetsu://pair?…` and the configured [Environment.sitePairUrl].
+  /// Accepts `orcabox://pair?…` and the configured [Environment.sitePairUrl].
   static PairLink? parse(Uri uri) {
     if (!_isPairUri(uri)) return null;
     final q = uri.queryParameters;

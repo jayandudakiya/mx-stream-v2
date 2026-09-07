@@ -87,7 +87,7 @@ class CloudflareInterceptor(
                     else -> "MISMATCH"
                 }
                 android.util.Log.w(
-                    "ZangetsuCF",
+                    "OrcaBoxCF",
                     "still challenged after a manual solve: ${retried.code} " +
                         "${request.url.host} cookie=${if (cookieSent) "sent" else "MISSING"} " +
                         "ua=$uaState mit=${retried.header("cf-mitigated") ?: "-"}\n" +
@@ -223,7 +223,7 @@ class CloudflareBypassException : Exception()
 /**
  * Thrown when the headless solver couldn't clear an interactive Cloudflare
  * challenge. Carries the [url] to solve so the app can open a visible WebView
- * ([com.spyou.watch_app.mihon.SourceWebViewActivity]). Extends [IOException]
+ * ([com.orcabox.app.mihon.SourceWebViewActivity]). Extends [IOException]
  * so it propagates cleanly through OkHttp and the source call.
  */
 class CloudflareRequiredException(val url: String) :

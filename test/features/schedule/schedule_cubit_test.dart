@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/schedule/airing_service.dart';
-import 'package:mxstream/core/schedule/coming_soon_service.dart';
-import 'package:mxstream/core/schedule/schedule_models.dart';
-import 'package:mxstream/core/playback/my_list.dart';
-import 'package:mxstream/features/schedule/schedule_cubit.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/schedule/airing_service.dart';
+import 'package:orcabox/core/schedule/coming_soon_service.dart';
+import 'package:orcabox/core/schedule/schedule_models.dart';
+import 'package:orcabox/core/playback/my_list.dart';
+import 'package:orcabox/features/schedule/schedule_cubit.dart';
 
 class _FakeAiring implements AiringService {
   @override

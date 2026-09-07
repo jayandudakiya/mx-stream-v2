@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
-import 'package:mxstream/core/zmode/zmode_module.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/zmode/zmode_module.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
 
 class _Repo implements SourceRepository {
   @override

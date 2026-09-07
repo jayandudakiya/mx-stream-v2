@@ -1,5 +1,5 @@
 /// Value object produced by [TitleNormalizer]. Ported verbatim from
-/// MXStream's `services/metadata/parsed_release_title.dart`.
+/// OrcaBox's `services/metadata/parsed_release_title.dart`.
 ///
 /// All fields except [cleanTitle] and [rawTitle] may be null when the
 /// information was not present in the release string.

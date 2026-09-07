@@ -1,7 +1,7 @@
 // test/watch_together/sync_math_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/features/watch_together/model/room_state.dart';
-import 'package:mxstream/features/watch_together/sync_math.dart';
+import 'package:orcabox/features/watch_together/model/room_state.dart';
+import 'package:orcabox/features/watch_together/sync_math.dart';
 
 RoomState _room({required int positionMs, required bool playing, required int updatedAt}) =>
     RoomState(code: 'X', hostId: 'h', hostName: '', hostAvatar: '', sourceId: '',

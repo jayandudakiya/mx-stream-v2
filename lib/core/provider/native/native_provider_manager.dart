@@ -4,7 +4,7 @@ import 'native_provider_adapter.dart';
 /// Holds the built-in native movie providers (`native:*` source ids) — the
 /// movie twin of `MihonManager`/`AniyomiManager`, except these two are always
 /// pre-installed rather than user-added from a repo (per the "auto-install /
-/// pre-install" requirement carried over from MXStream: a user should never
+/// pre-install" requirement carried over from OrcaBox: a user should never
 /// see a manual install screen just to get Hollywood/Bollywood browsing).
 ///
 /// Deliberately as small as [MihonManager] is NOT — there's no repo, no

@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/mihon/mihon_source_info.dart';
-import 'package:mxstream/core/models/provider_info.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/mihon/mihon_source_info.dart';
+import 'package:orcabox/core/models/provider_info.dart';
 
 /// Channel-surface tests for [MihonProvider].
 ///
@@ -18,7 +18,7 @@ import 'package:mxstream/core/models/provider_info.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const channel = MethodChannel('zangetsu/mihon');
+  const channel = MethodChannel('orcabox/mihon');
   final log = <MethodCall>[];
 
   void install(Future<dynamic> Function(MethodCall call) handler) {

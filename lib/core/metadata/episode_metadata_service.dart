@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 import 'package:dio/dio.dart';
 import 'package:hive_flutter/hive_flutter.dart';

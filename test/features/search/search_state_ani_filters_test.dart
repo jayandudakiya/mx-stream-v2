@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/features/search/bloc/search_state.dart';
+import 'package:orcabox/features/search/bloc/search_state.dart';
 
 void main() {
   group('SearchState.aniFiltersBySource', () {

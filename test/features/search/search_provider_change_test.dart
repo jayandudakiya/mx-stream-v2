@@ -6,7 +6,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'dart:io';
-import 'package:mxstream/core/zmode/metadata_provider_prefs.dart';
+import 'package:orcabox/core/zmode/metadata_provider_prefs.dart';
 
 void main() {
   late Directory dir;

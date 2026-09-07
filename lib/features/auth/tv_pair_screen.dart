@@ -176,7 +176,7 @@ class _TvPairScreenState extends State<TvPairScreen> {
               Text(context.l10n.signInWithYourPhone, style: AppText.title),
               const SizedBox(height: 14),
               Text(
-                context.l10n.onTheZangetsuAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR,
+                context.l10n.onTheOrcaBoxAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR,
                 style: AppText.body.copyWith(color: AppColors.textSecondary, height: 1.5),
               ),
               const SizedBox(height: 30),

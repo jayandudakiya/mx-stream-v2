@@ -38,9 +38,9 @@ class TorrentProgress {
 
 class TorrentService {
   static const MethodChannel _method =
-      MethodChannel('com.spyou.watch_app/torrent');
+      MethodChannel('com.orcabox.app/torrent');
   static const EventChannel _events =
-      EventChannel('com.spyou.watch_app/torrent/events');
+      EventChannel('com.orcabox.app/torrent/events');
 
   /// Starts streaming a magnet/.torrent; returns the torrent id + a local URL
   /// the player can open. Throws on Wi-Fi block (a `wifi_only` PlatformException

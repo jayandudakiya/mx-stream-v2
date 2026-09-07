@@ -9,13 +9,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/provider/base_provider.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/features/search/browse_source_screen.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/provider/base_provider.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/features/search/browse_source_screen.dart';
 
 class _FakeRepo implements SourceRepository {
   @override

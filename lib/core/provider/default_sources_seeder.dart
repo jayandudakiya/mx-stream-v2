@@ -10,7 +10,7 @@ import 'native/provider_config.dart';
 /// Installs the default source set on first launch, so a fresh install can
 /// browse and play without anyone visiting Providers first.
 ///
-/// MXStream v1 had nothing to install — its providers were compiled in — and
+/// OrcaBox v1 had nothing to install — its providers were compiled in — and
 /// this app inherited the opposite default: everything comes from a repo, and
 /// an untouched install has zero sources and an empty Home. This closes that
 /// gap without giving up the repo system: the built-in native providers

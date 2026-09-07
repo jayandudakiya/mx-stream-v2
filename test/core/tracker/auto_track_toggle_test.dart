@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
 
 /// Counts what actually reached a tracker, so a gate that silently swallows a
 /// write is distinguishable from one that lets it through.

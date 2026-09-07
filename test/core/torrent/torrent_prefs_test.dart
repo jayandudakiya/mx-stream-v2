@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:hive/hive.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/torrent/torrent_prefs.dart';
+import 'package:orcabox/core/torrent/torrent_prefs.dart';
 
 void main() {
   late Directory dir;

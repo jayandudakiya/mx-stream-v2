@@ -8,7 +8,7 @@
 // host (e.g. `static.comix.to`). Flutter's `cached_network_image` can't pass CF
 // because it has no access to the `cf_clearance` cookie. This provider fetches
 // image bytes through the SOURCE'S OWN OkHttpClient (which carries the CF session
-// cookie the browse path uses) via the `zangetsu/mihon` channel's `getImage`
+// cookie the browse path uses) via the `orcabox/mihon` channel's `getImage`
 // call, then decodes the bytes in Flutter.
 //
 // Keyed by `(sourceId, url)` so Flutter's ImageCache deduplicates identical
@@ -23,7 +23,7 @@ import 'package:flutter/services.dart';
 
 import '../cache/app_image_cache.dart';
 
-const MethodChannel _kMihonChannel = MethodChannel('zangetsu/mihon');
+const MethodChannel _kMihonChannel = MethodChannel('orcabox/mihon');
 
 /// [ImageProvider] that fetches image bytes via the native Mihon OkHttpClient.
 ///

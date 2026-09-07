@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/features/player/tv_track_menu.dart';
+import 'package:orcabox/features/player/tv_track_menu.dart';
 
 void main() {
   testWidgets('renders section titles and options', (tester) async {

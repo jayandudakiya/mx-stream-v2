@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/reading/read_history.dart';
-import 'package:mxstream/core/supabase/supabase_service.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/reading/read_history.dart';
+import 'package:orcabox/core/supabase/supabase_service.dart';
 
 /// In-memory fake for [ReadingHistoryRemote], mirroring FakeHistoryRemote in
 /// watch_history_supabase_test.dart, so the store's throttle/flush/merge

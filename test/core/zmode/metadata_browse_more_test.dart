@@ -6,13 +6,13 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/metadata_filters.dart';
-import 'package:mxstream/core/zmode/video_catalogue.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/metadata_filters.dart';
+import 'package:orcabox/core/zmode/video_catalogue.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 class _Video implements VideoCatalogue {
   String? lastRowId;

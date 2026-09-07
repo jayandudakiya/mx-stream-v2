@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/playback/tv_playback_tracker.dart';
-import 'package:mxstream/core/privacy/incognito_mode.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/playback/tv_playback_tracker.dart';
+import 'package:orcabox/core/privacy/incognito_mode.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
 
 class _CountingTracker extends ChangeNotifier implements Tracker {
   int watching = 0;

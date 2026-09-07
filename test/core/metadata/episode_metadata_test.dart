@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/metadata/episode_metadata_service.dart';
-import 'package:mxstream/core/models/episode.dart';
+import 'package:orcabox/core/metadata/episode_metadata_service.dart';
+import 'package:orcabox/core/models/episode.dart';
 
 void main() {
   test('copyWith fills extras, preserves untouched fields', () {

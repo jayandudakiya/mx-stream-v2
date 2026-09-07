@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
 
 void main() {
   testWidgets('TvFocusable fires onTap on OK key when focused', (tester) async {

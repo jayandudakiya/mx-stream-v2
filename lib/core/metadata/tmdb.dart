@@ -20,10 +20,7 @@ class Tmdb {
   /// Everything TMDB-backed degrades to the provider's own data when this is
   /// empty (see `NativeMetadataBridge.enrich`), so an unset key disables
   /// enrichment rather than breaking playback.
-  static const String apiKey = String.fromEnvironment(
-    'TMDB_API_KEY',
-    defaultValue: 'fab792d6c5936a7332045ca4565c7353',
-  );
+  static const String apiKey = String.fromEnvironment('TMDB_API_KEY');
 
   /// TMDB image CDN (no key needed).
   static const String img = 'https://image.tmdb.org/t/p';

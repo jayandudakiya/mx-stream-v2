@@ -393,7 +393,7 @@ class _TvLocationHeaderState extends State<_TvLocationHeader> {
     final label = (sl.isRegistered<DownloadPrefs>()
             ? sl<DownloadPrefs>().locationLabel
             : null) ??
-        l10n.downloadsZangetsu;
+        l10n.downloadsOrcaBox;
     return Padding(
       padding: const EdgeInsets.fromLTRB(48, 0, 48, 12),
       child: TvListFocusable(
@@ -590,7 +590,7 @@ class _TvLocationPickerState extends State<_TvLocationPicker> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-              child: Text(prefs?.locationLabel ?? l10n.downloadsZangetsu,
+              child: Text(prefs?.locationLabel ?? l10n.downloadsOrcaBox,
                   style: AppText.body),
             ),
             const Divider(height: 1, color: AppColors.hairline),

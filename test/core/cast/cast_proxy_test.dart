@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/cast/cast_proxy.dart';
+import 'package:orcabox/core/cast/cast_proxy.dart';
 
 void main() {
   // Proxify wraps an absolute URL as /p?u=<url> (raw, not encoded — keeps the

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/home_row.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/features/auth/auth_cubit.dart';
-import 'package:mxstream/features/home/cubit/home_cubit.dart';
-import 'package:mxstream/features/home/home_screen_tv.dart';
+import 'package:orcabox/core/models/home_row.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/features/auth/auth_cubit.dart';
+import 'package:orcabox/features/home/cubit/home_cubit.dart';
+import 'package:orcabox/features/home/home_screen_tv.dart';
 
 // TV mirrors the phone's saved arrangement: the tracker rows the merge emits
 // render as rails with the same chrome as the local ones — landscape progress

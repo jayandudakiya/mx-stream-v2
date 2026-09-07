@@ -7,7 +7,7 @@ import '../../core/ui/settings_widgets.dart';
 import '../../l10n/l10n.dart';
 import '../../core/ui/team_section.dart';
 
-/// The people behind Zangetsu: the curated core team (with roles) followed by
+/// The people behind OrcaBox: the curated core team (with roles) followed by
 /// "Community Contributors" — everyone else who's contributed on GitHub, pulled
 /// live. The community list is empty until someone new contributes.
 class ContributorsScreen extends StatefulWidget {
@@ -28,13 +28,21 @@ class _ContributorsScreenState extends State<ContributorsScreen> {
       body: ListView(
         padding: const EdgeInsets.only(top: 4, bottom: 28),
         children: [
-          SettingsSectionLabel(context.l10n.team, first: true, muted: true),
-          for (final m in kCoreTeam)
-            SettingsCard(
-              margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-              children: [_ContributorTile(member: m)],
-            ),
-          SettingsSectionLabel(context.l10n.communityContributors, muted: true),
+          // The "Team" heading only earns its place when somebody is pinned
+          // under it; with an empty [kCoreTeam] it would sit above nothing.
+          if (kCoreTeam.isNotEmpty) ...[
+            SettingsSectionLabel(context.l10n.team, first: true, muted: true),
+            for (final m in kCoreTeam)
+              SettingsCard(
+                margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                children: [_ContributorTile(member: m)],
+              ),
+          ],
+          SettingsSectionLabel(
+            context.l10n.communityContributors,
+            first: kCoreTeam.isEmpty,
+            muted: true,
+          ),
           // Hand-listed first — people with no commits to their name, so the
           // GitHub fetch below can't turn them up.
           for (final m in kFixedCommunity)

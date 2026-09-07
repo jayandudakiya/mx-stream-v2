@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/provider/cs_repo_url.dart';
+import 'package:orcabox/core/provider/cs_repo_url.dart';
 
 /// Pasted repo links rarely arrive clean. These pin the tidy-up applied before
 /// a repo is fetched — modelled on CloudStream's `RepositoryManager.parseRepoUrl`

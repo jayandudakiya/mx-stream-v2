@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_extension_service.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_extension_service.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -72,7 +72,7 @@ void main() {
   // AniyomiExtensionService.listSources via mocked MethodChannel
   // ---------------------------------------------------------------------------
   group('AniyomiExtensionService.listSources', () {
-    const channel = MethodChannel('zangetsu/aniyomi');
+    const channel = MethodChannel('orcabox/aniyomi');
 
     setUp(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger

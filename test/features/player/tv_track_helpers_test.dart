@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/hls.dart';
-import 'package:mxstream/core/playback/tv_track_helpers.dart';
+import 'package:orcabox/core/playback/hls.dart';
+import 'package:orcabox/core/playback/tv_track_helpers.dart';
 
 void main() {
   group('tvEpisodeUrl', () {

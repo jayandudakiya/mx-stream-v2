@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/hls.dart';
+import 'package:orcabox/core/playback/hls.dart';
 
 /// A Netflix-style master: two video renditions plus alternate audio tracks.
 /// FFmpeg opens every audio rendition and pulls segments from each before it

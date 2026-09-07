@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/playback/category_store.dart';
+import 'package:orcabox/core/playback/category_store.dart';
 
 // A category made under Streaming used to appear as an empty tab under Manga
 // and Novel too — categories are global and the screen only hid the ones that

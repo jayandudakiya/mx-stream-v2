@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_extension_service.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_extension_service.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +14,7 @@ void main() {
   late Directory tempDir;
   late AniyomiManager manager;
 
-  const channel = MethodChannel('zangetsu/aniyomi');
+  const channel = MethodChannel('orcabox/aniyomi');
 
   setUp(() async {
     tempDir = await Directory.systemTemp.createTemp('aniyomi_install_test_');

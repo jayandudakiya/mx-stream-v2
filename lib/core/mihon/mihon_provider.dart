@@ -19,7 +19,7 @@ import 'mihon_mapping.dart';
 import 'mihon_source_info.dart';
 
 /// Shared channel — matches the name registered in [MihonBridge.attach].
-const MethodChannel _mihonChannel = MethodChannel('zangetsu/mihon');
+const MethodChannel _mihonChannel = MethodChannel('orcabox/mihon');
 
 /// Evicts the native OkHttp response cache that Mihon AND Aniyomi share, so a
 /// manual refresh re-hits the source instead of serving the 10-min-cached JSON.
@@ -42,12 +42,12 @@ Future<void> clearMihonHttpCache() async {
 /// JS providers without collisions — never `ani:`, which `sourceTypeOf`
 /// hardcodes to anime.
 ///
-/// All data methods forward to the `zangetsu/mihon` channel. The bridge's
+/// All data methods forward to the `orcabox/mihon` channel. The bridge's
 /// method surface deliberately diverges from the anime twin in ONE place:
 /// chapter listing is `getChapters`, not `getEpisodes` (manga domain
 /// language — the payload carries `chapter_number`/`scanlator`). Every method
 /// name and argument key below is verified against
-/// `android/app/src/main/kotlin/com/spyou/watch_app/mihon/MihonBridge.kt`'s
+/// `android/app/src/main/kotlin/com/orcabox/app/mihon/MihonBridge.kt`'s
 /// `when` block, not inferred from the anime twin.
 ///
 /// This is a reading source, not a video one: [getVideoSources] always

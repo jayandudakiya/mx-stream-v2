@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -22,7 +22,7 @@ import 'cs_repo_url.dart';
 /// are async, Android-only, and return JSON-shaped collections. Every call is
 /// guarded by [Platform.isAndroid] at the call site; the channel itself never
 /// throws past the guards below (failures degrade to empty/safe values).
-const MethodChannel _csChannel = MethodChannel('zangetsu/cloudstream');
+const MethodChannel _csChannel = MethodChannel('orcabox/cloudstream');
 
 /// Whether the CloudStream source [apiName] exposes its OWN settings UI
 /// (the plugin's `openSettings`, e.g. AnimePahe's server picker). Android-only;

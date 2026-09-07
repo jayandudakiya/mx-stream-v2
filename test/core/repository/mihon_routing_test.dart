@@ -5,20 +5,20 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_source_info.dart';
-import 'package:mxstream/core/mihon/mihon_manager.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/mihon/mihon_source_info.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/playback/source_health_store.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_source_info.dart';
+import 'package:orcabox/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/mihon/mihon_source_info.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/playback/source_health_store.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
 
 /// M7 wiring net for `SourceRepository`: proves a `mihon:` id actually routes
 /// to its [MihonProvider], and proves the anime (`ani:`) routing next to it is
@@ -28,7 +28,7 @@ import 'package:mxstream/core/state/active_source_cubit.dart';
 /// which native method went out over the channel, which items came back — not
 /// merely that a call didn't throw.
 
-const _channel = MethodChannel('zangetsu/mihon');
+const _channel = MethodChannel('orcabox/mihon');
 
 MihonSourceInfo _info({
   int id = 7,

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_provider.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_source_info.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_update.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_source_info.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_update.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
 
 AniyomiProvider _prov(int id, String pkg, int code) => AniyomiProvider(
       info: AniyomiSourceInfo(

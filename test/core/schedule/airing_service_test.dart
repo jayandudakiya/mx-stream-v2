@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/schedule/airing_service.dart';
-import 'package:mxstream/core/schedule/schedule_models.dart';
+import 'package:orcabox/core/schedule/airing_service.dart';
+import 'package:orcabox/core/schedule/schedule_models.dart';
 
 void main() {
   test('weekWindowUtc spans local-midnight-today .. +7 days', () {

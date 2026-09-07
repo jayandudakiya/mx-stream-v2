@@ -3,19 +3,19 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/models/home_row.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/repository/catalogue_repository.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/ui/home_rows_prefs.dart';
-import 'package:mxstream/core/zmode/metadata_provider_prefs.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
-import 'package:mxstream/features/home/cubit/home_cubit.dart';
+import 'package:orcabox/core/models/home_row.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/repository/catalogue_repository.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/ui/home_rows_prefs.dart';
+import 'package:orcabox/core/zmode/metadata_provider_prefs.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/features/home/cubit/home_cubit.dart';
 
 // The cubit-level promises of the home rows: the tracker library is fetched
 // alongside the provider's sections, the DEFAULT arrangement hides every

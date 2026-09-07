@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/reading/reader_prefs.dart';
+import 'package:orcabox/core/reading/reader_prefs.dart';
 
 void main() {
   late Directory dir;

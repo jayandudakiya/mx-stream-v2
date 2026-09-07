@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/download/download_manager.dart';
-import 'package:mxstream/core/models/video_source.dart';
+import 'package:orcabox/core/download/download_manager.dart';
+import 'package:orcabox/core/models/video_source.dart';
 
 void main() {
   test('isTorrentSource is true only for the torrent container', () {

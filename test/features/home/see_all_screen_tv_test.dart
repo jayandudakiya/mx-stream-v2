@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/home/see_all_screen_tv.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/home/see_all_screen_tv.dart';
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

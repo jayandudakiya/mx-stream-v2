@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/notify/subscription_store.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/notify/subscription_store.dart';
 
 Subscription sub({ContentMode mode = ContentMode.anime}) => Subscription(
   sourceId: 'src',

@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 /// A stand-in for a type an OLD build persisted via a registered adapter
 /// (typeId 116). The current build no longer registers it — so reopening a box

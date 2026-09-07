@@ -1,60 +1,52 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/ui/team_section.dart';
+import 'package:orcabox/core/ui/team_section.dart';
 
 void main() {
-  test('parseCommunity drops core team, ghost + bots, tags Contributor', () {
+  test('parseCommunity drops bots and tags everyone else Contributor', () {
     final json = [
-      {'login': 'Spyou', 'html_url': 'h1', 'type': 'User'},
-      {'login': 'Ombryal', 'html_url': 'ho', 'type': 'User'},
-      {'login': 'chatgptkrylor', 'html_url': 'h2', 'type': 'User'},
       {'login': 'dependabot[bot]', 'html_url': 'h3', 'type': 'Bot'},
+      {'login': 'renovate[bot]', 'html_url': 'h4', 'type': 'User'},
       {'login': 'newHelper', 'avatar_url': 'x', 'html_url': 'hx', 'type': 'User'},
     ];
     final out = parseCommunity(json);
 
-    // Only the genuinely new contributor survives; everyone curated/ghost/bot
-    // is filtered out.
+    // Both bot forms are filtered — by payload `type`, and by the `[bot]`
+    // login suffix for accounts GitHub still reports as Users.
     expect(out.map((m) => m.name).toList(), ['newHelper']);
     expect(out.single.role, 'Contributor');
     expect(out.single.avatarUrl, 'x');
   });
 
-  test('parseCommunity is empty when only the core team has contributed', () {
-    final json = [
-      {'login': 'Spyou', 'type': 'User'},
-      {'login': 'Ombryal', 'type': 'User'},
-      {'login': 'chatgptkrylor', 'type': 'User'},
-    ];
-    expect(parseCommunity(json), isEmpty);
+  test('parseCommunity honours kExcludedFromCommunity, case-insensitively', () {
+    // Guards the filter itself rather than any particular name, so the test
+    // keeps working whoever OrcaBox pins later.
+    for (final login in kExcludedFromCommunity) {
+      expect(
+        parseCommunity([
+          {'login': login.toUpperCase(), 'type': 'User'},
+        ]),
+        isEmpty,
+        reason: '$login should not appear under Community Contributors',
+      );
+    }
   });
 
-  test('the core team lists Krishna, NeighborhoodNerd and Ombryal (dual role)',
-      () {
-    expect(kCoreTeam.map((m) => m.name), [
-      'Krishna Vishwakarma',
-      'NeighborhoodNerd',
-      'Ombryal',
-    ]);
-    expect(kCoreTeam[2].role, contains('Discord Head Admin'));
-    expect(kCoreTeam[2].role, contains('Contributor'));
+  test('OrcaBox pins no team by hand — the page is GitHub-driven', () {
+    expect(kCoreTeam, isEmpty);
+    expect(kFixedCommunity, isEmpty);
   });
 
-  test('a core member is not repeated under Community Contributors', () {
+  test('a pinned core member is never repeated under Community', () {
     for (final m in kCoreTeam) {
       final gh = m.github;
       if (gh != null) expect(kExcludedFromCommunity, contains(gh));
     }
   });
 
-  test('Riyoc is listed by hand, since no commit carries his name', () {
-    expect(kFixedCommunity.map((m) => m.name), contains('Riyoc'));
-    expect(kFixedCommunity.single.github, isNull);
-  });
-
   test('TeamMember.avatar falls back to the GitHub avatar, then empty', () {
     const gh = TeamMember(name: 'x', role: 'r', link: 'l', github: 'octocat');
     expect(gh.avatar, 'https://github.com/octocat.png?size=200');
-    const manual = TeamMember(name: 'Riyoc', role: 'r', link: 'l');
+    const manual = TeamMember(name: 'y', role: 'r', link: 'l');
     expect(manual.avatar, '');
   });
 }

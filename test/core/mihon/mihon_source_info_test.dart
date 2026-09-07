@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mihon/mihon_source_info.dart';
+import 'package:orcabox/core/mihon/mihon_source_info.dart';
 
 void main() {
   group('MihonSourceInfo.fromJson', () {

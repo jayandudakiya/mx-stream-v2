@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/appwrite/appwrite_service.dart';
-import 'package:mxstream/core/supabase/supabase_service.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/auth/auth_cubit.dart';
-import 'package:mxstream/features/auth/auth_screens_tv.dart';
-import 'package:mxstream/features/auth/migration_bridge.dart';
+import 'package:orcabox/core/appwrite/appwrite_service.dart';
+import 'package:orcabox/core/supabase/supabase_service.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/auth/auth_cubit.dart';
+import 'package:orcabox/features/auth/auth_screens_tv.dart';
+import 'package:orcabox/features/auth/migration_bridge.dart';
 
 // ── Minimal fakes ─────────────────────────────────────────────────────────────
 

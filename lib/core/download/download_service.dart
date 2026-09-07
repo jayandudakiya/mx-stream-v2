@@ -21,8 +21,8 @@ class DownloadService {
   static final FlutterBackgroundService _service = FlutterBackgroundService();
   static FlutterBackgroundService get instance => _service;
 
-  static const String channelId = 'zangetsu_downloads';
-  static const String sharedDir = 'MXStream';
+  static const String channelId = 'orcabox_downloads';
+  static const String sharedDir = 'OrcaBox';
   static const String resultsDirName = '.results';
 
   /// Configure the service once at app start (does not start it).
@@ -41,7 +41,7 @@ class DownloadService {
           autoStartOnBoot: false,
           // Leave notificationChannelId null so the plugin creates + uses its own
           // default channel (it only auto-creates one when this is null).
-          initialNotificationTitle: 'MXStream',
+          initialNotificationTitle: 'OrcaBox',
           initialNotificationContent: 'Preparing downloads…',
           foregroundServiceTypes: [AndroidForegroundType.dataSync],
         ),
@@ -73,7 +73,7 @@ void downloadServiceOnStart(ServiceInstance service) async {
 
   final dio = Dio(
     BaseOptions(
-      headers: {'User-Agent': 'Mozilla/5.0 (MXStream) Chrome/120.0'},
+      headers: {'User-Agent': 'Mozilla/5.0 (OrcaBox) Chrome/120.0'},
       connectTimeout: const Duration(seconds: 20),
       receiveTimeout: const Duration(seconds: 60),
     ),

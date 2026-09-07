@@ -13,8 +13,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/provider/cf_solve_needed.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
+import 'package:orcabox/core/provider/cf_solve_needed.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
 
 const String _cfBlockedJs = r'''
 async function search(query, page, opts) {
@@ -104,7 +104,7 @@ void main() {
     await provider.search('foo', 1);
     expect(CfSolveNeeded.hostFlagged('cf-blocked.test'), isTrue);
 
-    const channel = MethodChannel('zangetsu/cloudstream');
+    const channel = MethodChannel('orcabox/cloudstream');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
       if (call.method == 'solveCloudflare') {

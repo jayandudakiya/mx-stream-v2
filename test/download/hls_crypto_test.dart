@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pointycastle/export.dart';
-import 'package:mxstream/core/download/hls_downloader.dart';
+import 'package:orcabox/core/download/hls_downloader.dart';
 
 /// AES-128-CBC encrypt with PKCS7 padding — the inverse of [hlsAesCbcDecrypt],
 /// used here to build encrypted fixtures for the round-trip test.

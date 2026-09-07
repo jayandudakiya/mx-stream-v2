@@ -1,11 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_extension_service.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_extension_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const channel = MethodChannel('zangetsu/aniyomi');
+  const channel = MethodChannel('orcabox/aniyomi');
   final log = <MethodCall>[];
 
   // ---------------------------------------------------------------------------

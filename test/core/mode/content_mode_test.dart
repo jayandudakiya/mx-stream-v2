@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/models/provider_info.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/models/provider_info.dart';
 
 void main() {
   test('labels and reading flags', () {

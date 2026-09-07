@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/download/download_prefs.dart';
-import 'package:mxstream/features/settings/download_location_screen.dart';
+import 'package:orcabox/core/download/download_prefs.dart';
+import 'package:orcabox/features/settings/download_location_screen.dart';
 
 void main() {
   late Directory _dir;
@@ -31,7 +31,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Choose folder…'), findsOneWidget);
-    expect(find.text('Downloads › Zangetsu'), findsOneWidget);
+    expect(find.text('Downloads › OrcaBox'), findsOneWidget);
   });
 
   group('folderLabelFromUri', () {

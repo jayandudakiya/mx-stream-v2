@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/ui/jump_prompt.dart';
+import 'package:orcabox/core/ui/jump_prompt.dart';
 
 // The prompt exists to stop a look at another chapter/episode quietly moving
 // your place — and, jumping backwards, dragging the tracker count DOWN, since

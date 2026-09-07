@@ -12,7 +12,7 @@ import 'provider_config.dart';
 import 'rogmovies_provider.dart';
 import 'vega_movies_provider.dart';
 
-/// Bridges MXStream's native movie-provider engine (4-method
+/// Bridges OrcaBox's native movie-provider engine (4-method
 /// `NativeBaseProvider` contract: `getMainPage` / `search` / `loadDetails` /
 /// `extractStream`, `internal/native_base_provider.dart`) onto this app's
 /// richer CloudStream/anime-shaped `BaseProvider` contract (`getHome` /
@@ -199,7 +199,7 @@ abstract class NativeMovieAdapterBase implements BaseProvider {
       tmdbIsTv: isSeries,
     );
 
-    // Hybrid metadata, exactly as MXStream v1 did it: the scraper decides what
+    // Hybrid metadata, exactly as OrcaBox v1 did it: the scraper decides what
     // exists and stays the playback authority, TMDB only describes it. This is
     // the one funnel every screen's card tap reaches (Home, Search, My List and
     // Continue Watching all route through SourceRepository.detail →
@@ -248,7 +248,7 @@ abstract class NativeMovieAdapterBase implements BaseProvider {
   /// `Mutiny`, every native hit was rejected, and Play stayed disabled until
   /// the user pinned a title by hand through "Wrong title?".
   ///
-  /// [TitleNormalizer] is the same cleaner MXStream v1 ran before its own TMDB
+  /// [TitleNormalizer] is the same cleaner OrcaBox v1 ran before its own TMDB
   /// lookups, so both directions now agree on what a title is.
   MediaItem _toMediaItem(ProviderSearchItem item) {
     final parsed = TitleNormalizer.parse(

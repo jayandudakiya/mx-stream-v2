@@ -3,7 +3,7 @@ import 'parsed_release_title.dart';
 /// Converts a raw provider release string into a clean, structured
 /// [ParsedReleaseTitle] suitable for TMDB search.
 ///
-/// Ported verbatim from MXStream's `services/metadata/title_normalizer.dart`.
+/// Ported verbatim from OrcaBox's `services/metadata/title_normalizer.dart`.
 ///
 /// The pipeline is pure Dart — no network calls, no Flutter dependency.
 /// It is the mirror image of `StreamTitleParser`: where that parser *extracts*

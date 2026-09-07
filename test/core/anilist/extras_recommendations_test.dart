@@ -5,7 +5,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/anilist/anilist_api.dart';
+import 'package:orcabox/core/anilist/anilist_api.dart';
 
 Map<String, dynamic> _rec(String english, {String? type = 'ANIME', int? idMal}) => {
   'node': {

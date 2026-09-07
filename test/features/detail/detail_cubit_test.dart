@@ -12,15 +12,15 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/metadata/metadata_enrichment.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/media_extras.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/title_prefs.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/features/detail/cubit/detail_cubit.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/metadata/metadata_enrichment.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/media_extras.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/title_prefs.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/features/detail/cubit/detail_cubit.dart';
 
 /// Hands back a pre-built [MediaDetail] synchronously; nothing else is
 /// touched by these tests. Mirrors reading_detail_routing_test.dart's

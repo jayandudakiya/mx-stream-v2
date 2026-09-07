@@ -3,10 +3,10 @@
 // side showed up under Manga and Novel, and a manga list never showed at all.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/anilist/anilist_service.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/features/home/cubit/tracker_list_cubit.dart';
+import 'package:orcabox/core/anilist/anilist_service.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/features/home/cubit/tracker_list_cubit.dart';
 
 class _FakeAniList implements AniListService {
   final asked = <MediaKind>[];

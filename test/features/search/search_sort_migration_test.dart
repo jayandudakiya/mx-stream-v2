@@ -7,12 +7,12 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/search_history.dart';
-import 'package:mxstream/core/playback/search_prefs.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/search/title_suggestion_service.dart';
-import 'package:mxstream/features/search/bloc/search_bloc.dart';
-import 'package:mxstream/features/search/bloc/search_state.dart';
+import 'package:orcabox/core/playback/search_history.dart';
+import 'package:orcabox/core/playback/search_prefs.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/search/title_suggestion_service.dart';
+import 'package:orcabox/features/search/bloc/search_bloc.dart';
+import 'package:orcabox/features/search/bloc/search_state.dart';
 
 /// Fake prefs whose sortName is fixed at construction — models whatever an
 /// older build already wrote to the Hive box before this run starts.

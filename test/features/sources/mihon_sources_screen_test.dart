@@ -21,14 +21,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/mihon/mihon_extension_service.dart';
-import 'package:mxstream/core/mihon/mihon_manager.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/mihon/mihon_update.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/features/sources/mihon_repo_tab.dart';
-import 'package:mxstream/features/sources/mihon_sources_screen.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/mihon/mihon_extension_service.dart';
+import 'package:orcabox/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/mihon/mihon_update.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/features/sources/mihon_repo_tab.dart';
+import 'package:orcabox/features/sources/mihon_sources_screen.dart';
 
 MihonProvider _prov({
   int id = 1,

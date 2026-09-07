@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/tmdb_catalogue.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/tmdb_catalogue.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 Map<String, dynamic> _movie({
   int id = 438631,

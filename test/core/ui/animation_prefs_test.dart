@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/ui/animation_prefs.dart';
+import 'package:orcabox/core/ui/animation_prefs.dart';
 
 void main() {
   group('list animation style', () {

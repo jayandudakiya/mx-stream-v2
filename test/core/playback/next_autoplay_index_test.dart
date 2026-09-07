@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/playback/filler_service.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/playback/filler_service.dart';
 
 Episode _ep(int n) => Episode(
       id: 'e$n',

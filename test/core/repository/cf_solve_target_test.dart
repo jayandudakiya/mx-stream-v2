@@ -11,14 +11,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/provider/cf_solve_needed.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/provider/cf_solve_needed.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
 
-const _channel = MethodChannel('zangetsu/cloudstream');
+const _channel = MethodChannel('orcabox/cloudstream');
 
 /// Installs one CS source ("cs:Test") with [cachedMainUrl] as the value
 /// captured at listing time — the same shape `installedApis()` sends and

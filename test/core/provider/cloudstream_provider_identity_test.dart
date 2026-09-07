@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
 
 void main() {
   // A "bundle" plugin registers several sources under ONE .cs3 file id (e.g.

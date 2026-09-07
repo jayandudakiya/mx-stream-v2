@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
 
 /// A tracker that answers with whatever entry it was handed, and records the
 /// writes it received so a test can prove a write did (or didn't) reach it.

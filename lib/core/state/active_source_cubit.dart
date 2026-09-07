@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'package:hive/hive.dart';
 
 /// Holds the id of the currently-active content source (e.g. 'allanime',

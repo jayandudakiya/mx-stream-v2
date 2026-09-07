@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 /// Subtitle font families bundled in the app (registered in pubspec's
 /// `flutter: fonts:`). Used by the player's Subtitle-style font picker; the
@@ -205,7 +205,7 @@ class PlaybackPrefs {
   Future<void> setCloseConfirmation(String value) =>
       _box.put('closeConfirmation', value);
 
-  /// Whether installed extensions (Zangetsu / CloudStream / Aniyomi) auto-update
+  /// Whether installed extensions (OrcaBox / CloudStream / Aniyomi) auto-update
   /// in the background on launch, throttled to ~once a day. Off by default —
   /// updates otherwise happen only when the user taps Update in Sources. A
   /// failed update always leaves the working version in place.
@@ -506,7 +506,7 @@ class PlaybackPrefs {
   static int exoBackBufferMsFor(String preset) => preset == 'low' ? 0 : 30000;
 
   /// The four values above for the current settings, shaped for the
-  /// `zangetsu/exoplayer_view` PlatformView's `creationParams` and for the
+  /// `orcabox/exoplayer_view` PlatformView's `creationParams` and for the
   /// native TV player's launch arguments. One accessor so every ExoPlayer entry
   /// point sends the same thing and none of them can drift.
   Map<String, dynamic> get exoBufferParams => <String, dynamic>{

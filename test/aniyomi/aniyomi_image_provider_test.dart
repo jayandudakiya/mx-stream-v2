@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_image_provider.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_image_provider.dart';
 
 void main() {
   group('AniyomiImage equality and keying', () {

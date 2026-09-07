@@ -30,7 +30,7 @@ String folderLabelFromUri(Uri treeUri) {
 }
 
 /// Lets the user pick a custom SAF directory for MP4 downloads, or reset
-/// back to the default Downloads › Zangetsu location.
+/// back to the default Downloads › OrcaBox location.
 class DownloadLocationScreen extends StatefulWidget {
   const DownloadLocationScreen({super.key});
 
@@ -82,7 +82,7 @@ class _DownloadLocationScreenState extends State<DownloadLocationScreen> {
                     const SizedBox(width: 14),
                     Expanded(
                       child: Text(
-                        prefs.locationLabel ?? context.l10n.downloadsZangetsu,
+                        prefs.locationLabel ?? context.l10n.downloadsOrcaBox,
                         style: AppText.body,
                       ),
                     ),

@@ -9,7 +9,7 @@ import 'internal/title_normalizer.dart';
 
 /// Hybrid metadata: scraper titles in, catalogue metadata out.
 ///
-/// MXStream v1's arrangement, kept intact — the provider stays the authority on
+/// OrcaBox v1's arrangement, kept intact — the provider stays the authority on
 /// what is playable, and TMDB is only asked to describe it:
 ///
 ///  1. Home/Search/My List map straight from the provider, so what is listed is

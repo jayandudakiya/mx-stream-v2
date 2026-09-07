@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_mapping.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/video_source.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_mapping.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/video_source.dart';
 
 void main() {
   // ── videoSourceFromVideo ────────────────────────────────────────────────────

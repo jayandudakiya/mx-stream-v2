@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/backup/backup_cloud.dart';
-import 'package:mxstream/core/supabase/supabase_service.dart';
+import 'package:orcabox/core/backup/backup_cloud.dart';
+import 'package:orcabox/core/supabase/supabase_service.dart';
 
 /// In-memory fake for [BackupRemote] so [BackupCloud] can be tested without a
 /// live Supabase project.

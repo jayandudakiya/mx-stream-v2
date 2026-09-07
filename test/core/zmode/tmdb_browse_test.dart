@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/zmode/metadata_filters.dart';
-import 'package:mxstream/core/zmode/tmdb_catalogue.dart';
+import 'package:orcabox/core/zmode/metadata_filters.dart';
+import 'package:orcabox/core/zmode/tmdb_catalogue.dart';
 
 // A filters-only browse — sort by Popular and nothing else — used to be sent
 // to /search/multi with an empty query string, which TMDB answers with

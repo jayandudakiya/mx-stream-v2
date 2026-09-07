@@ -3,9 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/features/detail/chapter_meta.dart';
-import 'package:mxstream/l10n/app_localizations.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/features/detail/chapter_meta.dart';
+import 'package:orcabox/l10n/app_localizations.dart';
 
 Episode chapter({String? date, String? scanlator}) => Episode(
       id: 'c1',

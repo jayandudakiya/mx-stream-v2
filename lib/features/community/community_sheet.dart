@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -10,8 +10,15 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
 import '../../core/tv/tv_list_focusable.dart';
 
-const _telegramUrl = 'https://t.me/ZangetsuStream';
+// Empty until OrcaBox has its own Telegram channel. The pre-rebrand value was
+// the upstream project's, and a find/replace would only invent a dead handle.
+const _telegramUrl = '';
 const _discordUrl = kDiscordInviteUrl;
+
+/// True once at least one community link is configured. The sheet is suppressed
+/// entirely while this is false, so no one sees a "join us" prompt with nowhere
+/// to go.
+bool get _hasCommunityLinks => _telegramUrl.isNotEmpty || kHasDiscord;
 const _flagsBox = 'app_flags';
 const _seenKey = 'communitySheetSeen';
 
@@ -20,6 +27,8 @@ const _seenKey = 'communitySheetSeen';
 /// independent of the per-id announcement system, so future announcements still
 /// show. Fire-and-forget; never throws (a welcome must not block startup).
 Future<void> maybeShowCommunitySheet(BuildContext context) async {
+  // Nothing to join yet — don't burn the one-shot flag on an empty sheet.
+  if (!_hasCommunityLinks) return;
   try {
     final box = Hive.isBoxOpen(_flagsBox)
         ? Hive.box(_flagsBox)
@@ -100,7 +109,7 @@ class _CommunitySheet extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
-                    'Join the Zangetsu community',
+                    'Join the OrcaBox community',
                     style: AppText.headline.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
@@ -118,25 +127,29 @@ class _CommunitySheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 22),
-            _linkButton(
-              context,
-              icon: Icons.send_rounded,
-              label: 'Telegram  ·  @ZangetsuStream',
-              color: const Color(0xFF229ED9),
-              url: _telegramUrl,
-              autofocus: isTv, // first button gets D-pad focus on TV
-              isTv: isTv,
-            ),
-            const SizedBox(height: 12),
-            _linkButton(
-              context,
-              icon: Icons.forum_rounded,
-              label: 'Discord',
-              color: const Color(0xFF5865F2),
-              url: _discordUrl,
-              autofocus: false,
-              isTv: isTv,
-            ),
+            if (_telegramUrl.isNotEmpty) ...[
+              _linkButton(
+                context,
+                icon: Icons.send_rounded,
+                label: 'Telegram',
+                color: const Color(0xFF229ED9),
+                url: _telegramUrl,
+                autofocus: isTv, // first button gets D-pad focus on TV
+                isTv: isTv,
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (kHasDiscord)
+              _linkButton(
+                context,
+                icon: Icons.forum_rounded,
+                label: 'Discord',
+                color: const Color(0xFF5865F2),
+                url: _discordUrl,
+                // Takes D-pad focus when Telegram isn't shown.
+                autofocus: isTv && _telegramUrl.isEmpty,
+                isTv: isTv,
+              ),
             const SizedBox(height: 6),
             Center(child: _laterButton(context, isTv: isTv)),
           ],

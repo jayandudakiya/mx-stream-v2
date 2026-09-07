@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/my_list.dart';
-import 'package:mxstream/core/schedule/airing_service.dart';
-import 'package:mxstream/core/schedule/coming_soon_service.dart';
-import 'package:mxstream/core/schedule/schedule_models.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/schedule/schedule_cubit.dart';
-import 'package:mxstream/features/schedule/schedule_screen_tv.dart';
-import 'package:mxstream/l10n/app_localizations.dart';
+import 'package:orcabox/core/playback/my_list.dart';
+import 'package:orcabox/core/schedule/airing_service.dart';
+import 'package:orcabox/core/schedule/coming_soon_service.dart';
+import 'package:orcabox/core/schedule/schedule_models.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/schedule/schedule_cubit.dart';
+import 'package:orcabox/features/schedule/schedule_screen_tv.dart';
+import 'package:orcabox/l10n/app_localizations.dart';
 
 class _StubCubit extends ScheduleCubit {
   _StubCubit(super.a, super.b, super.c, ScheduleState seed) { emit(seed); }

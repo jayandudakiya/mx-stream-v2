@@ -28,7 +28,7 @@ class AppDelegate: FlutterAppDelegate {
     /// channel via `invokeMethod` (resolveEpisode / saveProgress / …).
     private func registerTvPlayerChannel(with flutterVC: FlutterViewController) {
         let channel = FlutterMethodChannel(
-            name: "zangetsu/tv_player",
+            name: "orcabox/tv_player",
             binaryMessenger: flutterVC.binaryMessenger
         )
         tvPlayerChannel = channel
@@ -68,7 +68,7 @@ class AppDelegate: FlutterAppDelegate {
     /// this binary only ships on Apple TV.
     private static func registerDeviceChannel(with messenger: FlutterBinaryMessenger) {
         let channel = FlutterMethodChannel(
-            name: "com.spyou.watch_app/device",
+            name: "com.orcabox.app/device",
             binaryMessenger: messenger
         )
         channel.setMethodCallHandler { call, result in
@@ -86,7 +86,7 @@ class AppDelegate: FlutterAppDelegate {
     /// back to Dio if this channel throws.
     private static func registerNovelHttp(with messenger: FlutterBinaryMessenger) {
         let channel = FlutterMethodChannel(
-            name: "zangetsu/novel_http",
+            name: "orcabox/novel_http",
             binaryMessenger: messenger
         )
         channel.setMethodCallHandler { call, result in

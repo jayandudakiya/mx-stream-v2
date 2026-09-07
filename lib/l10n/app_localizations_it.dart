@@ -327,7 +327,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get couldNotExportLogs => 'Impossibile esportare i log';
 
   @override
-  String get logsShareSubject => 'Log di MXStream';
+  String get logsShareSubject => 'Log di OrcaBox';
 
   @override
   String get signInSubtitle =>
@@ -878,7 +878,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get bootErrorTitle => 'MXStream non ha finito di avviarsi';
+  String get bootErrorTitle => 'OrcaBox non ha finito di avviarsi';
 
   @override
   String get bootErrorBody =>
@@ -892,10 +892,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get resetAppDataBody =>
-      'Questo cancella ciò che MXStream ha salvato su questo dispositivo così può ripartire da zero.\n\nIl tuo account e tutto ciò che è sul cloud non vengono toccati — accedi di nuovo e la libreria torna.';
+      'Questo cancella ciò che OrcaBox ha salvato su questo dispositivo così può ripartire da zero.\n\nIl tuo account e tutto ciò che è sul cloud non vengono toccati — accedi di nuovo e la libreria torna.';
 
   @override
-  String get resetAppDataDone => 'Chiudi MXStream del tutto e riaprilo.';
+  String get resetAppDataDone => 'Chiudi OrcaBox del tutto e riaprilo.';
 
   @override
   String get detailsCopied => 'Dettagli copiati — inviaceli';
@@ -1359,7 +1359,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Disattiva Material You per scegliere un colore tu';
 
   @override
-  String get downloadsZangetsu => 'Download › MXStream';
+  String get downloadsOrcaBox => 'Download › OrcaBox';
 
   @override
   String get removableDrive => 'Unità rimovibile';
@@ -2017,8 +2017,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get haveTheApp => 'Hai l’app?';
 
   @override
-  String get openZangetsuOnYourNphoneAndScan =>
-      'Apri MXStream sul tuo\\ntelefono e scansiona';
+  String get openOrcaBoxOnYourNphoneAndScan =>
+      'Apri OrcaBox sul tuo\\ntelefono e scansiona';
 
   @override
   String get noApp => 'Niente app?';
@@ -2076,8 +2076,8 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String
-  get onTheZangetsuAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR =>
-      'Nell’app MXStream sul telefono, apri\\n«Associa una TV» e inserisci questo codice — oppure scansiona il QR.';
+  get onTheOrcaBoxAppOnYourPhoneOpenNPairATVAndEnterThisCodeOrScanTheQR =>
+      'Nell’app OrcaBox sul telefono, apri\\n«Associa una TV» e inserisci questo codice — oppure scansiona il QR.';
 
   @override
   String get signingIn => 'Accesso…';
@@ -2102,8 +2102,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enterTheCodeFromYourTV => 'Inserisci il codice della TV';
 
   @override
-  String get openZangetsuOnYourTVAndSignInWithYourPhoneToSeeIt =>
-      'Apri MXStream sulla TV e accedi con il telefono per vederlo.';
+  String get openOrcaBoxOnYourTVAndSignInWithYourPhoneToSeeIt =>
+      'Apri OrcaBox sulla TV e accedi con il telefono per vederlo.';
 
   @override
   String get abcd2345 => 'ABCD 2345';
@@ -2147,8 +2147,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get restoreComplete => 'Ripristino completato';
 
   @override
-  String get reopenZangetsuToSeeRestoredLibrarySources =>
-      'Riapri MXStream per vedere libreria e sorgenti ripristinate.';
+  String get reopenOrcaBoxToSeeRestoredLibrarySources =>
+      'Riapri OrcaBox per vedere libreria e sorgenti ripristinate.';
 
   @override
   String get saveToAFile => 'Salva su file';
@@ -2370,7 +2370,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get noSourcesInThisRepo => 'Nessuna sorgente in questo repo.';
 
   @override
-  String get zangetsuProviders => 'Provider MXStream';
+  String get orcaboxProviders => 'Provider OrcaBox';
 
   @override
   String get addRepo => 'Aggiungi repo';
@@ -2472,7 +2472,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Apri le impostazioni proprie di questa sorgente (es. server, lingua)';
 
   @override
-  String get addZangetsuRepo => 'Aggiungi repo MXStream';
+  String get addOrcaBoxRepo => 'Aggiungi repo OrcaBox';
 
   @override
   String get theProviderWillBeRemovedFromYourInstalledSources =>
@@ -3595,7 +3595,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get appIconBlurb =>
-      'L\'icona sulla schermata iniziale. MXStream si chiude quando la modifichi: Android deve sostituire la voce del launcher.';
+      'L\'icona sulla schermata iniziale. OrcaBox si chiude quando la modifichi: Android deve sostituire la voce del launcher.';
 
   @override
   String useTheIcon(String label) {
@@ -3604,7 +3604,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get useTheIconBody =>
-      'MXStream si chiuderà per consentire ad Android di applicare la nuova icona. Riaprilo dalla schermata iniziale in seguito.\n\nSe MXStream si trova in una cartella o nel dock, potrebbe essere necessario aggiungerlo nuovamente.';
+      'OrcaBox si chiuderà per consentire ad Android di applicare la nuova icona. Riaprilo dalla schermata iniziale in seguito.\n\nSe OrcaBox si trova in una cartella o nel dock, potrebbe essere necessario aggiungerlo nuovamente.';
 
   @override
   String get animRise => 'Salita';
@@ -3684,7 +3684,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Il backup sul cloud non è riuscito. Verifica di essere online: se il problema persiste, l\'archivio di backup sul cloud potrebbe non essere ancora configurato.';
 
   @override
-  String get savedToDownloadsZangetsu => 'Salvato in Download › MXStream';
+  String get savedToDownloadsOrcaBox => 'Salvato in Download › OrcaBox';
 
   @override
   String restoreFailed(String error) {
@@ -3697,7 +3697,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get backupScreenBlurb =>
-      'Salva le tue fonti, l\'elenco e le impostazioni in un file sul tuo dispositivo o nel tuo account MXStream. Il ripristino aggiunge solo gli elementi, non elimina mai quelli già presenti.';
+      'Salva le tue fonti, l\'elenco e le impostazioni in un file sul tuo dispositivo o nel tuo account OrcaBox. Il ripristino aggiunge solo gli elementi, non elimina mai quelli già presenti.';
 
   @override
   String get includeInTheBackup => 'Includi nel backup';
@@ -3760,7 +3760,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get couldnTOpenInstaller =>
-      'Impossibile aprire il programma di installazione. Abilita l\'opzione \"Installa app sconosciute\" per MXStream nelle impostazioni di sistema, quindi riprova.';
+      'Impossibile aprire il programma di installazione. Abilita l\'opzione \"Installa app sconosciute\" per OrcaBox nelle impostazioni di sistema, quindi riprova.';
 
   @override
   String get downloadFailedCheckConnection =>
@@ -3925,7 +3925,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get lnreader => 'LNReader';
 
   @override
-  String get zangetsu => 'MXStream';
+  String get orcabox => 'OrcaBox';
 
   @override
   String get cloudStream => 'Flusso di nuvole';

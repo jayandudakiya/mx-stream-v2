@@ -3,7 +3,7 @@
 // around them. These are shapes taken from live responses.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/metadata/synopsis.dart';
+import 'package:orcabox/core/metadata/synopsis.dart';
 
 void main() {
   test('the <br> pair becomes one paragraph break, not three lines', () {

@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/aniyomi/aniyomi_repo.dart';
-import 'package:mxstream/core/mihon/mihon_extension_service.dart';
-import 'package:mxstream/core/mihon/mihon_manager.dart';
+import 'package:orcabox/core/aniyomi/aniyomi_repo.dart';
+import 'package:orcabox/core/mihon/mihon_extension_service.dart';
+import 'package:orcabox/core/mihon/mihon_manager.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +14,7 @@ void main() {
   late Directory tempDir;
   late MihonManager manager;
 
-  const channel = MethodChannel('zangetsu/mihon');
+  const channel = MethodChannel('orcabox/mihon');
   final log = <MethodCall>[];
 
   setUp(() async {

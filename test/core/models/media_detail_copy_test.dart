@@ -7,9 +7,9 @@
 // added is covered without anybody remembering to come back here.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/provider_info.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/provider_info.dart';
 
 void main() {
   final full = MediaDetail(

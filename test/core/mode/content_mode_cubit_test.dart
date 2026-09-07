@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/mode/content_mode_cubit.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/mode/content_mode_cubit.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
 
 /// Minimal [SourceRepository] stub — only [loadedSources] is used by
 /// [ContentModeCubit], the rest just isn't called from these tests.

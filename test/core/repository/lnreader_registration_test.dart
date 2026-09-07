@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/lnreader/lnreader_extension_service.dart';
-import 'package:mxstream/core/lnreader/lnreader_manager.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/core/ui/source_switcher.dart';
+import 'package:orcabox/core/lnreader/lnreader_extension_service.dart';
+import 'package:orcabox/core/lnreader/lnreader_manager.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/ui/source_switcher.dart';
 
 /// Task 6's isolation net: proves a `lnr:` novel source is wired end-to-end
 /// (type resolution, mode filtering, `SourceRepository` registration) WITHOUT

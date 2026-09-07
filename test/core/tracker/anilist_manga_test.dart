@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/anilist/anilist_api.dart';
-import 'package:mxstream/core/anilist/anilist_service.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
+import 'package:orcabox/core/anilist/anilist_api.dart';
+import 'package:orcabox/core/anilist/anilist_service.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
 
 // Golden strings: the EXACT query text anilist_api.dart sends for anime, so a
 // change to any of them fails loudly — MediaKind.manga must not perturb the

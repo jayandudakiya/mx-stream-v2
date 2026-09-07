@@ -396,7 +396,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   // done natively (MainActivity) because the plugin's OnLeavePiP only works on
   // Android 12+ and silently no-ops on older devices.
   final Floating _floating = Floating();
-  static const MethodChannel _pipChannel = MethodChannel('zangetsu/pip');
+  static const MethodChannel _pipChannel = MethodChannel('orcabox/pip');
   bool _pipSupported = false; // device supports PiP + we're on Android
   bool _inPip = false; // currently rendering inside the PiP window
   StreamSubscription<PiPStatus>? _pipSub;

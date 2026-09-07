@@ -9,10 +9,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/metadata/metadata_enrichment.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/metadata_provider_prefs.dart';
+import 'package:orcabox/core/metadata/metadata_enrichment.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/metadata_provider_prefs.dart';
 
 class _Adapter implements HttpClientAdapter {
   _Adapter(this.respond);

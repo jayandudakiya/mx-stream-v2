@@ -80,7 +80,7 @@ class _BrowseSourceViewState extends State<_BrowseSourceView> {
   late final String _ecosystem = _eco.label;
 
   /// Only the extension ecosystems publish a filter schema. CloudStream and
-  /// Zangetsu sources have no such concept, so they get no filter button
+  /// OrcaBox sources have no such concept, so they get no filter button
   /// rather than one that opens an empty sheet.
   bool get _canFilter =>
       _eco == SearchEcosystem.aniyomi || _eco == SearchEcosystem.mihon;

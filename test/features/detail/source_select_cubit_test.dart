@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/zmode/match_store.dart';
-import 'package:mxstream/core/zmode/zmode_source_prefs.dart';
-import 'package:mxstream/core/zmode/source_matcher.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
-import 'package:mxstream/features/detail/cubit/source_select_cubit.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/zmode/match_store.dart';
+import 'package:orcabox/core/zmode/zmode_source_prefs.dart';
+import 'package:orcabox/core/zmode/source_matcher.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
+import 'package:orcabox/features/detail/cubit/source_select_cubit.dart';
 
 MediaItem _hit(String src, String title) => MediaItem(
   id: title.toLowerCase(), title: title, url: 'https://$src/$title',

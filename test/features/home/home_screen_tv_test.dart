@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/auth/auth_cubit.dart';
-import 'package:mxstream/features/home/cubit/home_cubit.dart';
-import 'package:mxstream/features/home/home_screen_tv.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/auth/auth_cubit.dart';
+import 'package:orcabox/features/home/cubit/home_cubit.dart';
+import 'package:orcabox/features/home/home_screen_tv.dart';
 
 // ── Minimal fake ──────────────────────────────────────────────────────────────
 

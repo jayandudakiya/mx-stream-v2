@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/subtitle_translate_service.dart';
+import 'package:orcabox/core/playback/subtitle_translate_service.dart';
 
 /// Offline tests for the translate response shape.
 ///

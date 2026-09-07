@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/source_health_store.dart';
-import 'package:mxstream/core/repository/catalogue_repository.dart';
-import 'package:mxstream/features/search/cubit/browse_source_cubit.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/source_health_store.dart';
+import 'package:orcabox/core/repository/catalogue_repository.dart';
+import 'package:orcabox/features/search/cubit/browse_source_cubit.dart';
 
 class _Repo implements CatalogueRepository {
   _Repo(

@@ -3,9 +3,9 @@
 // be opened directly — search is only for an entry with nothing to go on.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 /// Mirrors `_canonicalOf` — the mapping is the part worth pinning, and it is
 /// pure.

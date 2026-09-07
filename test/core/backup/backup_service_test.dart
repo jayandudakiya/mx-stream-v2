@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/backup/backup_payload.dart';
-import 'package:mxstream/core/backup/backup_service.dart';
-import 'package:mxstream/core/backup/library_backup.dart';
-import 'package:mxstream/core/backup/settings_backup.dart';
-import 'package:mxstream/core/backup/sources_backup.dart';
+import 'package:orcabox/core/backup/backup_payload.dart';
+import 'package:orcabox/core/backup/backup_service.dart';
+import 'package:orcabox/core/backup/library_backup.dart';
+import 'package:orcabox/core/backup/settings_backup.dart';
+import 'package:orcabox/core/backup/sources_backup.dart';
 
 // ── Fakes ──────────────────────────────────────────────────────────────────────
 
@@ -74,10 +74,10 @@ void main() {
   });
 
   // 1. build with only settings bundle
-  test('build(settings) returns zangetsu payload with only settings bundle', () {
+  test('build(settings) returns orcabox payload with only settings bundle', () {
     final result = service.build({BackupBundle.settings});
 
-    expect(result['app'], 'zangetsu');
+    expect(result['app'], 'orcabox');
     expect(result['createdAt'], '2026-07-02T00:00:00.000Z');
 
     final bundles = result['bundles'] as Map;

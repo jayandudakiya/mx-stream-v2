@@ -3,10 +3,10 @@
 // box in whatever order the rows arrive.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/prefs/list_sort.dart';
-import 'package:mxstream/features/home/cubit/my_list_cubit.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/prefs/list_sort.dart';
+import 'package:orcabox/features/home/cubit/my_list_cubit.dart';
 
 MyListEntry _e(String title, {int? savedAtMs}) => MyListEntry(
   MediaItem(

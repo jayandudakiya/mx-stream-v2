@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/lnreader/lnreader_extension_service.dart';
-import 'package:mxstream/core/lnreader/lnreader_manager.dart';
-import 'package:mxstream/core/lnreader/lnreader_provider.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/provider_info.dart';
+import 'package:orcabox/core/lnreader/lnreader_extension_service.dart';
+import 'package:orcabox/core/lnreader/lnreader_manager.dart';
+import 'package:orcabox/core/lnreader/lnreader_provider.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/provider_info.dart';
 
 const _fakePlugin = '''
 module.exports.default = {

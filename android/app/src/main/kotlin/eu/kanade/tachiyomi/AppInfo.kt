@@ -38,7 +38,7 @@ import uy.kohesive.injekt.api.get
  * Two bodies had to be adapted (both noted at the method):
  *
  *  1. The version pair is read off our own installed package rather than a
- *     `BuildConfig` — we report Zangetsu's real version either way.
+ *     `BuildConfig` — we report OrcaBox's real version either way.
  *  2. `getSupportedImageMimeTypes()` is a literal list, because the
  *     `ImageUtil.ImageType` enum upstream derives it from isn't vendored.
  */
@@ -50,7 +50,7 @@ object AppInfo {
      *
      * ADAPTED: upstream reads Mihon's generated `BuildConfig`. Ours isn't
      * generated — AGP 8 turns the `buildConfig` feature off by default and
-     * nothing else in the app wanted it, so `com.spyou.watch_app.BuildConfig`
+     * nothing else in the app wanted it, so `com.orcabox.app.BuildConfig`
      * doesn't exist and enabling it is a build-file change this fix doesn't
      * need. The same two numbers are on the installed [PackageInfo], and the
      * [Application] is already in the Injekt graph that

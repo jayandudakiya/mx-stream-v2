@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- MXStream mark. Foreground + background come from the MXStream icon set, so
+<!-- OrcaBox mark. Foreground + background come from the OrcaBox icon set, so
      the cream background is the artwork's own and the two blend into one image
      under whatever mask a launcher applies. The monochrome layer is what
      Android 13+ themed icons use; it falls back to the colour layers below 33. -->

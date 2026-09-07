@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:mxstream/core/hive/safe_box.dart';
-import 'package:mxstream/core/lnreader/novel_cloudflare.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
+import 'package:orcabox/core/lnreader/novel_cloudflare.dart';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
@@ -170,12 +170,12 @@ const Map<String, String> _lnreaderBrowserHeaders = {
 /// Android the LNReader fetch tries this channel (see NovelHttp.kt) before
 /// falling back to Dio. iOS/other platforms never touch this and keep using
 /// Dio as before.
-const MethodChannel _novelHttp = MethodChannel('zangetsu/novel_http');
+const MethodChannel _novelHttp = MethodChannel('orcabox/novel_http');
 
 /// One-time app bootstrap: Hive boxes, Dio, the shared provider runtime,
 /// the provider registry (built-in providers seeded from assets + any
 /// repo-installed providers), and the bundled extractors.
-const _deviceChannel = MethodChannel('com.spyou.watch_app/device');
+const _deviceChannel = MethodChannel('com.orcabox.app/device');
 
 Future<void> initDependencies() async {
   // Detect device class first so every subsequent registration can gate on it.
@@ -452,7 +452,7 @@ Future<void> initDependencies() async {
     }),
   );
 
-  // Share deep links (zangetsu://open?…): opens a shared title's Detail, or
+  // Share deep links (orcabox://open?…): opens a shared title's Detail, or
   // reports an uninstalled source. Eager so its AppLinks listener is live from
   // boot; navigation is deferred until the root Navigator exists.
   sl.registerSingleton<OpenLinkService>(OpenLinkService());
@@ -668,7 +668,7 @@ Future<void> initDependencies() async {
   }
 
   // The app ships with NO built-in providers — every source comes from a repo
-  // (the Zangetsu repo is installed on first launch via onboarding). Drop any
+  // (the OrcaBox repo is installed on first launch via onboarding). Drop any
   // legacy `bundled://` entries left by older installs, then load the
   // repo-installed providers persisted from previous launches.
   await registry.purgeBundled();
@@ -889,7 +889,7 @@ Future<void> initDependencies() async {
 
   // Z Mode: the catalogue router and its metadata side. Off by default;
   // registering it costs nothing but makes the toggle instant.
-  await registerZangetsuMode(sl);
+  await registerOrcaBoxMode(sl);
 
   // Now that SourceRepository can enumerate loaded sources, make sure the
   // restored content mode points at a source that belongs to it (e.g. a
@@ -948,7 +948,7 @@ Future<void> initDependencies() async {
         .catchError((Object e) => debugPrint('[seed] skipped: $e')),
   );
 
-  // Chromecast session controller. Wraps the native zangetsu/cast channel.
+  // Chromecast session controller. Wraps the native orcabox/cast channel.
   // init() is guarded: if the native side is absent (non-Android, test) the
   // controller stays in CastState.unavailable and never throws.
   sl.registerSingleton<CastController>(CastController());

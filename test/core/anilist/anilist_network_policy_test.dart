@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/anilist/anilist_network_policy.dart';
+import 'package:orcabox/core/anilist/anilist_network_policy.dart';
 
 // AniList shares the app-wide Dio, whose 8s bound exists to stop a hanging
 // embed host stalling source resolution. The home read is the opposite shape

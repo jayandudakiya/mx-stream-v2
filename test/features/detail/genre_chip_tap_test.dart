@@ -8,9 +8,9 @@
 // distinguishes the two.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 MediaDetail _detail(String sourceId) => MediaDetail(
   id: 'x',

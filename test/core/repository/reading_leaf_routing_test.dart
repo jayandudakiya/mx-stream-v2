@@ -1,19 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/page_content.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/video_source.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/provider/base_provider.dart';
-import 'package:mxstream/core/provider/cloudstream_provider.dart';
-import 'package:mxstream/core/provider/provider_manager.dart';
-import 'package:mxstream/core/provider/reading_provider.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/page_content.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/video_source.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/provider/base_provider.dart';
+import 'package:orcabox/core/provider/cloudstream_provider.dart';
+import 'package:orcabox/core/provider/provider_manager.dart';
+import 'package:orcabox/core/provider/reading_provider.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
 
 /// A fake reading-capable source — mirrors a real JsProvider, which is both a
 /// [BaseProvider] and a [ReadingProvider] — so pages()/chapterText() routing

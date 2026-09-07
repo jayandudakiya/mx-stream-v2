@@ -5,8 +5,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mihon/mihon_filters.dart';
-import 'package:mxstream/features/mihon/mihon_filter_sheet.dart';
+import 'package:orcabox/core/mihon/mihon_filters.dart';
+import 'package:orcabox/features/mihon/mihon_filter_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers

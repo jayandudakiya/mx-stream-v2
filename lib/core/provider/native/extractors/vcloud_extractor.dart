@@ -7,7 +7,7 @@ import '../provider_config.dart';
 /// Resolves VegaMovies/RogMovies download-page links (V-Cloud, HubCloud,
 /// GDFlix, ...) down to final playable stream links.
 ///
-/// Ported verbatim from MXStream's
+/// Ported verbatim from OrcaBox's
 /// `functions/fetchers/providers/VegaMovies/extractors/vcloud_extractor.dart`.
 class VCloudExtractor {
   static String getBaseUrl(String url) {

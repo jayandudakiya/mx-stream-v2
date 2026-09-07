@@ -11,20 +11,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/picker_deps.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/provider/cf_solve_needed.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/playback/title_prefs.dart';
-import 'package:mxstream/core/repository/catalogue_repository.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/zmode/match_store.dart';
-import 'package:mxstream/core/zmode/zmode_source_prefs.dart';
-import 'package:mxstream/core/zmode/source_matcher.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
-import 'package:mxstream/features/detail/cubit/detail_cubit.dart';
-import 'package:mxstream/features/detail/wrong_title_sheet.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/provider/cf_solve_needed.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/playback/title_prefs.dart';
+import 'package:orcabox/core/repository/catalogue_repository.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/zmode/match_store.dart';
+import 'package:orcabox/core/zmode/zmode_source_prefs.dart';
+import 'package:orcabox/core/zmode/source_matcher.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
+import 'package:orcabox/features/detail/cubit/detail_cubit.dart';
+import 'package:orcabox/features/detail/wrong_title_sheet.dart';
 
 class _Src implements SourceRepository {
   _Src(this.bySource);
@@ -68,7 +68,7 @@ void main() {
   late ZSourcePrefs prefs;
   late Directory dir;
   const fma = ZCanonical(ZKind.anime, 'mal:5114');
-  const aniChannel = MethodChannel('zangetsu/aniyomi');
+  const aniChannel = MethodChannel('orcabox/aniyomi');
   final aniCalls = <MethodCall>[];
 
   Widget harness(Widget child) => MaterialApp(

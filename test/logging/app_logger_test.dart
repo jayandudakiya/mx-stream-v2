@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/logging/app_logger.dart';
+import 'package:orcabox/core/logging/app_logger.dart';
 
 void main() {
   test('ring buffer keeps only the most recent lines', () {
@@ -14,7 +14,7 @@ void main() {
   });
 
   test('redact strips emails, keys, jwts and token values', () {
-    expect(AppLogger.redact('user chatgptkrylor@gmail.com in'),
+    expect(AppLogger.redact('user someone@example.com in'),
         isNot(contains('@gmail.com')));
     expect(
         AppLogger.redact('key standard_2c3735bd0e4461c4813c4359d0617ba5'),

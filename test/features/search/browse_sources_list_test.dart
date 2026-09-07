@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/features/search/browse_sources_list.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/features/search/browse_sources_list.dart';
 
 import '../../support/picker_deps.dart';
 

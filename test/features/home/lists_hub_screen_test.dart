@@ -4,11 +4,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/di/injector.dart' show sl;
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
-import 'package:mxstream/features/home/lists_hub_screen.dart';
-import 'package:mxstream/l10n/app_localizations.dart';
+import 'package:orcabox/core/di/injector.dart' show sl;
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
+import 'package:orcabox/features/home/lists_hub_screen.dart';
+import 'package:orcabox/l10n/app_localizations.dart';
 
 class _FakeTracker implements Tracker {
   _FakeTracker(this.displayName, {required this.supportsReading,

@@ -49,7 +49,7 @@ import '../reader/manga_reader_screen.dart';
 import '../reader/novel_reader_screen.dart';
 import '../sources/aniyomi_repo_tab.dart' show kAniyomiReposBoxName;
 import '../sources/providers_hub_screen.dart';
-import '../sources/zangetsu_sources_screen.dart';
+import '../sources/orcabox_sources_screen.dart';
 import '../update/update_dialog.dart';
 import 'continue_section.dart';
 import 'my_list_screen.dart';
@@ -111,7 +111,7 @@ class _HomeViewState extends State<_HomeView>
   bool _heroPrewarmed = false;
 
   // ── Logo-strike mode transition ──────────────────────────────────────────
-  // Tapping a mode card runs a full-screen overlay: the Zangetsu mark springs
+  // Tapping a mode card runs a full-screen overlay: the OrcaBox mark springs
   // in at centre behind a scrim, a red glow pulses and a steel glint sweeps the
   // blade, the mode swaps hidden at that peak, then it reveals. Self-contained —
   // see [_enterMode] / [_slashOverlay].
@@ -1278,7 +1278,7 @@ class HomeSourceSwitcherSlot extends StatelessWidget {
                 onInstallSources: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) =>
-                        const ZangetsuSourcesScreen(openToRepos: true),
+                        const OrcaBoxSourcesScreen(openToRepos: true),
                   ),
                 ),
               ),

@@ -33,46 +33,23 @@ class TeamMember {
 /// The curated core team, shown first on the Contributors page with their
 /// specific roles. Everyone else who contributes on GitHub shows up under
 /// "Community Contributors" automatically.
-const List<TeamMember> kCoreTeam = [
-  TeamMember(
-    name: 'Krishna Vishwakarma',
-    role: 'Lead Developer',
-    github: 'spyou',
-    link: 'https://github.com/spyou',
-  ),
-  TeamMember(
-    name: 'NeighborhoodNerd',
-    role: 'Contributor',
-    github: 'neighborhoodnerd',
-    link: 'https://github.com/NeighborhoodNerd',
-  ),
-  TeamMember(
-    name: 'Ombryal',
-    role: 'Discord Head Admin · Contributor',
-    github: 'ombryal',
-    link: 'https://github.com/Ombryal',
-  ),
-];
+///
+/// Empty: OrcaBox pins nobody by hand, so the Contributors page is driven
+/// entirely by [kAppRepo]'s own GitHub contributors. Add entries here to give
+/// someone an explicit role above that list — and add their login to
+/// [kExcludedFromCommunity] so they aren't listed twice.
+const List<TeamMember> kCoreTeam = [];
 
 /// Community contributors we list by hand, ahead of the GitHub-pulled ones.
 /// For people whose work never landed as a commit — art, design — so the
 /// contributors fetch can't find them.
-const List<TeamMember> kFixedCommunity = [
-  TeamMember(
-    name: 'Riyoc',
-    role: 'New logo creator',
-    link: 'https://discord.com/users/1443370547877646447',
-  ),
-];
+const List<TeamMember> kFixedCommunity = [];
 
-/// GitHub logins NOT shown under Community Contributors: the curated core (they
-/// already appear above) and known ghost / bot accounts.
-const Set<String> kExcludedFromCommunity = {
-  'spyou',
-  'ombryal',
-  'neighborhoodnerd',
-  'chatgptkrylor',
-};
+/// GitHub logins NOT shown under Community Contributors: anyone already pinned
+/// in [kCoreTeam] (they appear above) plus known ghost accounts. Bots are
+/// dropped by [parseCommunity] on the payload's own `type`, so they don't need
+/// to be listed here.
+const Set<String> kExcludedFromCommunity = {};
 
 /// Map GitHub's `/contributors` payload to community [TeamMember]s: drop the
 /// core + ghost logins and bots, tag everyone else as "Contributor". GitHub

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/share/share_link.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/share/share_link.dart';
 
 void main() {
   const item = MediaItem(
@@ -19,10 +19,10 @@ void main() {
     // Short link: plain query params, no base64 blob.
     expect(webUrl, isNot(contains('d=')));
 
-    // The site forwards the same query params into a zangetsu://open link.
+    // The site forwards the same query params into an orcabox://open link.
     final web = Uri.parse(webUrl);
     final deepLink =
-        Uri.parse('zangetsu://open').replace(queryParameters: web.queryParameters);
+        Uri.parse('orcabox://open').replace(queryParameters: web.queryParameters);
     final parsed = ShareLink.parse(deepLink);
     expect(parsed, isNotNull);
     expect(parsed!.url, item.url);
@@ -46,7 +46,7 @@ void main() {
     expect(web.queryParameters.containsKey('c'), isFalse);
 
     final parsed = ShareLink.parse(
-      Uri.parse('zangetsu://open').replace(queryParameters: web.queryParameters),
+      Uri.parse('orcabox://open').replace(queryParameters: web.queryParameters),
     );
     // Older builds shared links without `c`; Detail falls back to the source.
     expect(parsed, isNotNull);
@@ -54,12 +54,12 @@ void main() {
     expect(parsed.url, noCover.url);
   });
 
-  test('parse ignores links that are not zangetsu://open', () {
-    expect(ShareLink.parse(Uri.parse('zangetsu://anilist-auth')), isNull);
+  test('parse ignores links that are not orcabox://open', () {
+    expect(ShareLink.parse(Uri.parse('orcabox://anilist-auth')), isNull);
     expect(
-      ShareLink.parse(Uri.parse('https://spyou.github.io/Zangetsu-Site/')),
+      ShareLink.parse(Uri.parse('https://orcabox.online/')),
       isNull,
     );
-    expect(ShareLink.parse(Uri.parse('zangetsu://open')), isNull); // no source/url
+    expect(ShareLink.parse(Uri.parse('orcabox://open')), isNull); // no source/url
   });
 }

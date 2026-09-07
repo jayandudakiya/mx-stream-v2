@@ -6,20 +6,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/appwrite/appwrite_service.dart';
-import 'package:mxstream/core/locale/locale_controller.dart';
-import 'package:mxstream/core/playback/playback_prefs.dart';
-import 'package:mxstream/core/playback/search_prefs.dart';
-import 'package:mxstream/core/provider/provider_registry.dart';
-import 'package:mxstream/core/state/active_source_cubit.dart';
-import 'package:mxstream/core/supabase/supabase_service.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/core/tv/tv_list_focusable.dart';
-import 'package:mxstream/features/auth/auth_cubit.dart';
-import 'package:mxstream/features/auth/migration_bridge.dart';
-import 'package:mxstream/features/settings/settings_screen_tv.dart';
-import 'package:mxstream/l10n/app_localizations.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/appwrite/appwrite_service.dart';
+import 'package:orcabox/core/locale/locale_controller.dart';
+import 'package:orcabox/core/playback/playback_prefs.dart';
+import 'package:orcabox/core/playback/search_prefs.dart';
+import 'package:orcabox/core/provider/provider_registry.dart';
+import 'package:orcabox/core/state/active_source_cubit.dart';
+import 'package:orcabox/core/supabase/supabase_service.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/core/tv/tv_list_focusable.dart';
+import 'package:orcabox/features/auth/auth_cubit.dart';
+import 'package:orcabox/features/auth/migration_bridge.dart';
+import 'package:orcabox/features/settings/settings_screen_tv.dart';
+import 'package:orcabox/l10n/app_localizations.dart';
 
 MigrationBridge _fakeBridge() => MigrationBridge(
       invoke: (_, __) async => const {'ok': false},

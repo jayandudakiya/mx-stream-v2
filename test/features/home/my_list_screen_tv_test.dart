@@ -2,20 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/di/injector.dart';
-import 'package:mxstream/core/mode/content_mode.dart';
-import 'package:mxstream/core/mode/content_mode_cubit.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/core/playback/list_status_store.dart';
-import 'package:mxstream/core/playback/my_list.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
-import 'package:mxstream/core/tracker/tracker_hub.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/home/cubit/my_list_cubit.dart';
-import 'package:mxstream/features/home/cubit/tracker_list_cubit.dart';
-import 'package:mxstream/features/home/my_list_screen_tv.dart';
+import 'package:orcabox/core/di/injector.dart';
+import 'package:orcabox/core/mode/content_mode.dart';
+import 'package:orcabox/core/mode/content_mode_cubit.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/core/playback/list_status_store.dart';
+import 'package:orcabox/core/playback/my_list.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
+import 'package:orcabox/core/tracker/tracker_hub.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/home/cubit/my_list_cubit.dart';
+import 'package:orcabox/features/home/cubit/tracker_list_cubit.dart';
+import 'package:orcabox/features/home/my_list_screen_tv.dart';
 
 // ── Minimal fakes ─────────────────────────────────────────────────────────────
 

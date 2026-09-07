@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'package:hive/hive.dart';
 
 import '../error/exceptions.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/playback/skip_service.dart';
-import 'package:mxstream/core/playback/tv_playback_helpers.dart';
+import 'package:orcabox/core/playback/skip_service.dart';
+import 'package:orcabox/core/playback/tv_playback_helpers.dart';
 
 void main() {
   group('kTvSpeeds', () {

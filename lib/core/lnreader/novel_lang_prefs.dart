@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 import 'package:hive/hive.dart';
 
 /// Which novel-source languages to show in the LNReader catalog.

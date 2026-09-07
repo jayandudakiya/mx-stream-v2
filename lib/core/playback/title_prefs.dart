@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/hive/safe_box.dart';
+import 'package:orcabox/core/hive/safe_box.dart';
 
 /// Remembers per-title user choices (currently the sub/dub category), keyed by
 /// `"<sourceId>::<showUrl>"`. Netflix-style "remember my choice for this title".

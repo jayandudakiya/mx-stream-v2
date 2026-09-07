@@ -16,13 +16,13 @@ import 'aniyomi_update.dart';
 
 export 'aniyomi_source_info.dart';
 
-/// Dart-side wrapper around the `zangetsu/aniyomi` [MethodChannel].
+/// Dart-side wrapper around the `orcabox/aniyomi` [MethodChannel].
 ///
 /// Mirrors the three methods exposed by `AniyomiBridge.attach()` on the
 /// Android side. All methods are thin channel invocations; no caching or
 /// business logic lives here.
 class AniyomiExtensionService {
-  static const MethodChannel _channel = MethodChannel('zangetsu/aniyomi');
+  static const MethodChannel _channel = MethodChannel('orcabox/aniyomi');
 
   /// Hive box name used to persist installed pkg → apk-path entries so they
   /// can be reloaded on a cold start without re-downloading.

@@ -4,9 +4,12 @@
          launch window so there's no white/black flash before the Flutter splash
          paints — the launch screen matches the app's dark UI. -->
     <color name="launch_bg">#FF0B0B0F</color>
-    <!-- The MXStream artwork's own background, so the adaptive icon's two
-         layers read as one image (see mipmap-anydpi-v26/ic_launcher.xml). -->
-    <color name="ic_launcher_bg">#F4E9D3</color>
+    <!-- The OrcaBox artwork's own background, so the adaptive icon's two
+         layers read as one image (see mipmap-anydpi-v26/ic_launcher.xml).
+         Matches launch_bg: the orca mark is cyan-on-dark, so it needs a dark
+         plate. The previous cream (#F4E9D3) belonged to the old artwork and
+         made the new mark look pasted onto someone else's icon. -->
+    <color name="ic_launcher_bg">#0B0B0F</color>
     <!-- Monochrome icon choice: the flat mark sits on black. -->
     <color name="ic_launcher_classic_bg">#000000</color>
 </resources>

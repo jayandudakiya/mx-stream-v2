@@ -2,18 +2,18 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/video_source.dart';
-import 'package:mxstream/core/repository/source_repository.dart';
-import 'package:mxstream/core/zmode/anilist_catalogue.dart';
-import 'package:mxstream/core/zmode/match_store.dart';
-import 'package:mxstream/core/zmode/zmode_source_prefs.dart';
-import 'package:mxstream/core/zmode/metadata_repository.dart';
-import 'package:mxstream/core/zmode/source_matcher.dart';
-import 'package:mxstream/core/zmode/tmdb_catalogue.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/video_source.dart';
+import 'package:orcabox/core/repository/source_repository.dart';
+import 'package:orcabox/core/zmode/anilist_catalogue.dart';
+import 'package:orcabox/core/zmode/match_store.dart';
+import 'package:orcabox/core/zmode/zmode_source_prefs.dart';
+import 'package:orcabox/core/zmode/metadata_repository.dart';
+import 'package:orcabox/core/zmode/source_matcher.dart';
+import 'package:orcabox/core/zmode/tmdb_catalogue.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 Map<String, dynamic> _al({int? chapters, int? episodes = 12}) => {
   'id': 1, 'idMal': 100, 'title': {'romaji': 'FMA', 'english': null},

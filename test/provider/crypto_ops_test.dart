@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/provider/crypto_ops.dart';
+import 'package:orcabox/core/provider/crypto_ops.dart';
 
 void main() {
   test('sha256Hex matches the AllAnime key vector', () {

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/update/update_service.dart';
+import 'package:orcabox/core/update/update_service.dart';
 
 void main() {
   int cmp(String a, String b) => UpdateService.compareVersions(a, b);

@@ -1,6 +1,6 @@
-# MXStream App v2 — Build & Configuration Guide
+# OrcaBox App v2 — Build & Configuration Guide
 
-This guide details everything needed to set up, configure, build, and release **MXStream App v2** across all supported platforms (Android, Android TV, Windows, and iOS).
+This guide details everything needed to set up, configure, build, and release **OrcaBox App v2** across all supported platforms (Android, Android TV, Windows, and iOS).
 
 ---
 
@@ -29,7 +29,7 @@ This guide details everything needed to set up, configure, build, and release **
 
 ## ⚡ 1. Prerequisites & Environment Setup
 
-MXStream v2 is built with Flutter and uses **FVM (Flutter Version Management)** to pin the exact Flutter SDK version.
+OrcaBox v2 is built with Flutter and uses **FVM (Flutter Version Management)** to pin the exact Flutter SDK version.
 
 ### Requirements:
 - **Flutter SDK**: `3.38.5` (managed via `.fvmrc`)
@@ -95,7 +95,7 @@ static const String apiKey = String.fromEnvironment(
 | Environment Variable | Location | Purpose | Default |
 |---|---|---|---|
 | `TMDB_API_KEY` | [`lib/core/metadata/tmdb.dart`](lib/core/metadata/tmdb.dart) | TMDB API v3 key for search/trailers/enrichment | Embedded public fallback |
-| `SUPABASE_URL` | [`lib/core/environment.dart`](lib/core/environment.dart) | Supabase project endpoint | MXStream public endpoint |
+| `SUPABASE_URL` | [`lib/core/environment.dart`](lib/core/environment.dart) | Supabase project endpoint | OrcaBox public endpoint |
 | `SUPABASE_ANON_KEY` | [`lib/core/environment.dart`](lib/core/environment.dart) | Supabase client anon public key | Embedded public anon key |
 | `SUBDL_API_KEY` | [`lib/core/playback/subtitle_download_service.dart`](lib/core/playback/subtitle_download_service.dart) | SubDL API key for subtitle downloads | `''` (empty) |
 | `EXO_SPIKE` | [`lib/features/player/tv_exo_spike_screen.dart`](lib/features/player/tv_exo_spike_screen.dart) | Enable experimental ExoPlayer spike | `false` |
@@ -167,7 +167,7 @@ Edit [`.vscode/launch.json`](.vscode/launch.json) and add `toolArgs` to your des
 #### Option A (Using the JSON file):
 ```json
 {
-  "name": "MXStream (debug with TMDB)",
+  "name": "OrcaBox (debug with TMDB)",
   "request": "launch",
   "type": "dart",
   "toolArgs": [
@@ -179,7 +179,7 @@ Edit [`.vscode/launch.json`](.vscode/launch.json) and add `toolArgs` to your des
 #### Option B (Direct argument):
 ```json
 {
-  "name": "MXStream (debug · fast arm64)",
+  "name": "OrcaBox (debug · fast arm64)",
   "request": "launch",
   "type": "dart",
   "args": ["--target-platform", "android-arm64"],

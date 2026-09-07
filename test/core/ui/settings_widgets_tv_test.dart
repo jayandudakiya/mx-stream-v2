@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mxstream/core/app_mode.dart';
-import 'package:mxstream/core/tv/tv_list_focusable.dart';
-import 'package:mxstream/core/ui/settings_widgets.dart';
+import 'package:orcabox/core/app_mode.dart';
+import 'package:orcabox/core/tv/tv_list_focusable.dart';
+import 'package:orcabox/core/ui/settings_widgets.dart';
 
 void main() {
   tearDown(() async {

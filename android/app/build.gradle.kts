@@ -25,7 +25,7 @@ if (hasReleaseKeystore) {
 }
 
 android {
-    namespace = "com.spyou.watch_app"
+    namespace = "com.orcabox.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -45,7 +45,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mxstream.app"
+        applicationId = "com.orcabox.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -1,6 +1,6 @@
 import 'native_models.dart';
 
-/// MXStream's original movie-provider contract, ported verbatim. Named
+/// OrcaBox's original movie-provider contract, ported verbatim. Named
 /// [NativeBaseProvider] (rather than `BaseProvider`) to avoid colliding with
 /// this app's own richer `BaseProvider`
 /// (`lib/core/provider/base_provider.dart`) — see

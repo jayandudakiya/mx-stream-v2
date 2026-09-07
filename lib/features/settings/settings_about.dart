@@ -1,6 +1,5 @@
-// About: version, updates, support and the developer credits.
+// About: version, updates, support and community links.
 part of 'settings_screen.dart';
-
 
 // ---------------------------------------------------------------------------
 // About
@@ -14,8 +13,9 @@ class AboutSettingsScreen extends StatefulWidget {
 }
 
 class _AboutSettingsScreenState extends State<AboutSettingsScreen> {
-  static const String _websiteUrl = 'https://zangetsu.online';
-  static const String _telegramUrl = 'https://t.me/+9mQlsdvDlo83Mjk1';
+  static const String _websiteUrl = 'https://orcabox.online';
+  // Empty until OrcaBox has its own Telegram; the old value was upstream's.
+  static const String _telegramUrl = '';
   static const String _discordUrl = kDiscordInviteUrl;
   static const String _githubUrl = kAppRepoUrl;
 
@@ -68,21 +68,25 @@ class _AboutSettingsScreenState extends State<AboutSettingsScreen> {
               SettingsTile(
                 icon: Icons.language_rounded,
                 title: context.l10n.website,
-                subtitle: 'zangetsu.online',
+                subtitle: 'orcabox.online',
                 onTap: () => _open(_websiteUrl),
               ),
-              SettingsTile(
-                icon: Icons.send_rounded,
-                title: context.l10n.telegram,
-                subtitle: context.l10n.communityChat,
-                onTap: () => _open(_telegramUrl),
-              ),
-              SettingsTile(
-                icon: Icons.discord,
-                title: context.l10n.discord,
-                subtitle: context.l10n.joinTheServer,
-                onTap: () => _open(_discordUrl),
-              ),
+              // Telegram and Discord hide themselves until OrcaBox has its own
+              // channels — the previous values were the upstream project's.
+              if (_telegramUrl.isNotEmpty)
+                SettingsTile(
+                  icon: Icons.send_rounded,
+                  title: context.l10n.telegram,
+                  subtitle: context.l10n.communityChat,
+                  onTap: () => _open(_telegramUrl),
+                ),
+              if (kHasDiscord)
+                SettingsTile(
+                  icon: Icons.discord,
+                  title: context.l10n.discord,
+                  subtitle: context.l10n.joinTheServer,
+                  onTap: () => _open(_discordUrl),
+                ),
               SettingsTile(
                 icon: Icons.code_rounded,
                 title: context.l10n.github,
@@ -132,12 +136,16 @@ class _AboutSettingsScreenState extends State<AboutSettingsScreen> {
                   },
                 ),
               ),
-              SettingsTile(
-                icon: Icons.favorite_border_rounded,
-                title: context.l10n.supportTheApp,
-                subtitle: context.l10n.buyMeACoffee,
-                onTap: () => _push(const DonateScreen()),
-              ),
+              // Hidden until OrcaBox has its own payout endpoints — see
+              // DonateScreen. Better no Support entry than one that opens an
+              // empty screen (or, worse, pays someone else).
+              if (DonateScreen.isConfigured)
+                SettingsTile(
+                  icon: Icons.favorite_border_rounded,
+                  title: context.l10n.supportTheApp,
+                  subtitle: context.l10n.buyMeACoffee,
+                  onTap: () => _push(const DonateScreen()),
+                ),
             ],
           ),
           const SizedBox(height: 24),
@@ -157,7 +165,7 @@ class _AboutSettingsScreenState extends State<AboutSettingsScreen> {
 }
 
 /// The app header: the clean logo mark, name and version floating on the page
-/// (no grey box), then the lead-developer card.
+/// (no grey box).
 class _ProfileCard extends StatelessWidget {
   const _ProfileCard();
 
@@ -175,75 +183,7 @@ class _ProfileCard extends StatelessWidget {
           style: AppText.caption.copyWith(color: AppColors.textTertiary),
         ),
         const SizedBox(height: 20),
-        const _DeveloperRow(),
       ],
-    );
-  }
-}
-
-/// The "Developer" row inside the profile card.
-class _DeveloperRow extends StatelessWidget {
-  const _DeveloperRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: () async {
-            final uri = Uri.parse('https://github.com/spyou');
-            if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-              await launchUrl(uri, mode: LaunchMode.platformDefault);
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              // One solid dark grey, matching the app's cards.
-              color: AppColors.settingsCard,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                const TeamAvatar(
-                  url: 'https://github.com/spyou.png?size=200',
-                  name: 'Krishna',
-                  size: 46,
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Krishna Vishwakarma',
-                        style: AppText.headline.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        context.l10n.leadDeveloper,
-                        style: AppText.caption.copyWith(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.code_rounded, color: AppColors.textTertiary),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text.dart';
 
-/// The MXStream logotype, drawn as text rather than loaded as artwork.
+/// The OrcaBox logotype, drawn as text rather than loaded as artwork.
 ///
 /// It replaces the wordmark PNG the app used to ship: the name is set in the
-/// app's own type (Inter, tight and heavy), two-tone so "MX" carries the accent
-/// the rest of the UI uses. Being text, it stays sharp at any size, follows a
-/// custom accent colour, and needs no per-density asset.
+/// app's own type (Inter, tight and heavy), two-tone so "Orca" carries the
+/// accent the rest of the UI uses. Being text, it stays sharp at any size,
+/// follows a custom accent colour, and needs no per-density asset.
+///
+/// The two halves are separate [TextSpan]s, which is why a repo-wide search for
+/// the old product name never matched this file during the rebrand — keep the
+/// split in mind if the name changes again.
 ///
 /// Sizing matches what `Image.asset(..., fit: BoxFit.contain)` did, so it drops
 /// into both kinds of call site unchanged:
@@ -29,7 +33,7 @@ class AppWordmark extends StatelessWidget {
   /// Where the mark sits when the box is bigger than the text.
   final AlignmentGeometry alignment;
 
-  /// Overrides the "Stream" half's colour (the "MX" half always uses the
+  /// Overrides the "Box" half's colour (the "Orca" half always uses the
   /// accent). Defaults to the primary text colour.
   final Color? color;
 
@@ -55,8 +59,8 @@ class AppWordmark extends StatelessWidget {
     final mark = Text.rich(
       TextSpan(
         children: [
-          TextSpan(text: 'MX', style: base.copyWith(color: AppColors.accent)),
-          const TextSpan(text: 'Stream'),
+          TextSpan(text: 'Orca', style: base.copyWith(color: AppColors.accent)),
+          const TextSpan(text: 'Box'),
         ],
       ),
       style: base,

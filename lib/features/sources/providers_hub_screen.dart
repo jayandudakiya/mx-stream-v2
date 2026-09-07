@@ -28,7 +28,7 @@ const Widget _kChevron = Icon(
 const _csBlue = Color(0xFF4D9DFF);
 const _aniGreen = Color(0xFF4DD68C);
 
-/// Providers hub — lists the three provider ecosystems (Zangetsu always,
+/// Providers hub — lists the three provider ecosystems (OrcaBox always,
 /// CloudStream/Aniyomi on Android only), each row pushing its dedicated
 /// ecosystem screen (Tasks 1-3). Stateful only so counts refresh when the
 /// user returns from an ecosystem screen (install/remove there is reflected
@@ -69,7 +69,7 @@ class _HubPhoneView extends StatelessWidget {
   Widget build(BuildContext context) {
     // Recompute the counts live when a source is installed / enabled / updated
     // while the hub is open (CS + Aniyomi managers are ChangeNotifiers). The
-    // Zangetsu registry isn't a Listenable, but it can only be mutated from its
+    // OrcaBox registry isn't a Listenable, but it can only be mutated from its
     // own screen, so its count refreshes on navigation back here anyway.
     return ListenableBuilder(
       listenable: Listenable.merge([

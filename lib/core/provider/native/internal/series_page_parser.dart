@@ -4,7 +4,7 @@ import 'package:html/dom.dart' as dom;
 /// RogMovies). Mirrors the selectors and matching order of the CloudStream
 /// Kotlin providers these are ported from.
 ///
-/// Ported verbatim from MXStream's
+/// Ported verbatim from OrcaBox's
 /// `functions/fetchers/providers/core/series_page_parser.dart`.
 
 /// CloudStream keys movie-vs-series off the page's own synopsis heading:

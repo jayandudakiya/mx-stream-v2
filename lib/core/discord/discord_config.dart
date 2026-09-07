@@ -14,7 +14,7 @@ class DiscordConfig {
   /// REBRAND TODO (see REBRANDING.md): still the upstream project's
   /// application, so Discord shows ITS name next to whatever the user is
   /// watching, no matter what [appName] says here — the label comes from the
-  /// Discord application, not from this app. Create an MXStream application
+  /// Discord application, not from this app. Create an OrcaBox application
   /// and paste its id here before release.
   static const String applicationId = '1518610045422665748';
 
@@ -29,7 +29,7 @@ class DiscordConfig {
   /// another project's logo.
   static const String appLogoUrl = '${kAppRepoRawBase}assets/icon/app_icon.png';
 
-  static const String appName = 'MXStream';
+  static const String appName = 'OrcaBox';
 
   /// Discord API base (v10).
   static const String api = 'https://discord.com/api/v10';

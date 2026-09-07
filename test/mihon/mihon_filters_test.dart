@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mihon/mihon_filters.dart';
+import 'package:orcabox/core/mihon/mihon_filters.dart';
 
 // A schema JSON that exercises all 8 filter types in a single payload,
 // including a Group that nests a Group (two levels deep) so the recursive

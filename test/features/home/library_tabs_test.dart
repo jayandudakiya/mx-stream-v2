@@ -8,11 +8,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/models/watch_status.dart';
-import 'package:mxstream/features/home/cubit/my_list_cubit.dart';
-import 'package:mxstream/features/home/library_tabs.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/models/watch_status.dart';
+import 'package:orcabox/features/home/cubit/my_list_cubit.dart';
+import 'package:orcabox/features/home/library_tabs.dart';
 
 LibraryTab _tab(String id) => LibraryTab(
   id: id,

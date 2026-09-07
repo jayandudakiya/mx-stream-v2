@@ -1,7 +1,7 @@
 // test/core/cast/cast_controller_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/cast/cast_controller.dart';
-import 'package:mxstream/core/models/video_source.dart';
+import 'package:orcabox/core/cast/cast_controller.dart';
+import 'package:orcabox/core/models/video_source.dart';
 
 void main() {
   test('castMimeFor maps containers + sniffs unknown by extension', () {

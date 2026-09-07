@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/provider_info.dart';
+import 'package:orcabox/core/models/provider_info.dart';
 
 void main() {
   test('ProviderInfo round-trips anime type', () {

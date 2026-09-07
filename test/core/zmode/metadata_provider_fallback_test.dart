@@ -4,15 +4,15 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/models/episode.dart';
-import 'package:mxstream/core/models/home_section.dart';
-import 'package:mxstream/core/models/media_detail.dart';
-import 'package:mxstream/core/models/media_item.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/anime_catalogue.dart';
-import 'package:mxstream/core/zmode/metadata_filters.dart';
-import 'package:mxstream/core/zmode/metadata_provider_prefs.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/episode.dart';
+import 'package:orcabox/core/models/home_section.dart';
+import 'package:orcabox/core/models/media_detail.dart';
+import 'package:orcabox/core/models/media_item.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/anime_catalogue.dart';
+import 'package:orcabox/core/zmode/metadata_filters.dart';
+import 'package:orcabox/core/zmode/metadata_provider_prefs.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 /// Stands in for either provider: answers, or throws on command.
 class _Cat implements AnimeCatalogue {

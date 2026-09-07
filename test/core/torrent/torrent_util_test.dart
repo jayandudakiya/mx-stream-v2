@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/torrent/torrent_util.dart';
+import 'package:orcabox/core/torrent/torrent_util.dart';
 
 void main() {
   test('detects magnet and .torrent, not direct urls', () {

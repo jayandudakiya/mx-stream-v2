@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/video_source.dart';
+import 'package:orcabox/core/models/video_source.dart';
 
 void main() {
   test('VideoSource parses an HLS sub source with soft subtitles', () {

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/mihon/mihon_provider.dart';
-import 'package:mxstream/core/models/episode.dart';
+import 'package:orcabox/core/mihon/mihon_provider.dart';
+import 'package:orcabox/core/models/episode.dart';
 
 Episode _ch(double n) => Episode(id: 'c$n', title: 'Ch $n', number: n, url: 'u$n');
 Episode _chNoNum(String u) => Episode(id: u, title: u, url: u);

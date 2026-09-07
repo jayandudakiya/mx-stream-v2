@@ -22,7 +22,7 @@ Future<bool> resolveAppleTv() async {
   }
   // tvOS AppDelegate answers this; iPhone has no handler → false.
   try {
-    final v = await const MethodChannel('com.spyou.watch_app/device')
+    final v = await const MethodChannel('com.orcabox.app/device')
         .invokeMethod<bool>('isTv');
     if (v == true) {
       _appleTv = true;

@@ -1,10 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/torrent/torrent_service.dart';
+import 'package:orcabox/core/torrent/torrent_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('com.spyou.watch_app/torrent');
+  const channel = MethodChannel('com.orcabox.app/torrent');
   final calls = <MethodCall>[];
 
   setUp(() {

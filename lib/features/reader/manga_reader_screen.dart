@@ -32,7 +32,7 @@ import '../../l10n/l10n.dart';
 import 'reader_pull_chapter.dart';
 
 /// Image reader for manga chapters — the paged/webtoon counterpart of
-/// [package:mxstream/features/reader/novel_reader_screen.dart]'s text
+/// [package:orcabox/features/reader/novel_reader_screen.dart]'s text
 /// reader. Phone-only (no TV twin, no TV focus handling needed).
 class MangaReaderScreen extends StatefulWidget {
   const MangaReaderScreen({
@@ -2007,7 +2007,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen>
         headers: page.headers ?? const {},
       );
       final bytes = await file.readAsBytes();
-      final name = 'Zangetsu_${DateTime.now().millisecondsSinceEpoch}';
+      final name = 'OrcaBox_${DateTime.now().millisecondsSinceEpoch}';
       try {
         await Gal.putImageBytes(bytes, name: name);
       } on GalException {

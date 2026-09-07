@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
 
 void main() {
   // Touch support: on a touchscreen TV a physical tap must trigger the same

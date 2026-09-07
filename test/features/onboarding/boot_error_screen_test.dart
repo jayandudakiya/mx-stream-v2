@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/features/onboarding/boot_error_screen.dart';
+import 'package:orcabox/features/onboarding/boot_error_screen.dart';
 
 Future<void> _pump(
   WidgetTester tester, {

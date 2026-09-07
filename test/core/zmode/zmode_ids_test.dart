@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 void main() {
   const fma = ZCanonical(ZKind.anime, 'mal:5114');

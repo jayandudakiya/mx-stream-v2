@@ -67,7 +67,7 @@ class SubtitleSearchService {
   static const String _base = 'https://api.opensubtitles.com/api/v1';
 
   /// A descriptive User-Agent — OpenSubtitles requires (and rate-limits by) one.
-  static const String _userAgent = 'MXStream v2.0.0';
+  static const String _userAgent = 'OrcaBox v2.0.0';
 
   PlaybackPrefs get _prefs => sl<PlaybackPrefs>();
 

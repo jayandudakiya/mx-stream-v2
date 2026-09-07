@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/features/player/player_screen.dart';
+import 'package:orcabox/features/player/player_screen.dart';
 
 void main() {
   group('stripEpisodePrefix', () {

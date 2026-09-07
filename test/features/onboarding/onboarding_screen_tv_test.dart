@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/tv/tv_focusable.dart';
-import 'package:mxstream/features/onboarding/onboarding_screen_tv.dart';
+import 'package:orcabox/core/tv/tv_focusable.dart';
+import 'package:orcabox/features/onboarding/onboarding_screen_tv.dart';
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 //

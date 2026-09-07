@@ -4,7 +4,7 @@
 // it falls back to that choice.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/zmode/metadata_provider_prefs.dart';
+import 'package:orcabox/core/zmode/metadata_provider_prefs.dart';
 
 /// Mirrors `_providerOf` in the list screen — the mapping is the whole point.
 PreferredProvider? providerOf(String? trackerName) => switch (trackerName) {

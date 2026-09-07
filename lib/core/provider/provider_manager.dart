@@ -89,7 +89,7 @@ class _JsHost {
   // one the CloudStream side uses) over a MethodChannel and cache the solved
   // clearance cookie + matching User-Agent per host. Android-only; on platforms
   // without the handler the invoke throws and we fall back to a plain request.
-  static const MethodChannel _cf = MethodChannel('zangetsu/cloudstream');
+  static const MethodChannel _cf = MethodChannel('orcabox/cloudstream');
   final Map<String, String> _cfCookie = {}; // host -> cf_clearance cookie(s)
   final Map<String, String> _cfUa = {}; // host -> the solving User-Agent
   // Persists solved clearances across restarts so a JS source cleared once
@@ -776,8 +776,8 @@ class JsProvider implements BaseProvider, ReadingProvider {
     ], timeout: const Duration(seconds: 30));
     final map = jsonDecode(raw) as Map<String, dynamic>;
     // Sozo Read manga/novel detail payloads carry the chapter list under
-    // `chapters`; Zangetsu's MediaDetail reads `episodes` (Task E4 compat
-    // alias). Only fills in when `episodes` is absent, so a Zangetsu-shaped
+    // `chapters`; OrcaBox's MediaDetail reads `episodes` (Task E4 compat
+    // alias). Only fills in when `episodes` is absent, so an OrcaBox-shaped
     // payload's own `episodes` key always wins.
     if (!map.containsKey('episodes') && map.containsKey('chapters')) {
       map['episodes'] = map['chapters'];

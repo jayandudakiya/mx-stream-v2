@@ -42,7 +42,7 @@ class PushService {
       if (n != null) {
         NotificationService.instance.showMessage(
           id: m.hashCode & 0x7fffffff,
-          title: n.title ?? 'MXStream',
+          title: n.title ?? 'OrcaBox',
           body: n.body ?? '',
           imageUrl: n.android?.imageUrl,
         );
@@ -72,7 +72,7 @@ class PushService {
       unawaited(store.saveNew(
         Announcement(
           id: id,
-          title: n.title ?? 'MXStream',
+          title: n.title ?? 'OrcaBox',
           body: n.body ?? '',
           actionLabel: link != null ? 'Open' : null,
           actionUrl: link,

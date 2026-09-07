@@ -5,9 +5,9 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/anilist/anilist_service.dart';
-import 'package:mxstream/core/anilist/anilist_store.dart';
-import 'package:mxstream/core/tracker/tracker.dart';
+import 'package:orcabox/core/anilist/anilist_service.dart';
+import 'package:orcabox/core/anilist/anilist_store.dart';
+import 'package:orcabox/core/tracker/tracker.dart';
 
 /// Fake Dio adapter that inspects the GraphQL query text it was asked to
 /// send and returns a matching canned response — no real network. Lets the

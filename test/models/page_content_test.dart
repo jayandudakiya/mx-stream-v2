@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/page_content.dart';
+import 'package:orcabox/core/models/page_content.dart';
 
 void main() {
   test('PageImage parses url + optional headers', () {

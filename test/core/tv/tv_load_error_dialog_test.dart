@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/tv/tv_load_error_dialog.dart';
+import 'package:orcabox/core/tv/tv_load_error_dialog.dart';
 
 void main() {
   testWidgets('TV load-error dialog shows the change-sources message',

@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/zmode/match_store.dart';
-import 'package:mxstream/core/zmode/zmode_source_prefs.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/zmode/match_store.dart';
+import 'package:orcabox/core/zmode/zmode_source_prefs.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 void main() {
   late ZSourcePrefs prefs;

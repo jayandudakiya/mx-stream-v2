@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:mxstream/core/zmode/zmode_prefs.dart';
-import 'package:mxstream/features/home/home_screen.dart';
-import 'package:mxstream/features/home/search_screen.dart';
-import 'package:mxstream/features/shell/dock_icons.dart';
+import 'package:orcabox/core/zmode/zmode_prefs.dart';
+import 'package:orcabox/features/home/home_screen.dart';
+import 'package:orcabox/features/home/search_screen.dart';
+import 'package:orcabox/features/shell/dock_icons.dart';
 
 /// Search left the dock (task 17) — this header icon, beside
 /// [HomeBrowseSourcesAction], is the primary way in now. Unlike the sources

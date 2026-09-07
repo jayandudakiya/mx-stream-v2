@@ -6,8 +6,8 @@
 // kind is what makes the number mean anything.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
-import 'package:mxstream/features/detail/open_related.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
+import 'package:orcabox/features/detail/open_related.dart';
 
 void main() {
   test('a manga id resolves against the manga catalogue', () {

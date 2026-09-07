@@ -29,7 +29,7 @@ class AppIconOption {
 /// Android-only. Everywhere else [supported] is false and the setting is hidden;
 /// iOS has its own unrelated API and TV has no icon picker at all.
 class AppIconService {
-  static const _ch = MethodChannel('zangetsu/app_icon');
+  static const _ch = MethodChannel('orcabox/app_icon');
   static const String boxName = 'app_prefs';
   static const String _key = 'appIconId';
 
@@ -43,13 +43,13 @@ class AppIconService {
   /// actually wearing.
   ///
   /// The ids are persisted and therefore frozen; only the labels and artwork
-  /// moved in the MXStream rename. `default` is the full-colour mark,
+  /// moved in the OrcaBox rename. `default` is the full-colour mark,
   /// `classic` the flat monochrome one (the same artwork Android 13+ themed
   /// icons use).
   static const List<AppIconOption> options = [
     AppIconOption(
       id: 'default',
-      label: 'MXStream',
+      label: 'OrcaBox',
       asset: 'assets/icon/preview_default.png',
     ),
     AppIconOption(

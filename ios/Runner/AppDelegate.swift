@@ -21,7 +21,7 @@ import UIKit
     // its own request if this channel throws, so nothing regresses.
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "NovelHttp") {
       let channel = FlutterMethodChannel(
-        name: "zangetsu/novel_http",
+        name: "orcabox/novel_http",
         binaryMessenger: registrar.messenger()
       )
       channel.setMethodCallHandler { call, result in

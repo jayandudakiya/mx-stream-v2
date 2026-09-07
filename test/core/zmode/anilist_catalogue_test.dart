@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mxstream/core/models/provider_info.dart';
-import 'package:mxstream/core/zmode/anilist_catalogue.dart';
-import 'package:mxstream/core/zmode/zmode_ids.dart';
+import 'package:orcabox/core/models/provider_info.dart';
+import 'package:orcabox/core/zmode/anilist_catalogue.dart';
+import 'package:orcabox/core/zmode/zmode_ids.dart';
 
 Map<String, dynamic> _media({
   int id = 1,
