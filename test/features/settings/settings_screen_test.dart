@@ -8,7 +8,6 @@ import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:orcabox/core/anilist/anilist_service.dart';
 import 'package:orcabox/core/app_mode.dart';
-import 'package:orcabox/core/appwrite/appwrite_service.dart';
 import 'package:orcabox/core/download/download_prefs.dart';
 import 'package:orcabox/core/playback/playback_prefs.dart';
 import 'package:orcabox/core/playback/search_prefs.dart';
@@ -20,17 +19,9 @@ import 'package:orcabox/core/supabase/supabase_service.dart';
 import 'package:orcabox/core/locale/locale_controller.dart';
 import 'package:orcabox/core/theme/theme_controller.dart';
 import 'package:orcabox/core/tracker/mal_service.dart';
-import 'package:orcabox/core/tracker/simkl_service.dart';
 import 'package:orcabox/features/auth/auth_cubit.dart';
-import 'package:orcabox/features/auth/migration_bridge.dart';
 import 'package:orcabox/features/settings/settings_screen.dart';
 import 'package:orcabox/l10n/app_localizations.dart';
-
-MigrationBridge _fakeBridge() => MigrationBridge(
-      invoke: (_, __) async => const {'ok': false},
-      signInPassword: (_, __) async => false,
-      verifyOtp: (_, __) async => false,
-    );
 
 // ── Minimal stubs (mirrors settings_screen_tv_test.dart) ─────────────────────
 
@@ -67,12 +58,6 @@ class _StubMal implements MalService {
   noSuchMethod(Invocation i) => super.noSuchMethod(i);
 }
 
-class _StubSimkl implements SimklService {
-  @override
-  bool get isConnected => false;
-  @override
-  noSuchMethod(Invocation i) => super.noSuchMethod(i);
-}
 
 void _mockPathProvider(WidgetTester tester) {
   const channel = MethodChannel('plugins.flutter.io/path_provider');
@@ -103,7 +88,6 @@ void main() {
       ..registerSingleton<ProviderRegistry>(_StubProviderRegistry())
       ..registerSingleton<AniListService>(_StubAniList())
       ..registerSingleton<MalService>(_StubMal())
-      ..registerSingleton<SimklService>(_StubSimkl())
       ..registerSingleton<PlaybackPrefs>(PlaybackPrefs())
       ..registerSingleton<DownloadPrefs>(DownloadPrefs())
       ..registerSingleton<TorrentPrefs>(TorrentPrefs())
@@ -124,7 +108,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     final authCubit =
-        AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge());
+        AuthCubit(SupabaseService());
     addTearDown(authCubit.close);
     GetIt.instance.registerSingleton<AuthCubit>(authCubit);
 

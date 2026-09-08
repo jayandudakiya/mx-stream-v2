@@ -132,7 +132,6 @@ class _TvPairScreenState extends State<TvPairScreen> {
   String _label(String id) => switch (id) {
         'anilist' => context.l10n.anilist,
         'mal' => context.l10n.myAnimeList,
-        'simkl' => context.l10n.simkl,
         _ => id,
       };
 

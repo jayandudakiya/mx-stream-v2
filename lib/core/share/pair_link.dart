@@ -1,7 +1,7 @@
 import '../environment.dart';
 
 /// Encodes TV pairing links and parses incoming pair URLs from either the
-/// website (`https://orcabox.online/pair/…`) or the `orcabox://pair` deeplink.
+/// website (`$SITE_BASE_URL/pair/…`) or the `orcabox://pair` deeplink.
 class PairLink {
   const PairLink({this.code, this.nonce, this.trackers = false});
 

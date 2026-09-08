@@ -272,16 +272,12 @@ class _DetailScreenTvState extends State<DetailScreenTv> {
   }
 
   /// Whether the Tracking action should show — same rule as the phone view: a
-  /// tracker is connected AND it can track this title (anime always; movies/TV
-  /// only via Simkl with a tmdb/imdb id).
+  /// tracker is connected AND it can track this title. Anime only: no remaining
+  /// tracker has a movie/TV catalogue (NOTES task 15).
   bool _trackingAvailable(MediaDetail detail) {
     final hub = sl<TrackerHub>();
     if (!hub.anyConnected) return false;
-    if (detail.type == ProviderType.anime) return true;
-    final simklOn = hub.connected.any((t) => t.displayName == 'Simkl');
-    final hasId =
-        (detail.tmdbId ?? widget.item.tmdbId) != null || ((detail.imdbId ?? widget.item.imdbId)?.isNotEmpty ?? false);
-    return simklOn && hasId;
+    return detail.type == ProviderType.anime;
   }
 
   /// Open the tracker sync sheet (status / score / episode progress) on TV.

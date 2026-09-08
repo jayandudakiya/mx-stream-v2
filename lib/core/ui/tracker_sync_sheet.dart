@@ -549,15 +549,11 @@ class _TrackerSyncSheetState extends State<TrackerSyncSheet> {
       TextSpan(
         style: AppText.caption,
         children: [
+          // Both remaining trackers (AniList, MyAnimeList) have a manga side,
+          // so the dimmed "(no manga)" note that used to mark the one that
+          // didn't is gone with it (NOTES task 15).
           for (var i = 0; i < names.length; i++)
-            TextSpan(
-              text:
-                  '${i > 0 ? '  ·  ' : ''}${names[i]}'
-                  '${names[i] == 'Simkl' ? ' (no manga)' : ''}',
-              style: names[i] == 'Simkl'
-                  ? TextStyle(color: AppColors.textTertiary)
-                  : null,
-            ),
+            TextSpan(text: '${i > 0 ? '  ·  ' : ''}${names[i]}'),
         ],
       ),
     );

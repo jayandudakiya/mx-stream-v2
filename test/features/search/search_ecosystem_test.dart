@@ -1,3 +1,18 @@
+// The ecosystem TAB STRIP (All · OrcaBox · CloudStream · Aniyomi) is gone —
+// NOTES task 2. It filtered loaded results by which provider ecosystem a
+// source came from, which is an implementation detail rather than something a
+// viewer looking for a title cares about, and it split one search across
+// several views. An all-sources search now aggregates every source into one
+// grid; the per-source chips still narrow to a single source.
+//
+// What survives, and is tested here:
+//   • [ecosystemOf] — still names a source ("Aniyomi") and still decides
+//     whether it publishes a filter schema (browse_source_screen.dart).
+//   • The group getters no longer filter by ecosystem at all, which is what
+//     "one aggregated grid" means in practice.
+//
+// Deleted with the strip: `ecosystemTabsFor`, `SearchEcosystem.all` and
+// `SearchState.ecosystem`.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orcabox/core/models/media_item.dart';
 import 'package:orcabox/core/models/provider_info.dart';
@@ -31,6 +46,11 @@ void main() {
       expect(ecosystemOf('cs:MovieBox@cncverse'), SearchEcosystem.cloudstream);
     });
 
+    test('maps the manga/novel prefixes to their own ecosystems', () {
+      expect(ecosystemOf('mihon:1'), SearchEcosystem.mihon);
+      expect(ecosystemOf('lnr:royalroad'), SearchEcosystem.lnreader);
+    });
+
     test('maps anything else to OrcaBox', () {
       expect(ecosystemOf('allanime'), SearchEcosystem.orcabox);
       expect(ecosystemOf('netmirror'), SearchEcosystem.orcabox);
@@ -38,72 +58,19 @@ void main() {
       expect(ecosystemOf('anilist'), SearchEcosystem.orcabox);
       expect(ecosystemOf('csfd'), SearchEcosystem.orcabox);
       expect(ecosystemOf(''), SearchEcosystem.orcabox);
+      // Native channel hubs are OrcaBox's own providers, not an extension.
+      expect(ecosystemOf('native:vegamovies'), SearchEcosystem.orcabox);
+      expect(ecosystemOf('native:rogmovies'), SearchEcosystem.orcabox);
     });
 
-    test('never returns the All sentinel', () {
-      for (final id in ['ani:1', 'cs:x', 'allanime', '']) {
-        expect(ecosystemOf(id), isNot(SearchEcosystem.all));
+    test('every ecosystem still carries a display label', () {
+      for (final e in SearchEcosystem.values) {
+        expect(e.label, isNotEmpty);
       }
     });
   });
 
-  group('ecosystemTabsFor (hide-empty-ecosystem logic)', () {
-    test('always includes All, even with no sources', () {
-      expect(ecosystemTabsFor(const []), [SearchEcosystem.all]);
-    });
-
-    test('only OrcaBox sources → All + OrcaBox (no CS/Ani tabs)', () {
-      expect(ecosystemTabsFor(const ['allanime', 'netmirror']), [
-        SearchEcosystem.all,
-        SearchEcosystem.orcabox,
-      ]);
-    });
-
-    test('no Aniyomi source → no Aniyomi tab', () {
-      final tabs = ecosystemTabsFor(const ['allanime', 'cs:AnimePahe']);
-      expect(tabs, [
-        SearchEcosystem.all,
-        SearchEcosystem.orcabox,
-        SearchEcosystem.cloudstream,
-      ]);
-      expect(tabs, isNot(contains(SearchEcosystem.aniyomi)));
-    });
-
-    test('an Aniyomi source makes the Aniyomi tab appear', () {
-      final tabs = ecosystemTabsFor(const ['allanime', 'ani:1']);
-      expect(tabs, contains(SearchEcosystem.aniyomi));
-    });
-
-    test('all three ecosystems present → All + all three, in fixed order', () {
-      expect(ecosystemTabsFor(const ['allanime', 'cs:AnimePahe', 'ani:1']), [
-        SearchEcosystem.all,
-        SearchEcosystem.orcabox,
-        SearchEcosystem.cloudstream,
-        SearchEcosystem.aniyomi,
-      ]);
-    });
-
-    test('order is fixed regardless of input order; no duplicates', () {
-      expect(
-        ecosystemTabsFor(const ['ani:2', 'ani:1', 'cs:b', 'cs:a', 'zjs']),
-        [
-          SearchEcosystem.all,
-          SearchEcosystem.orcabox,
-          SearchEcosystem.cloudstream,
-          SearchEcosystem.aniyomi,
-        ],
-      );
-    });
-
-    test('only an Aniyomi source → All + Aniyomi (no OrcaBox/CS tabs)', () {
-      expect(ecosystemTabsFor(const ['ani:1']), [
-        SearchEcosystem.all,
-        SearchEcosystem.aniyomi,
-      ]);
-    });
-  });
-
-  group('SearchState group filtering by ecosystem', () {
+  group('results aggregate across every ecosystem', () {
     final groups = [
       _group('allanime', arrival: 0), // OrcaBox
       _group('cs:AnimePahe', arrival: 1), // CloudStream
@@ -114,13 +81,13 @@ void main() {
       groups: groups,
     );
 
-    test('defaults to the All ecosystem', () {
-      expect(SearchState().ecosystem, SearchEcosystem.all);
-    });
-
-    test('All tab shows every group (unchanged behaviour)', () {
-      expect(base.ecosystem, SearchEcosystem.all);
+    test('one grid holds all three ecosystems, in arrival order', () {
       expect(base.sortedVisibleGroups.map((g) => g.sourceId), [
+        'allanime',
+        'cs:AnimePahe',
+        'ani:1',
+      ]);
+      expect(base.visibleGroups.map((g) => g.sourceId), [
         'allanime',
         'cs:AnimePahe',
         'ani:1',
@@ -129,41 +96,21 @@ void main() {
       expect(base.visibleResults, hasLength(3));
     });
 
-    test('OrcaBox tab shows only OrcaBox groups', () {
-      final s = base.copyWith(ecosystem: SearchEcosystem.orcabox);
-      expect(s.sortedVisibleGroups.map((g) => g.sourceId), ['allanime']);
-      expect(s.visibleGroups.map((g) => g.sourceId), ['allanime']);
-      expect(s.visibleResults.map((i) => i.sourceId), ['allanime']);
-      expect(s.totalCount, 1);
+    test('the source chips still offer every source', () {
+      expect(base.sourceChipGroups.map((g) => g.sourceId), [
+        'allanime',
+        'cs:AnimePahe',
+        'ani:1',
+      ]);
     });
 
-    test('CloudStream tab shows only CloudStream groups', () {
-      final s = base.copyWith(ecosystem: SearchEcosystem.cloudstream);
+    test('the per-source chip is what narrows the view now', () {
+      final s = base.copyWith(sourceFilter: 'cs:AnimePahe');
       expect(s.sortedVisibleGroups.map((g) => g.sourceId), ['cs:AnimePahe']);
       expect(s.visibleResults.map((i) => i.sourceId), ['cs:AnimePahe']);
-      expect(s.totalCount, 1);
-    });
-
-    test('Aniyomi tab shows only Aniyomi groups', () {
-      final s = base.copyWith(ecosystem: SearchEcosystem.aniyomi);
-      expect(s.sortedVisibleGroups.map((g) => g.sourceId), ['ani:1']);
-      expect(s.visibleResults.map((i) => i.sourceId), ['ani:1']);
-      expect(s.totalCount, 1);
-    });
-
-    test(
-      'ecosystem is part of props (states differing by tab are unequal)',
-      () {
-        expect(
-          base,
-          isNot(equals(base.copyWith(ecosystem: SearchEcosystem.aniyomi))),
-        );
-      },
-    );
-
-    test('copyWith without ecosystem preserves the active tab', () {
-      final s = base.copyWith(ecosystem: SearchEcosystem.cloudstream);
-      expect(s.copyWith(query: 'x').ecosystem, SearchEcosystem.cloudstream);
+      // The chip is a view filter over loaded groups, so the count of what the
+      // search actually found is unchanged.
+      expect(s.totalCount, 3);
     });
   });
 }

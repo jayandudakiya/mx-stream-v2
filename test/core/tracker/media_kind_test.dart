@@ -1,8 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orcabox/core/models/watch_status.dart';
-import 'package:orcabox/core/tracker/simkl_service.dart';
 import 'package:orcabox/core/tracker/tracker.dart';
 import 'package:orcabox/core/tracker/tracker_hub.dart';
 
@@ -146,42 +144,11 @@ void main() {
     });
   });
 
-  group('SimklService manga no-op', () {
-    test('scrobble(kind: MediaKind.manga) no-ops without touching Simkl',
-        () async {
-      // A Dio that fails any request — proves the manga gate returns before
-      // ever reaching the network (Simkl has no manga/novel API).
-      final dio = Dio()
-        ..httpClientAdapter = _ThrowingAdapter();
-      final simkl = SimklService(dio);
-      addTearDown(simkl.dispose);
-
-      await expectLater(
-        simkl.scrobble(malId: 1, episode: 5, kind: MediaKind.manga),
-        completes,
-      );
-    });
-  });
 }
 
-class _ThrowingAdapter implements HttpClientAdapter {
-  @override
-  void close({bool force = false}) {}
 
-  @override
-  Future<ResponseBody> fetch(
-    RequestOptions options,
-    Stream<Uint8List>? requestStream,
-    Future<void>? cancelFuture,
-  ) {
-    throw StateError('no network call expected for manga kind on Simkl');
-  }
-}
-
-// "Wrong title? Change match" was hidden for movies/TV, so a Simkl entry
-// matched to the wrong film was stuck. Unhiding it alone would have been worse
-// than nothing: SimklService.searchEntries always queried /search/anime, so the
-// picker would have opened and found nothing. These pin both halves.
+// "Wrong title? Change match" was hidden for movies/TV, so an entry
+// matched to the wrong film was stuck. These pin the routing that fixed it.
 
 void _mediaKindRoutingTests() {
   group('MediaKind covers movie/TV', () {

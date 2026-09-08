@@ -22,9 +22,9 @@ class DonateScreen extends StatelessWidget {
   // at the upstream author's Buy Me a Coffee, PayPal and UPI accounts, so
   // shipping them would have sent OrcaBox donations to someone else. Fill these
   // in (and only these) to turn the Support screen back on.
-  static const String _bmcUrl = '';
-  static const String _paypalUrl = '';
-  static const String _upiId = '';
+  static const String _bmcUrl = kDonateBmcUrl;
+  static const String _paypalUrl = kDonatePaypalUrl;
+  static const String _upiId = kDonateUpiId;
 
   static bool get _hasBmc => _bmcUrl.isNotEmpty;
   static bool get _hasPaypal => _paypalUrl.isNotEmpty;

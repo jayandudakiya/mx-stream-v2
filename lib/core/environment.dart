@@ -1,32 +1,38 @@
-/// Public Appwrite configuration. These are NOT secrets — the project id and
-/// endpoint ship in every Appwrite client app. Auth uses email/password
-/// sessions; the server API key is never embedded here.
+/// Public backend configuration. These are NOT secrets — the project URL and
+/// anon key ship in every Supabase client app. Auth uses email/password
+/// sessions; the service-role key is never embedded here.
+///
+/// Supabase is the only backend. The Appwrite project and the account-migration
+/// bridge it existed for were removed (see NOTES.md task 16): OrcaBox is a new
+/// project with no legacy accounts to import, so every user registers directly
+/// into Supabase.
 class Environment {
-  static const String appwriteProjectId = '6a1ed44f0029b50bccde';
-  static const String appwriteProjectName = 'OrcaBox';
-  static const String appwritePublicEndpoint =
-      'https://sgp.cloud.appwrite.io/v1';
-
-  // Supabase project URL + anon (public) key — safe to embed, same as the
-  // Appwrite project id/endpoint above. Override with --dart-define if a
-  // build needs a different project (e.g. staging).
+  // Supabase project URL + anon (public) key. Supplied at build time via
+  // --dart-define / --dart-define-from-file so a staging build needs no edit.
   static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
   );
 
-  /// Where Appwrite sends the password-recovery link. Appwrite appends
-  /// Password-reset landing. Supabase now drives reset (via the auth `site_url`,
-  /// which points at this same page); kept for reference. Not used by the
-  /// Supabase AuthCubit, which calls `resetPasswordForEmail`.
-  static const String passwordResetUrl = 'https://orcabox.online/';
-
   /// Base of the OrcaBox website (landing + reset + the share "open" page).
-  static const String siteBaseUrl = 'https://orcabox.online';
+  ///
+  /// Supplied at build time via `--dart-define-from-file=.env` (`SITE_BASE_URL`)
+  /// so the deployed site can move without a code change. The default is only
+  /// a fallback for a build that forgets the define — a real build should
+  /// always pass one. No trailing slash: the derived URLs add their own.
+  static const String siteBaseUrl = String.fromEnvironment(
+    'SITE_BASE_URL',
+    defaultValue: 'https://orcabox.vercel.app',
+  );
+
+  /// Password-reset landing. Supabase drives the reset (via the auth `site_url`,
+  /// which points at this same page); the AuthCubit calls
+  /// `resetPasswordForEmail`.
+  static const String passwordResetUrl = '$siteBaseUrl/';
 
   /// Share links point here. The page opens the app if installed (via the
   /// [openLinkScheme] scheme below), otherwise offers the download. Its domain
-  /// must be an Appwrite Web platform (already added for the reset page).
+  /// must be allow-listed as a Supabase auth redirect URL.
   static const String siteOpenUrl = '$siteBaseUrl/open/';
 
   /// TV pairing page on the website. Used when someone opens a shared/https
@@ -40,21 +46,11 @@ class Environment {
   static const String openLinkHost = 'open';
   static const String pairLinkHost = 'pair';
 
-  // Provisioned backend ids (see docs / setup).
-  static const String databaseId = 'main';
-  static const String mylistCollectionId = 'mylist';
-  static const String historyCollectionId = 'history';
-  static const String watchRoomsCollectionId = 'watch_rooms';
-  static const String roomParticipantsCollectionId = 'room_participants';
-  static const String roomMessagesCollectionId = 'room_messages';
-  static const String avatarsBucketId = 'avatars';
-  static const String backupsCollectionId = 'backups';
 
   // ── Tracker OAuth ──────────────────────────────────────────────────────────
   // All redirects share the orcabox:// scheme; each has its own host with a
-  // matching Android intent-filter. Client secrets are embedded where the
-  // provider's token exchange requires it (MAL = PKCE, no secret; Simkl needs
-  // one) — standard for these APIs and low-risk.
+  // matching Android intent-filter. Neither remaining tracker needs a client
+  // secret: AniList uses the implicit grant and MAL uses PKCE.
   static const String trackerRedirectScheme = 'orcabox';
 
   // AniList — implicit grant (token in URL fragment, 1-year, no secret).
@@ -65,20 +61,13 @@ class Environment {
   static String get anilistRedirectUri =>
       '$trackerRedirectScheme://$anilistRedirectHost';
 
-  // MyAnimeList — OAuth2 PKCE (plain), no client secret.
-  static const String malClientId = 'ac006943589381143c4c4e54eac93a89';
+  // MyAnimeList — OAuth2 PKCE (plain), no client secret. Supplied at build time
+  // like every other client id, so no account-specific value sits in the repo.
+  static const String malClientId = String.fromEnvironment('MAL_CLIENT_ID');
   static const String malRedirectHost = 'mal-auth';
   static String get malRedirectUri =>
       '$trackerRedirectScheme://$malRedirectHost';
 
-  // Simkl — OAuth2 authorization-code (needs the secret to exchange the code).
-  static const String simklClientId =
-      '8b847b09206ccdb0b3de4cc1293d6dd7d355821f5c179c57315da8ba9030eb53';
-  static const String simklClientSecret =
-      '34ba8e5ac7c8a5c27926dfdf78205e5b913de9928361cb5a243558239298c96d';
-  static const String simklRedirectHost = 'simkl-auth';
-  static String get simklRedirectUri =>
-      '$trackerRedirectScheme://$simklRedirectHost';
 
   // Back-compat alias (older AniList code referenced this name).
   static const String anilistRedirectScheme = trackerRedirectScheme;

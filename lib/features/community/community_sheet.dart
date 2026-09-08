@@ -12,8 +12,8 @@ import '../../core/tv/tv_list_focusable.dart';
 
 // Empty until OrcaBox has its own Telegram channel. The pre-rebrand value was
 // the upstream project's, and a find/replace would only invent a dead handle.
-const _telegramUrl = '';
-const _discordUrl = kDiscordInviteUrl;
+const _telegramUrl = kTelegramUrl;
+final _discordUrl = kDiscordInviteLink;
 
 /// True once at least one community link is configured. The sheet is suppressed
 /// entirely while this is false, so no one sees a "join us" prompt with nowhere

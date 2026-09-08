@@ -190,7 +190,7 @@ class _WatchPartyLobbyScreenState extends State<WatchPartyLobbyScreen> {
                 const SizedBox(height: 40),
 
                 // Create button — shows a spinner + "Creating…" while the room
-                // is being created (Appwrite round-trip), so the tap has visible
+                // is being created (server round-trip), so the tap has visible
                 // feedback instead of feeling unresponsive.
                 SizedBox(
                   width: double.infinity,

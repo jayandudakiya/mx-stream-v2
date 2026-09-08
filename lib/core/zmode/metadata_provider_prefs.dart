@@ -15,9 +15,6 @@ enum AnimeProvider { anilist, mal }
 /// public) would keep drifting back to romaji while the library obeyed it.
 enum TitleLanguage { romaji, english, native }
 
-/// Who supplies movie/TV metadata.
-enum VideoProvider { tmdb, simkl }
-
 /// A specific provider to prefer for one request, whatever the saved choice.
 ///
 /// Opening a title from a tracker should read it from THAT tracker's own
@@ -25,7 +22,7 @@ enum VideoProvider { tmdb, simkl }
 /// should be AniList's, even when MyAnimeList is the app-wide pick. A tracker
 /// with no catalogue behind it (Trakt, say) simply has no value here and falls
 /// back to the saved choice.
-enum PreferredProvider { anilist, mal, tmdb, simkl }
+enum PreferredProvider { anilist, mal, tmdb }
 
 /// The user's metadata provider choice, and nothing else — which provider is
 /// actually answering right now is [MetadataRepository]'s business, since it
@@ -36,7 +33,6 @@ class MetadataProviderPrefs {
 
   static const String boxName = 'metadata_provider';
   static const String _kAnime = 'anime';
-  static const String _kVideo = 'video';
 
   /// Bumped whenever the choice changes, so screens holding cached rows can
   /// reload without every one of them subscribing to Hive.
@@ -55,15 +51,9 @@ class MetadataProviderPrefs {
     revision.value++;
   }
 
-  VideoProvider get video => _box.get(_kVideo) == VideoProvider.simkl.name
-      ? VideoProvider.simkl
-      : VideoProvider.tmdb;
-
-  Future<void> setVideo(VideoProvider p) async {
-    if (p == video) return;
-    await _box.put(_kVideo, p.name);
-    revision.value++;
-  }
+  // Movie/TV metadata has no setting: TMDB is the sole source (NOTES task 15).
+  // The old `video` / `setVideo` pair and its Hive key are gone — a stored
+  // value from a build that still had Simkl is simply never read.
 
   static const String _kTitleLang = 'titleLanguage';
 

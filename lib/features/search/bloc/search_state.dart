@@ -164,11 +164,15 @@ class SourceResultGroup extends Equatable {
 /// Sentinel source-filter value meaning "all sources".
 const String kAllSources = '__all__';
 
-/// The provider ecosystem a source belongs to. Drives the phone Search
-/// ecosystem tab strip (All · OrcaBox · CloudStream · Aniyomi). [all] is the
-/// default "no filter" tab, not a real ecosystem.
+/// The provider ecosystem a source belongs to.
+///
+/// This used to drive a Search tab strip (All · OrcaBox · CloudStream ·
+/// Aniyomi) that filtered results by where a source came from — removed under
+/// NOTES task 2, since that is an implementation detail, not something a
+/// viewer looking for a title cares about. The enum survives because a source
+/// still needs naming ("Aniyomi") and because only the extension ecosystems
+/// publish a filter schema; see `browse_source_screen.dart`.
 enum SearchEcosystem {
-  all('All'),
   orcabox('OrcaBox'),
   cloudstream('CloudStream'),
   aniyomi('Aniyomi'),
@@ -180,38 +184,14 @@ enum SearchEcosystem {
 }
 
 /// Maps a [sourceId] to its ecosystem from the id prefix: `ani:` → Aniyomi,
-/// `cs:` → CloudStream, anything else → OrcaBox (the app's own JS providers).
-/// Never returns [SearchEcosystem.all] — that's the "no filter" tab.
+/// `cs:` → CloudStream, `mihon:` → Mihon, `lnr:` → LNReader, anything else →
+/// OrcaBox (the app's own JS and native providers).
 SearchEcosystem ecosystemOf(String sourceId) {
   if (sourceId.startsWith('ani:')) return SearchEcosystem.aniyomi;
   if (sourceId.startsWith('cs:')) return SearchEcosystem.cloudstream;
-  // Manga and novel extensions carry their own prefixes and belong to their own
-  // ecosystems. Without these they fell through to OrcaBox, so a MangaDex
-  // result sat under a tab labelled "OrcaBox" and no Mihon tab ever appeared.
-  // A future ecosystem (Mangayomi, say) is one prefix and one enum value.
   if (sourceId.startsWith('mihon:')) return SearchEcosystem.mihon;
   if (sourceId.startsWith('lnr:')) return SearchEcosystem.lnreader;
   return SearchEcosystem.orcabox;
-}
-
-/// The ecosystem tabs to offer for the given installed [sourceIds]. Always
-/// leads with [SearchEcosystem.all]; each real ecosystem (OrcaBox, then
-/// CloudStream, then Aniyomi) is included only when at least one installed
-/// source belongs to it — so e.g. the Aniyomi tab never appears until an
-/// Aniyomi source is installed.
-List<SearchEcosystem> ecosystemTabsFor(Iterable<String> sourceIds) {
-  final present = {for (final id in sourceIds) ecosystemOf(id)};
-  return [
-    SearchEcosystem.all,
-    for (final e in const [
-      SearchEcosystem.orcabox,
-      SearchEcosystem.cloudstream,
-      SearchEcosystem.aniyomi,
-      SearchEcosystem.mihon,
-      SearchEcosystem.lnreader,
-    ])
-      if (present.contains(e)) e,
-  ];
 }
 
 class SearchState extends Equatable {
@@ -224,14 +204,26 @@ class SearchState extends Equatable {
   /// Active source-filter chip: [kAllSources] or a specific sourceId.
   final String sourceFilter;
 
-  /// Active ecosystem tab (phone Search). [SearchEcosystem.all] (default) shows
-  /// every ecosystem's groups together — identical to the pre-tabs behaviour;
-  /// any other value narrows the rendered groups to that one ecosystem.
-  final SearchEcosystem ecosystem;
+  /// The source a scoped search runs against — Search's OWN pick, not Home's.
+  ///
+  /// Search used to read `ActiveSourceCubit` for this, which is a process-wide
+  /// singleton Home also listens to: picking a source here reloaded the Home
+  /// channel out from under the user. This field is seeded once from the active
+  /// source when the bloc is built (so Search opens where you were browsing)
+  /// and thereafter only [SearchScopeSourceChanged] moves it. Nothing on this
+  /// screen writes to Home's state.
+  ///
+  /// Null only before the first seed, or when no source is loaded at all.
+  final String? searchSourceId;
 
-  /// When true the search is scoped to ONLY the active Home source (the heavy
-  /// search never fans out). When false the legacy multi-source search runs.
+  /// When true the search is scoped to ONLY [searchSourceId] (the heavy search
+  /// never fans out). When false it fans out to every included source.
   final bool currentSourceOnly;
+
+  /// The scope as the task spec states it: null means "search all sources",
+  /// non-null means "search only that source". [currentSourceOnly] is the
+  /// persisted toggle behind it.
+  String? get scopedSourceId => currentSourceOnly ? searchSourceId : null;
 
   final SearchSort sort;
 
@@ -354,7 +346,7 @@ class SearchState extends Equatable {
     this.query = '',
     this.groups = const [],
     this.sourceFilter = kAllSources,
-    this.ecosystem = SearchEcosystem.all,
+    this.searchSourceId,
     this.currentSourceOnly = true,
     this.sort = SearchSort.bestMatch,
     this.contentFilter = SearchContentFilter.all,
@@ -408,19 +400,9 @@ class SearchState extends Equatable {
     return true;
   }
 
-  /// True when [sourceId]'s ecosystem matches the active tab. The default "All"
-  /// tab matches every ecosystem, so nothing is filtered — keeping the All view
-  /// byte-for-byte identical to the pre-tabs behaviour.
-  bool _inEcosystem(String sourceId) =>
-      ecosystem == SearchEcosystem.all || ecosystemOf(sourceId) == ecosystem;
-
-  /// Total results across every source in the active ecosystem, honouring all
-  /// client-side filters.
-  int get totalCount => groups.fold(
-    0,
-    (sum, g) =>
-        sum + (_inEcosystem(g.sourceId) ? g.items.where(_passes).length : 0),
-  );
+  /// Total results across every source, honouring all client-side filters.
+  int get totalCount =>
+      groups.fold(0, (sum, g) => sum + g.items.where(_passes).length);
 
   /// Result count for one source group under the active filters.
   int countFor(SourceResultGroup g) => g.items.where(_passes).length;
@@ -471,14 +453,13 @@ class SearchState extends Equatable {
     ),
   );
 
-  /// Result groups (in the active ecosystem) that have at least one item under
-  /// the active filters.
+  /// Result groups that have at least one item under the active filters.
   List<SourceResultGroup> get visibleGroups => [
     for (final g in groups)
-      if (_inEcosystem(g.sourceId) && countFor(g) > 0) g,
+      if (countFor(g) > 0) g,
   ];
 
-  /// Groups in the active ecosystem whose SOURCE returned at least one result,
+  /// Groups whose SOURCE returned at least one result,
   /// IGNORING the content/audio/genre filters. Drives the source-filter chip
   /// row so it (and the selected chip) stays put even when a filter empties the
   /// current view — otherwise selecting a chip that yields nothing would hide
@@ -492,7 +473,7 @@ class SearchState extends Equatable {
   List<SourceResultGroup> get sourceChipGroups {
     final raw = [
       for (final g in groups)
-        if (_inEcosystem(g.sourceId) && g.items.isNotEmpty) g,
+        if (g.items.isNotEmpty) g,
     ];
     if (query.trim().isEmpty) return raw;
     final m = _queryMatch;
@@ -515,7 +496,6 @@ class SearchState extends Equatable {
   List<SourceResultGroup> get sortedVisibleGroups {
     final out = <SourceResultGroup>[];
     for (final g in groups) {
-      if (!_inEcosystem(g.sourceId)) continue;
       if (sourceFilter != kAllSources && g.sourceId != sourceFilter) continue;
       final items = _sortItems(g.items.where(_passes).toList());
       if (items.isEmpty) continue;
@@ -567,8 +547,7 @@ class SearchState extends Equatable {
   List<MediaItem> get visibleResults {
     final base = <MediaItem>[
       for (final g in groups)
-        if (_inEcosystem(g.sourceId) &&
-            (sourceFilter == kAllSources || g.sourceId == sourceFilter))
+        if (sourceFilter == kAllSources || g.sourceId == sourceFilter)
           for (final item in g.items)
             if (_passes(item)) item,
     ];
@@ -699,7 +678,7 @@ class SearchState extends Equatable {
     String? query,
     List<SourceResultGroup>? groups,
     String? sourceFilter,
-    SearchEcosystem? ecosystem,
+    String? searchSourceId,
     bool? currentSourceOnly,
     SearchSort? sort,
     SearchContentFilter? contentFilter,
@@ -727,7 +706,7 @@ class SearchState extends Equatable {
     query: query ?? this.query,
     groups: groups ?? this.groups,
     sourceFilter: sourceFilter ?? this.sourceFilter,
-    ecosystem: ecosystem ?? this.ecosystem,
+    searchSourceId: searchSourceId ?? this.searchSourceId,
     currentSourceOnly: currentSourceOnly ?? this.currentSourceOnly,
     sort: sort ?? this.sort,
     contentFilter: contentFilter ?? this.contentFilter,
@@ -748,8 +727,7 @@ class SearchState extends Equatable {
     filteredBrowsePage: filteredBrowsePage ?? this.filteredBrowsePage,
     filteredBrowseLoadingMore:
         filteredBrowseLoadingMore ?? this.filteredBrowseLoadingMore,
-    filteredBrowseLoading:
-        filteredBrowseLoading ?? this.filteredBrowseLoading,
+    filteredBrowseLoading: filteredBrowseLoading ?? this.filteredBrowseLoading,
     filteredBrowseAtEnd: filteredBrowseAtEnd ?? this.filteredBrowseAtEnd,
   );
 
@@ -759,7 +737,7 @@ class SearchState extends Equatable {
     query,
     groups,
     sourceFilter,
-    ecosystem,
+    searchSourceId,
     currentSourceOnly,
     sort,
     contentFilter,

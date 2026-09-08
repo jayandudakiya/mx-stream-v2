@@ -3,24 +3,27 @@ import 'package:hive/hive.dart';
 
 import '../../core/app_mode.dart';
 import '../../core/di/injector.dart';
+import '../../core/privacy/privacy_consent_prefs.dart';
 import '../../core/state/active_source_cubit.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
 import '../../core/ui/app_wordmark.dart';
-import '../sources/providers_hub_screen.dart';
 import 'onboarding_screen_tv.dart';
+import 'privacy_consent_modal.dart';
 import '../../l10n/l10n.dart';
 
 /// First-run flag, stored in the shared 'app_prefs' Hive box (opened during
-/// [initDependencies]). True once the user has completed onboarding.
+/// [initDependencies]). True once the user has completed onboarding AND
+/// accepted the privacy policy & ad consent.
 bool isOnboarded() {
   if (!Hive.isBoxOpen(ActiveSourceCubit.boxName)) return false;
-  return Hive.box(ActiveSourceCubit.boxName)
-      .get('onboarded', defaultValue: false) as bool;
+  final box = Hive.box(ActiveSourceCubit.boxName);
+  final onboarded = box.get('onboarded', defaultValue: false) as bool;
+  final consent = box.get(PrivacyConsentPrefs.keyConsentAccepted, defaultValue: false) as bool;
+  return onboarded && consent;
 }
 
-Future<void> _markOnboarded() =>
-    Hive.box(ActiveSourceCubit.boxName).put('onboarded', true);
+Future<void> _markOnboarded() => PrivacyConsentPrefs.markAccepted();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Splash — shown while initDependencies() runs.
@@ -167,18 +170,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// Marks onboarding done, hands off to the app, then opens Providers so the
   /// user lands right where they add a repository. No network call, no
   /// install — the app just navigates.
-  Future<void> _addSourcesNow() async {
+  Future<void> _acceptAndContinue() async {
     await _markOnboarded();
     if (!mounted) return;
     widget.onDone();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const ProvidersHubScreen()),
-    );
   }
 
-  Future<void> _later() async {
-    await _markOnboarded();
-    if (mounted) widget.onDone();
+  void _skipToConsent() {
+    _controller.animateToPage(
+      2,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   void _next() => _controller.nextPage(
@@ -224,7 +227,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: IgnorePointer(
                       ignoring: onLastPage,
                       child: TextButton(
-                        onPressed: _later,
+                        onPressed: _skipToConsent,
                         child: Text(
                           context.l10n.skip,
                           style: AppText.caption.copyWith(
@@ -245,10 +248,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _pageShell(1, (d) => _HowItWorksPage(delta: d)),
                   _pageShell(
                     2,
-                    (d) => _GetGoingPage(
+                    (d) => _PrivacyConsentPage(
                       delta: d,
-                      onAddSourcesNow: _addSourcesNow,
-                      onLater: _later,
+                      onAcceptAndContinue: _acceptAndContinue,
                     ),
                   ),
                 ],
@@ -419,10 +421,13 @@ class _HowItWorksPage extends StatelessWidget {
                   icon: Icons.movie_filter_outlined,
                   label: context.l10n.modeStreaming,
                 ),
-                _EcosystemTile(icon: Icons.menu_book_outlined, label: context.l10n.modeManga),
                 _EcosystemTile(
-                  icon: Icons.auto_stories_outlined,
-                  label: context.l10n.modeNovel,
+                  icon: Icons.tv_outlined,
+                  label: context.l10n.series,
+                ),
+                _EcosystemTile(
+                  icon: Icons.animation_outlined,
+                  label: context.l10n.anime,
                 ),
               ],
             ),
@@ -434,9 +439,8 @@ class _HowItWorksPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _Step(number: 1, label: context.l10n.openProviders),
-                _Step(number: 2, label: context.l10n.pickStreamingMangaOrNovels),
-                _Step(number: 3, label: context.l10n.pasteInARepositoryLink),
-                _Step(number: 4, label: context.l10n.browseAndGrab),
+                const _Step(number: 2, label: 'Pick Movies, Series, or Anime'),
+                _Step(number: 3, label: context.l10n.browseAndGrab),
               ],
             ),
           ),
@@ -515,74 +519,28 @@ class _Step extends StatelessWidget {
   }
 }
 
-/// Page 3 — the hand-off. Same two actions and same styling this screen
-/// always had; only the surrounding page (and copy above them) is new. The
-/// closing line drifts a touch as the page scrolls in (parallax via
-/// [delta]); the buttons stay put once you land here, so they're always
-/// easy to tap.
-class _GetGoingPage extends StatelessWidget {
-  const _GetGoingPage({
+/// Page 3 — Privacy Policy, Terms of Service & Ad Consent.
+/// Explains that MXStream respects user privacy and does not collect or sell
+/// personal phone data, transparently states that ads support infrastructure,
+/// and provides links to full documents before proceeding.
+class _PrivacyConsentPage extends StatelessWidget {
+  const _PrivacyConsentPage({
     required this.delta,
-    required this.onAddSourcesNow,
-    required this.onLater,
+    required this.onAcceptAndContinue,
   });
 
   final double delta;
-  final VoidCallback onAddSourcesNow;
-  final VoidCallback onLater;
+  final VoidCallback onAcceptAndContinue;
 
   @override
   Widget build(BuildContext context) {
     return _ScrollablePage(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Transform.translate(
-            offset: Offset(delta * 22, 0),
-            child: Column(
-              children: [
-                Text(
-                  context.l10n.readyWhenYouAre,
-                  style: AppText.title,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  context.l10n.providersWaitingInSettings,
-                  style: AppText.body.copyWith(color: AppColors.textSecondary),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: FilledButton(
-              onPressed: onAddSourcesNow,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.accent,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: Text(
-                context.l10n.addSourcesNow,
-                style: AppText.button.copyWith(color: Colors.white),
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          TextButton(
-            onPressed: onLater,
-            child: Text(
-              context.l10n.illDoItLater,
-              style: AppText.caption.copyWith(color: AppColors.textTertiary),
-            ),
-          ),
-        ],
+      child: Transform.translate(
+        offset: Offset(delta * 22, 0),
+        child: PrivacyConsentModal(
+          onAccepted: onAcceptAndContinue,
+          isReview: false,
+        ),
       ),
     );
   }

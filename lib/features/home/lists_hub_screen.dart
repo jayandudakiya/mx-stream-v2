@@ -73,8 +73,8 @@ class ListsHubScreen extends StatelessWidget {
 
   /// Which lists a tracker actually holds. AniList and MAL split light novels
   /// out of the manga list (by `format`/`media_type`), so a novel row there has
-  /// real content rather than being a permanently empty tab. Simkl has no
-  /// reading side at all, so it gets the one row.
+  /// real content rather than being a permanently empty tab. A tracker with no
+  /// reading side at all gets the one row.
   static List<ContentMode> _kindsFor(Tracker t) => t.supportsReading
       ? const [ContentMode.anime, ContentMode.manga, ContentMode.novel]
       : const [ContentMode.anime];
@@ -110,7 +110,6 @@ class ListsHubScreen extends StatelessWidget {
   static Color _tintFor(Tracker t) => switch (t.displayName) {
     'AniList' => const Color(0xFF02A9FF),
     'MyAnimeList' => const Color(0xFF2E51A2),
-    'Simkl' => const Color(0xFF00B4E4),
     _ => AppColors.accent,
   };
 }

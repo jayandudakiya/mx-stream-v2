@@ -70,14 +70,23 @@ class SearchSourceFilterChanged extends SearchEvent {
   List<Object?> get props => [sourceId];
 }
 
-/// Switches the active ecosystem tab (All / OrcaBox / CloudStream / Aniyomi).
-/// Purely a view filter over the already-loaded groups — never re-runs search.
-class SearchEcosystemChanged extends SearchEvent {
-  const SearchEcosystemChanged(this.ecosystem);
-  final SearchEcosystem ecosystem;
+/// Scopes the search to one source and re-runs it.
+///
+/// This is what the Search source picker dispatches instead of calling
+/// `ActiveSourceCubit.setSource` — that cubit is a process-wide singleton the
+/// Home screen listens to, so writing to it from Search reloaded Home's
+/// channel. The scope lives in [SearchState.searchSourceId] and goes no
+/// further than this bloc.
+///
+/// Implies "current source only": picking a source from the sheet is the
+/// gesture that turns scoping ON, so this also flips [SearchScopeChanged]'s
+/// flag rather than needing a second event.
+class SearchScopeSourceChanged extends SearchEvent {
+  const SearchScopeSourceChanged(this.sourceId);
+  final String sourceId;
 
   @override
-  List<Object?> get props => [ecosystem];
+  List<Object?> get props => [sourceId];
 }
 
 /// Switches the content-type filter (All / Anime / Movies & Series).

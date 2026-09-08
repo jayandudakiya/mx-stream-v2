@@ -218,26 +218,6 @@ already gated on those values and will appear on their own.
 
 ---
 
-## 🙏 Acknowledgments
-
-A heartfelt thank you to everyone who has contributed to the development of OrcaBox. Your time, effort, feedback, and support help keep the project moving forward.
-
-<div align="center">
-
-<a href="https://github.com/jayandudakiya8100/mx-stream-app/graphs/contributors">
-  <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/jayandudakiya8100/mx-stream-app?style=for-the-badge&label=Contributors&labelColor=1a1a2e&color=FF4D57" />
-</a>
-
-<br/><br/>
-
-<a href="https://github.com/jayandudakiya8100/mx-stream-app/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jayandudakiya8100/mx-stream-app" alt="Contributors"/>
-</a>
-
-</div>
-
----
-
 ## 📜 License & Attribution
 
 OrcaBox is licensed under the **[GNU GPL-3.0](LICENSE)**, with additional terms under GPLv3 Section 7. See the included license file for the complete terms, and **[NOTICE.md](NOTICE.md)** for the full third-party attribution record.

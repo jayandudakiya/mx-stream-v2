@@ -108,7 +108,7 @@ class MyListStore {
   /// absent-only: an item is pushed only when the cloud doesn't already have it,
   /// so an existing cloud row (and its watch status) is never overwritten.
   /// Additive — deletes nothing. Seeds a fresh device / backfills a list
-  /// orphaned by the Appwrite→Supabase move. Returns (pushed, failed): `failed`
+  /// orphaned by the original backend move. Returns (pushed, failed): `failed`
   /// counts upserts that errored (or a cloud read that failed) so the caller can
   /// tell whether the push was complete.
   Future<({int pushed, int failed})> pushAllLocalToCloud() async {

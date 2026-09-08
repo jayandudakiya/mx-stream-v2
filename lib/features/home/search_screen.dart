@@ -231,16 +231,12 @@ class _SearchViewState extends State<_SearchView>
   final _history = sl<SearchHistory>();
   final _searchPrefs = sl<SearchPrefs>();
 
-  /// Owns the ecosystem [TabBar]'s controller — see [_ecoTabControllerFor].
-  TabController? _ecoTabController;
-  List<SearchEcosystem> _ecoTabs = const [];
-
   /// [_repo.loadedSources] narrowed to the active content mode, or
   /// [_SearchView.forceMode] when set. Anime narrows too — it used to
   /// short-circuit to the unfiltered list, which meant manga (`mihon:`) and
   /// novel (`lnr:`) sources were searched and rendered while in anime mode.
   /// Keep this in step with `SearchBloc._modeSources` (same override), which
-  /// drives the actual fan-out; this copy drives the ecosystem tabs and the
+  /// drives the actual fan-out; this copy drives the source picker and the
   /// pending skeletons, so a mismatch shows up as skeletons for sources that
   /// are never queried.
   List<({String id, String name})> get _modeSources {
@@ -279,7 +275,6 @@ class _SearchViewState extends State<_SearchView>
     widget.focusSignal?.removeListener(_onFocusSignal);
     _controller.dispose();
     _focusNode.dispose();
-    _ecoTabController?.dispose();
     super.dispose();
   }
 
@@ -633,9 +628,9 @@ class _SearchViewState extends State<_SearchView>
             // Library scope queries the metadata catalogue, not a source, so
             // this (and the picker it opens) is Sources-only.
             if (widget.scope == SearchScope.sources) _sourceLine(),
-            // Control row — ecosystem tabs (or a result count once scoped to a
-            // single source) on the left, sort + filter actions on the right.
-            _controlRow(modeSources),
+            // Control row — result count on the left, sort + filter actions on
+            // the right.
+            _controlRow(),
             // What the catalogue is currently narrowed to, spelled out.
             // Arriving here from a genre or tag chip, the results are already
             // filtered before you have typed anything — without this the
@@ -696,8 +691,8 @@ class _SearchViewState extends State<_SearchView>
   // ── Search bar ────────────────────────────────────────────────────────────
   Widget _searchBar() {
     // The redesign is the METADATA search's own. Sources search keeps the bar
-    // it had — it carries ecosystem tabs, source scope and per-source filters,
-    // and restyling around those is a separate question.
+    // it had — it carries the source scope and per-source filters, and
+    // restyling around those is a separate question.
     final meta = widget.scope == SearchScope.library;
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -835,89 +830,100 @@ class _SearchViewState extends State<_SearchView>
   /// Replaces the old scope pill + hint sentence: one line of text —
   /// "Searching" + the value — with the value in accent when scoped to a
   /// single source. The whole row opens the source picker sheet. Shown in
-  /// idle state too, so the scope is always visible up front. Follows the
-  /// active source live via [ActiveSourceCubit], same as the old pill did.
+  /// idle state too, so the scope is always visible up front.
+  ///
+  /// Reads [SearchState.searchSourceId] — Search's own scope. It used to watch
+  /// [ActiveSourceCubit], the same singleton Home listens to, which is why the
+  /// two screens moved together.
   Widget _sourceLine() {
     return BlocBuilder<SearchBloc, SearchState>(
-      buildWhen: (p, c) => p.currentSourceOnly != c.currentSourceOnly,
+      buildWhen: (p, c) =>
+          p.currentSourceOnly != c.currentSourceOnly ||
+          p.searchSourceId != c.searchSourceId,
       builder: (context, state) {
         final currentOnly = state.currentSourceOnly;
-        return BlocBuilder<ActiveSourceCubit, String>(
-          builder: (context, activeId) {
-            final value = currentOnly
-                ? _repo.displayName(activeId)
-                : context.l10n.allSources;
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => _openSourcePicker(context),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                // Tighter above than below: the search field already carries
-                // its own bottom gap, so an even 11/11 left the line sitting
-                // lower than it looked like it should.
-                padding: const EdgeInsets.only(top: 5, bottom: 11),
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: AppColors.hairline)),
+        final scopedId = state.searchSourceId;
+        final value = (currentOnly && scopedId != null)
+            ? _repo.displayName(scopedId)
+            : context.l10n.allSources;
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _openSourcePicker(context),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            // Tighter above than below: the search field already carries
+            // its own bottom gap, so an even 11/11 left the line sitting
+            // lower than it looked like it should.
+            padding: const EdgeInsets.only(top: 5, bottom: 11),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: AppColors.hairline)),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  context.l10n.searching,
+                  style: AppText.caption.copyWith(fontSize: 12.5),
                 ),
-                child: Row(
-                  children: [
-                    Text(
-                      context.l10n.searching,
-                      style: AppText.caption.copyWith(fontSize: 12.5),
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.caption.copyWith(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: currentOnly
+                          ? AppColors.accent
+                          : AppColors.textPrimary,
                     ),
-                    const SizedBox(width: 5),
-                    Flexible(
-                      child: Text(
-                        value,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppText.caption.copyWith(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: currentOnly
-                              ? AppColors.accent
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      size: 16,
-                      color: AppColors.textTertiary,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
+                const SizedBox(width: 5),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 16,
+                  color: AppColors.textTertiary,
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
   }
 
   /// Bottom sheet listing "All sources" then every source in the current mode
-  /// — plain rows, no health/counts. Tapping a row scopes the search to it (or
-  /// clears the scope for "All sources") and re-runs, reusing the exact same
-  /// [SearchScopeChanged] event the old scope pill dispatched. Switching from
-  /// one specific source to another (both already scoped) needs a second,
-  /// already-existing event — [SearchScopeChanged] alone no-ops when the
-  /// current-source-only flag doesn't change — so that case sets the new
-  /// active source then dispatches [SearchSubmitted] to re-run against it.
+  /// — plain rows, no health/counts. Tapping a row scopes the search to that
+  /// one source; "All sources" clears the scope. Both re-run the query.
+  ///
+  /// Nothing here writes to [ActiveSourceCubit]. It used to call `setSource`,
+  /// the process-wide active source Home listens to — so picking a source to
+  /// search with silently reloaded the Home channel behind you (NOTES task 1).
+  /// The scope now lives in the search bloc and goes no further.
+  ///
+  /// Rows are grouped under "Built-in" and "Installed" headings, each sorted
+  /// alphabetically (NOTES task 2).
+  ///
+  /// The app ships its own Dart providers for a few sites (`native:*` — the
+  /// Hollywood/Bollywood Home channels) and a user can also install an
+  /// extension that scrapes the SAME site. Those are two different engines, so
+  /// both stay searchable and both need a row — but ungrouped they read as one
+  /// provider listed twice. The headings are what makes the pairing look
+  /// deliberate; nothing is renamed and nothing is hidden.
+  ///
+  /// Deduplication is by source id only. Names deliberately are NOT deduped: a
+  /// built-in and an extension for one site have similar names on purpose, and
+  /// collapsing them would silently drop an engine the user can still pick.
   void _openSourcePicker(BuildContext context) {
     final bloc = context.read<SearchBloc>();
-    final activeCubit = context.read<ActiveSourceCubit>();
     final currentOnly = bloc.state.currentSourceOnly;
-    final activeId = activeCubit.state;
-    // Active source pinned directly under "All sources" instead of wherever it
-    // happens to fall alphabetically — it's the one row you're most likely to
-    // want, and with a long source list it was otherwise a scroll away.
-    final sources = [..._modeSources]
-      ..sort((a, b) {
-        if (a.id == activeId) return -1;
-        if (b.id == activeId) return 1;
-        return 0;
-      });
+    final scopedId = bloc.state.searchSourceId;
+    final rows = sourcePickerRows(
+      _modeSources,
+      builtInLabel: context.l10n.builtIn,
+      installedLabel: context.l10n.installed,
+    );
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.surface,
@@ -950,9 +956,13 @@ class _SearchViewState extends State<_SearchView>
               Flexible(
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: sources.length + 1,
-                  separatorBuilder: (_, _) =>
-                      const Divider(height: 1, color: AppColors.hairline),
+                  itemCount: rows.length + 1,
+                  // No hairline directly above a heading — the heading's own
+                  // top padding is the separation there, and a rule plus a gap
+                  // reads as a stray empty row.
+                  separatorBuilder: (_, i) => (rows[i].header != null)
+                      ? const SizedBox.shrink()
+                      : const Divider(height: 1, color: AppColors.hairline),
                   itemBuilder: (context, i) {
                     if (i == 0) {
                       return _sourcePickerRow(
@@ -965,29 +975,26 @@ class _SearchViewState extends State<_SearchView>
                         },
                       );
                     }
-                    final s = sources[i - 1];
-                    final selected = currentOnly && activeId == s.id;
+                    final row = rows[i - 1];
+                    final header = row.header;
+                    if (header != null) return _sourcePickerHeader(header);
+                    final s = row.source!;
+                    final selected = currentOnly && scopedId == s.id;
                     return _sourcePickerRow(
                       label: s.name,
                       selected: selected,
-                      // Point out the active source even when the scope is "All
+                      // Point out the scoped source even while showing "All
                       // sources" — otherwise nothing on this sheet says which
-                      // one "current source" actually means.
-                      hint: activeId == s.id
+                      // one a scoped search would use.
+                      hint: scopedId == s.id
                           ? context.l10n.activeSourceHint
                           : null,
                       onTap: () {
                         Navigator.pop(ctx);
                         if (selected) return;
-                        activeCubit.setSource(s.id);
-                        // Already scoped (just to a DIFFERENT source): flipping
-                        // currentSourceOnly to `true` again would no-op in the
-                        // bloc, so re-run explicitly instead of re-toggling scope.
-                        if (currentOnly) {
-                          bloc.add(const SearchSubmitted());
-                        } else {
-                          bloc.add(const SearchScopeChanged(true));
-                        }
+                        // One event covers both "all -> this one" and "that one
+                        // -> this one", and it touches only the search bloc.
+                        bloc.add(SearchScopeSourceChanged(s.id));
                       },
                     );
                   },
@@ -995,6 +1002,23 @@ class _SearchViewState extends State<_SearchView>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Section heading inside the source picker. Not tappable — it only tells
+  /// you why two similarly-named rows are both in the list.
+  Widget _sourcePickerHeader(String label) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 6),
+      child: Text(
+        label.toUpperCase(),
+        style: AppText.caption.copyWith(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+          color: AppColors.textTertiary,
         ),
       ),
     );
@@ -1039,15 +1063,13 @@ class _SearchViewState extends State<_SearchView>
     );
   }
 
-  // ── Control row (ecosystem tabs / result count + sort + filter) ────────────
-  /// Left: ecosystem tabs when searching all sources (unchanged strip), or a
-  /// plain "N results" label once scoped to a single source (tabs are
-  /// meaningless with one source). Right: sort + filter actions — relocated
+  // ── Control row (result count + sort + filter) ─────────────────────────────
+  /// Left: a plain "N results" label. Right: sort + filter actions — relocated
   /// here from the search field so the field itself stays a plain text input.
-  /// Unlike the old ecosystem-tabs band, this row never fully collapses: sort
-  /// and filter must stay reachable in every state (idle included), exactly as
-  /// they were when they lived inside the search bar.
-  Widget _controlRow(List<({String id, String name})> modeSources) {
+  /// This row never fully collapses: sort and filter must stay reachable in
+  /// every state (idle included), exactly as they were when they lived inside
+  /// the search bar.
+  Widget _controlRow() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 4, 0),
       child: SizedBox(
@@ -1060,7 +1082,7 @@ class _SearchViewState extends State<_SearchView>
             if (widget.scope == SearchScope.library &&
                 sl<PlaybackPrefs>().adultMetadata)
               _adultToggle(),
-            Expanded(child: _controlRowLeft(modeSources)),
+            Expanded(child: _controlRowLeft()),
             // Per-source filter sheet — Library scope has no per-source
             // filters to apply, they'd be silently dropped.
             if (widget.scope == SearchScope.sources) ...[
@@ -1129,12 +1151,20 @@ class _SearchViewState extends State<_SearchView>
     );
   }
 
-  Widget _controlRowLeft(List<({String id, String name})> modeSources) {
+  /// Left of the control row: the result count.
+  ///
+  /// This used to host the All | OrcaBox | CloudStream ecosystem tab strip.
+  /// The strip filtered the already-loaded groups down to one provider
+  /// ecosystem, which is an implementation detail of where a source came from
+  /// — not something a viewer looking for a title cares about. Removed under
+  /// NOTES task 2; an all-sources search now aggregates every source into the
+  /// one grid, and the per-source chips below still narrow to a single source
+  /// for anyone who wants that.
+  Widget _controlRowLeft() {
     return BlocBuilder<SearchBloc, SearchState>(
       buildWhen: (p, c) =>
           p.status != c.status ||
           p.currentSourceOnly != c.currentSourceOnly ||
-          p.ecosystem != c.ecosystem ||
           p.suggestions != c.suggestions ||
           p.groups != c.groups ||
           p.contentFilter != c.contentFilter ||
@@ -1142,42 +1172,20 @@ class _SearchViewState extends State<_SearchView>
           p.genreFilter != c.genreFilter ||
           p.statusFilter != c.statusFilter,
       builder: (context, state) {
-        if (state.currentSourceOnly) {
-          if (state.status != SearchStatus.success) {
-            return const SizedBox.shrink();
-          }
-          final n = state.totalCount;
-          return Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '$n result${n == 1 ? '' : 's'}',
-              style: AppText.caption.copyWith(fontSize: 12.5),
-            ),
-          );
-        }
         final showingSuggestions =
             state.status != SearchStatus.success &&
             state.suggestions.isNotEmpty;
         if (showingSuggestions || state.status != SearchStatus.success) {
           return const SizedBox.shrink();
         }
-        final tabs = ecosystemTabsFor(modeSources.map((s) => s.id));
-        // Fewer than three means "All" plus at most one real ecosystem — the
-        // two would show identical results, so the strip is pointless. Show
-        // the result count instead of leaving the row blank next to a lone
-        // filter icon, which reads as something failing to load. (Manga mode
-        // hits this whenever every installed source is a Mihon one.)
-        if (tabs.length < 3) {
-          final n = state.totalCount;
-          return Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '$n result${n == 1 ? '' : 's'}',
-              style: AppText.caption.copyWith(fontSize: 12.5),
-            ),
-          );
-        }
-        return _ecosystemTabs(state, tabs);
+        final n = state.totalCount;
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '$n result${n == 1 ? '' : 's'}',
+            style: AppText.caption.copyWith(fontSize: 12.5),
+          ),
+        );
       },
     );
   }
@@ -1320,107 +1328,27 @@ class _SearchViewState extends State<_SearchView>
     return BlocBuilder<SearchBloc, SearchState>(
       buildWhen: (p, c) =>
           p.currentSourceOnly != c.currentSourceOnly ||
+          p.searchSourceId != c.searchSourceId ||
           p.aniFiltersBySource != c.aniFiltersBySource ||
           p.mihonFiltersBySource != c.mihonFiltersBySource,
       builder: (context, state) {
         if (!state.currentSourceOnly) return const SizedBox.shrink();
-        return BlocBuilder<ActiveSourceCubit, String>(
-          builder: (context, activeId) {
-            final filter = _sourceFilterFor(activeId, state);
-            if (filter.onFilter == null) return const SizedBox.shrink();
-            return IconButton(
-              onPressed: filter.onFilter,
-              icon: Icon(
-                Icons.tune_rounded,
-                size: 20,
-                color: filter.active
-                    ? AppColors.accent
-                    : AppColors.textTertiary,
-              ),
-              tooltip: context.l10n.sourceFilters,
-              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            );
-          },
+        final scopedId = state.searchSourceId;
+        if (scopedId == null) return const SizedBox.shrink();
+        final filter = _sourceFilterFor(scopedId, state);
+        if (filter.onFilter == null) return const SizedBox.shrink();
+        return IconButton(
+          onPressed: filter.onFilter,
+          icon: Icon(
+            Icons.tune_rounded,
+            size: 20,
+            color: filter.active ? AppColors.accent : AppColors.textTertiary,
+          ),
+          tooltip: context.l10n.sourceFilters,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
         );
       },
     );
-  }
-
-  // ── Ecosystem tabs (All · OrcaBox · CloudStream · Aniyomi) ────────────────
-  /// Real [TabBar]/[TabController] pair — same treatment as the History
-  /// screen's tabs (`history_screen.dart:321`): sliding rounded accent
-  /// underline + label-colour crossfade instead of a static border, so
-  /// switching tabs actually animates. [isScrollable] + [TabAlignment.start]
-  /// keep it left-anchored regardless of how many tabs are present. "All"
-  /// (first, default) applies no filter — selecting a tab is a pure view
-  /// filter over already-fetched groups; see [SearchEcosystemChanged].
-  Widget _ecosystemTabs(SearchState state, List<SearchEcosystem> tabs) {
-    final controller = _ecoTabControllerFor(tabs, state.ecosystem);
-    return TabBar(
-      controller: controller,
-      isScrollable: true,
-      tabAlignment: TabAlignment.start,
-      padding: EdgeInsets.zero,
-      labelPadding: const EdgeInsets.only(right: 20),
-      // Drop the default full-width hairline under the bar, same as History.
-      dividerColor: Colors.transparent,
-      dividerHeight: 0,
-      indicatorSize: TabBarIndicatorSize.label,
-      indicator: UnderlineTabIndicator(
-        borderRadius: const BorderRadius.all(Radius.circular(2)),
-        borderSide: BorderSide(width: 3, color: AppColors.accent),
-        insets: const EdgeInsets.symmetric(horizontal: -6),
-      ),
-      labelColor: AppColors.accent,
-      unselectedLabelColor: AppColors.textSecondary,
-      // History uses 14.5 — sized down here since this row also hosts the
-      // sort/filter icons and has less height to spend.
-      labelStyle: const TextStyle(
-        fontFamily: 'Inter',
-        fontFamilyFallback: AppText.fontFamilyFallback,
-        fontSize: 13,
-        fontWeight: FontWeight.w700,
-      ),
-      unselectedLabelStyle: const TextStyle(
-        fontFamily: 'Inter',
-        fontFamilyFallback: AppText.fontFamilyFallback,
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-      ),
-      overlayColor: WidgetStateProperty.all(Colors.transparent),
-      onTap: (i) =>
-          context.read<SearchBloc>().add(SearchEcosystemChanged(tabs[i])),
-      tabs: [for (final t in tabs) Tab(text: t.label)],
-    );
-  }
-
-  /// Keeps [_ecoTabController] glued to the CURRENT tab set/selection so it
-  /// can never throw from a length mismatch: [ecosystemTabsFor] is recomputed
-  /// every relevant build (tabs appear/disappear as sources are
-  /// installed/removed while the screen is open), so the controller is
-  /// recreated whenever the tab list itself changes, and just re-indexed in
-  /// place when only the selection changes (e.g. [SearchState.ecosystem]
-  /// getting reset to "All" by a fresh search or a scope change). Falls back
-  /// to index 0 ("All") if the previously-selected ecosystem isn't in the new
-  /// tab set.
-  TabController _ecoTabControllerFor(
-    List<SearchEcosystem> tabs,
-    SearchEcosystem selected,
-  ) {
-    final target = tabs.indexOf(selected);
-    final index = target < 0 ? 0 : target;
-    if (_ecoTabController == null || !listEquals(_ecoTabs, tabs)) {
-      _ecoTabController?.dispose();
-      _ecoTabs = tabs;
-      _ecoTabController = TabController(
-        length: tabs.length,
-        vsync: this,
-        initialIndex: index,
-      );
-    } else if (_ecoTabController!.index != index) {
-      _ecoTabController!.index = index;
-    }
-    return _ecoTabController!;
   }
 
   // ── Per-source result pills (jump straight to one source) ──────────────────
@@ -1430,10 +1358,9 @@ class _SearchViewState extends State<_SearchView>
   /// byte-for-byte: [SearchState.sourceFilter] is a pure view filter over
   /// already-fetched [SearchState.groups] via [SearchSourceFilterChanged] —
   /// it never re-runs the search. [SearchState.sourceChipGroups] already
-  /// narrows to the active ecosystem tab, so this row can't disagree with the
-  /// tabs above it: switching ecosystems resets the pill selection back to
-  /// "All" the same way the bloc already resets it on a fresh search or scope
-  /// change (see `SearchBloc._onEcosystemChanged`).
+  /// The bloc resets the pill selection back to "All" on a fresh search and on
+  /// any scope change, so a selection can never survive into a result set that
+  /// no longer contains it.
   Widget _sourcePillsRow() {
     return BlocBuilder<SearchBloc, SearchState>(
       buildWhen: (p, c) =>
@@ -1444,7 +1371,6 @@ class _SearchViewState extends State<_SearchView>
           p.audioFilter != c.audioFilter ||
           p.genreFilter != c.genreFilter ||
           p.statusFilter != c.statusFilter ||
-          p.ecosystem != c.ecosystem ||
           p.suggestions != c.suggestions ||
           p.status != c.status,
       builder: (context, state) {
@@ -1557,8 +1483,6 @@ class _SearchViewState extends State<_SearchView>
     final landed = {for (final g in state.groups) g.sourceId};
     // Current-source-only mode queries a single source, so there are never
     // other sources still streaming in — no skeleton sections. On a specific
-    // ecosystem tab, only that ecosystem's still-loading sources get skeletons
-    // (the "All" tab keeps every pending source, i.e. current behaviour).
     //
     // Driven by state.queriedSources — what the bloc ACTUALLY searched — not by
     // the enabled-source list. Re-deriving it here was a guess, and it drifted:
@@ -1573,9 +1497,7 @@ class _SearchViewState extends State<_SearchView>
                 (s) =>
                     state.queriedSources.contains(s.id) &&
                     !landed.contains(s.id) &&
-                    !state.respondedSources.contains(s.id) &&
-                    (state.ecosystem == SearchEcosystem.all ||
-                        ecosystemOf(s.id) == state.ecosystem),
+                    !state.respondedSources.contains(s.id),
               )
               .toList();
     final stillLoading = pending.isNotEmpty;
@@ -1585,13 +1507,7 @@ class _SearchViewState extends State<_SearchView>
     final failed =
         (state.currentSourceOnly || state.sourceFilter != kAllSources)
         ? const <MapEntry<String, SourceOutcome>>[]
-        : state.failedSources.entries
-              .where(
-                (e) =>
-                    state.ecosystem == SearchEcosystem.all ||
-                    ecosystemOf(e.key) == state.ecosystem,
-              )
-              .toList();
+        : state.failedSources.entries.toList();
 
     if (groups.isEmpty && !stillLoading && failed.isEmpty) {
       return _noResults(state);
@@ -2463,6 +2379,65 @@ searchFilterSections(
 /// [searchFilterSections]) so it's unit-testable without pumping the sheet.
 bool searchTypeAudioGroupsVisible(ContentMode mode) => !mode.isReading;
 
+/// One row of the search source picker: either a section heading ([header]) or
+/// a selectable source ([source]). Exactly one is non-null.
+typedef SourcePickerRow = ({
+  String? header,
+  ({String id, String name})? source,
+});
+
+/// Whether [sourceId] is one of the app's own bundled providers rather than
+/// something the user installed.
+///
+/// The `native:` prefix is the whole test: NativeProviderManager is the only
+/// registrar that mints those ids, and every other manager (JS, CloudStream,
+/// Aniyomi, Mihon, LNReader) hands out sources that arrived from a repo the
+/// user added.
+bool isBuiltInSource(String sourceId) => sourceId.startsWith('native:');
+
+/// Groups [sources] for the search source-picker sheet: built-in providers
+/// under one heading, installed extensions under another, each sorted
+/// alphabetically.
+///
+/// The app ships its own Dart providers for a few sites (the Hollywood and
+/// Bollywood Home channels) and a user can also install an extension scraping
+/// the SAME site. Those are two different engines, so both stay searchable and
+/// both get a row — but ungrouped they read as one provider listed twice. The
+/// headings are what make the pairing look deliberate.
+///
+/// Deduplication is by source id only. Names are deliberately NOT deduped: a
+/// built-in and an extension for one site have similar names on purpose, and
+/// collapsing them would silently drop an engine the user can still pick.
+/// A heading is omitted when its group is empty, so a build with no extensions
+/// installed shows no "Installed" heading rather than an empty section.
+List<SourcePickerRow> sourcePickerRows(
+  Iterable<({String id, String name})> sources, {
+  required String builtInLabel,
+  required String installedLabel,
+}) {
+  final seenIds = <String>{};
+  final unique = [
+    for (final s in sources)
+      if (seenIds.add(s.id)) s,
+  ];
+  int byName(({String id, String name}) a, ({String id, String name}) b) =>
+      a.name.toLowerCase().compareTo(b.name.toLowerCase());
+  final builtIn = unique.where((s) => isBuiltInSource(s.id)).toList()
+    ..sort(byName);
+  final installed = unique.where((s) => !isBuiltInSource(s.id)).toList()
+    ..sort(byName);
+  return [
+    if (builtIn.isNotEmpty) ...[
+      (header: builtInLabel, source: null),
+      for (final s in builtIn) (header: null, source: s),
+    ],
+    if (installed.isNotEmpty) ...[
+      (header: installedLabel, source: null),
+      for (final s in installed) (header: null, source: s),
+    ],
+  ];
+}
+
 /// Which ecosystem's per-source filter sheet [sourceId] opens — Aniyomi for
 /// `ani:` ids, Mihon for `mihon:` ids, or null for everything else (no
 /// per-source filter button shown). Drives the filter icon on the
@@ -2689,7 +2664,6 @@ class _SearchFilterSheet extends StatelessWidget {
           p.statusFilter != c.statusFilter ||
           p.sort != c.sort ||
           p.groups != c.groups ||
-          p.ecosystem != c.ecosystem ||
           p.currentSourceOnly != c.currentSourceOnly,
       builder: (context, state) {
         final canReset = _canReset(state, prefs);

@@ -219,7 +219,7 @@ class PlayerCubit extends Cubit<PlayerState> {
   /// provider / AllAnime). Non-null only for anime — gates scrobbling.
   final String? scrobbleTitle;
 
-  /// TMDB id (movies/series) for Simkl tracking; [tmdbIsTv] selects namespace.
+  /// TMDB id (movies/series); [tmdbIsTv] selects TMDB's movie vs tv namespace.
   final int? tmdbId;
   final bool tmdbIsTv;
 
@@ -229,7 +229,7 @@ class PlayerCubit extends Cubit<PlayerState> {
   /// [_markWatching] so a peek can't flip the title to "watching" either.
   final bool peek;
 
-  /// IMDb id (movies/series) for Simkl tracking when no TMDB id is exposed.
+  /// IMDb id (movies/series), used when no TMDB id is exposed.
   final String? imdbId;
 
   /// Episode indices already scrobbled this session (fire once per episode).

@@ -1,5 +1,5 @@
 // The provider label follows the TITLE, not the mode you happen to be in.
-// Opening an anime from a tracker while browsing movies labelled it Simkl —
+// Opening an anime from a tracker while browsing movies labelled it wrongly —
 // a provider that never saw that title.
 
 import 'dart:io';
@@ -25,29 +25,27 @@ void main() {
   });
 
   // The mapping under test, mirrored: anime/manga/novel answer from the anime
-  // provider, movie/tv from the video one — whatever the browse mode is.
+  // provider, movie/tv always from TMDB — whatever the browse mode is.
   String nameForKind(ZKind kind) {
     final isVideo = kind == ZKind.movie || kind == ZKind.tv;
     if (isVideo) {
-      return prefs.video == VideoProvider.simkl ? 'Simkl' : 'TMDB';
+      return 'TMDB';
     }
     return prefs.anime == AnimeProvider.mal ? 'MyAnimeList' : 'AniList';
   }
 
   test('an anime title never names a video provider', () async {
-    await prefs.setVideo(VideoProvider.simkl);
 
-    // Browsing movies does not make this anime a Simkl title.
+    // Browsing movies does not make this anime a TMDB title.
     expect(nameForKind(ZKind.anime), 'AniList');
     expect(nameForKind(ZKind.manga), 'AniList');
     expect(nameForKind(ZKind.novel), 'AniList');
   });
 
   test('a movie title names the video provider', () async {
-    await prefs.setVideo(VideoProvider.simkl);
 
-    expect(nameForKind(ZKind.movie), 'Simkl');
-    expect(nameForKind(ZKind.tv), 'Simkl');
+    expect(nameForKind(ZKind.movie), 'TMDB');
+    expect(nameForKind(ZKind.tv), 'TMDB');
   });
 
   test('it follows the chosen provider, not a fixed name', () async {

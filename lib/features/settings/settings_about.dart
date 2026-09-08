@@ -13,10 +13,12 @@ class AboutSettingsScreen extends StatefulWidget {
 }
 
 class _AboutSettingsScreenState extends State<AboutSettingsScreen> {
-  static const String _websiteUrl = 'https://orcabox.online';
+  // Follows SITE_BASE_URL from the build's .env, so the tile can never point
+  // somewhere the rest of the app (share/pair/reset links) doesn't.
+  static const String _websiteUrl = Environment.siteBaseUrl;
   // Empty until OrcaBox has its own Telegram; the old value was upstream's.
-  static const String _telegramUrl = '';
-  static const String _discordUrl = kDiscordInviteUrl;
+  static const String _telegramUrl = kTelegramUrl;
+  static final String _discordUrl = kDiscordInviteLink;
   static const String _githubUrl = kAppRepoUrl;
 
   final UpdateService _updateService = UpdateService();
@@ -51,24 +53,16 @@ class _AboutSettingsScreenState extends State<AboutSettingsScreen> {
         children: [
           const _ProfileCard(),
           const SizedBox(height: 24),
-          // Contributors — above Social, opens the full list.
-          SettingsCard(
-            children: [
-              SettingsTile(
-                autofocus: true,
-                icon: Icons.group_rounded,
-                title: context.l10n.contributors,
-                onTap: () => _push(const ContributorsScreen()),
-              ),
-            ],
-          ),
           SettingsSectionLabel(context.l10n.social, muted: true),
           SettingsCard(
             children: [
               SettingsTile(
+                autofocus: true,
                 icon: Icons.language_rounded,
                 title: context.l10n.website,
-                subtitle: 'orcabox.online',
+                // Host only, derived — a hardcoded label would drift from the
+                // URL the tile actually opens.
+                subtitle: Uri.parse(_websiteUrl).host,
                 onTap: () => _open(_websiteUrl),
               ),
               // Telegram and Discord hide themselves until OrcaBox has its own

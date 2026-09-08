@@ -129,7 +129,6 @@ PreferredProvider? _preferFromName(String? name) => switch (name) {
   'AniList' => PreferredProvider.anilist,
   'MyAnimeList' => PreferredProvider.mal,
   'TMDB' => PreferredProvider.tmdb,
-  'Simkl' => PreferredProvider.simkl,
   _ => null,
 };
 
@@ -153,8 +152,6 @@ String _sourceLabel(
         return 'MyAnimeList';
       case PreferredProvider.tmdb:
         return 'TMDB';
-      case PreferredProvider.simkl:
-        return 'Simkl';
       case null:
         break;
     }
@@ -679,22 +676,16 @@ class _DetailViewState extends State<_DetailView>
 
   /// Whether the Tracking button should show for [detail]. Only when a tracker
   /// is connected AND it can actually track this title: anime/manga/novel →
-  /// always (AniList/MAL resolve by malId or title regardless); movies &
-  /// live-action TV → only Simkl, and only with a tmdb/imdb id to key on.
-  /// Keeps the button out of the way for everyone else.
+  /// always (AniList/MAL resolve by malId or title regardless). Movies and
+  /// live-action TV are never trackable now — the one tracker with a movie/TV
+  /// catalogue was removed (NOTES task 15), and AniList/MAL index anime and
+  /// manga only. Keeps the button out of the way for everyone else.
   bool _trackingAvailable(MediaDetail detail) {
     final hub = sl<TrackerHub>();
     if (!hub.anyConnected) return false;
-    if (detail.type == ProviderType.anime ||
+    return detail.type == ProviderType.anime ||
         detail.type == ProviderType.manga ||
-        detail.type == ProviderType.novel) {
-      return true;
-    }
-    final simklOn = hub.connected.any((t) => t.displayName == 'Simkl');
-    final hasId =
-        (detail.tmdbId ?? widget.item.tmdbId) != null ||
-        ((detail.imdbId ?? widget.item.imdbId)?.isNotEmpty ?? false);
-    return simklOn && hasId;
+        detail.type == ProviderType.novel;
   }
 
   /// Open the tracker list — one row per connected tracker, showing what each

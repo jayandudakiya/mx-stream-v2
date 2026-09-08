@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:orcabox/core/appwrite/appwrite_service.dart';
 import 'package:orcabox/core/anilist/anilist_service.dart';
 import 'package:orcabox/core/announce/announcement.dart';
 import 'package:orcabox/core/announce/announcement_service.dart';
@@ -37,22 +36,14 @@ import 'package:orcabox/core/state/active_source_cubit.dart';
 import 'package:orcabox/core/supabase/supabase_service.dart';
 import 'package:orcabox/core/theme/theme_controller.dart';
 import 'package:orcabox/core/tracker/mal_service.dart';
-import 'package:orcabox/core/tracker/simkl_service.dart';
 import 'package:orcabox/core/tracker/tracker_hub.dart';
 import 'package:orcabox/core/download/chapter_download_store.dart';
 import 'package:orcabox/core/zmode/zmode_prefs.dart';
 import 'package:orcabox/features/auth/auth_cubit.dart';
-import 'package:orcabox/features/auth/migration_bridge.dart';
 import 'package:orcabox/features/home/cubit/home_cubit.dart';
 import 'package:orcabox/features/home/home_screen.dart';
 import 'package:orcabox/features/shell/root_shell.dart';
 import 'package:orcabox/features/shell/root_shell_tv.dart';
-
-MigrationBridge _fakeBridge() => MigrationBridge(
-  invoke: (_, __) async => const {'ok': false},
-  signInPassword: (_, __) async => false,
-  verifyOtp: (_, __) async => false,
-);
 
 // ── Minimal fakes (same shape as root_shell_tv_test.dart's harness) ────────
 
@@ -196,22 +187,6 @@ class _FakeMalService extends ChangeNotifier implements MalService {
   String? get viewerAvatar => null;
 }
 
-class _FakeSimklService extends ChangeNotifier implements SimklService {
-  @override
-  noSuchMethod(Invocation i) => super.noSuchMethod(i);
-
-  @override
-  bool get isConnected => false;
-
-  @override
-  String get displayName => 'Simkl';
-
-  @override
-  String? get viewerName => null;
-
-  @override
-  String? get viewerAvatar => null;
-}
 
 class _FakeDownloadPrefs extends DownloadPrefs {
   @override
@@ -304,7 +279,7 @@ void main() {
     final dio = Dio();
     final fakeRepo = _FakeSourceRepository();
     activeSource = ActiveSourceCubit();
-    authCubit = AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge());
+    authCubit = AuthCubit(SupabaseService());
     // This suite reuses a fixed on-disk Hive dir (not a fresh temp dir) across
     // runs, so a mode persisted by an earlier run would otherwise leak in here
     // and start tests in the wrong mode.
@@ -342,7 +317,6 @@ void main() {
     sl.registerSingleton<AniyomiManager>(AniyomiManager());
     sl.registerSingleton<AniListService>(_FakeAniListService());
     sl.registerSingleton<MalService>(_FakeMalService());
-    sl.registerSingleton<SimklService>(_FakeSimklService());
     sl.registerSingleton<TitleSuggestionService>(TitleSuggestionService(dio));
     sl.registerSingleton<DownloadPrefs>(_FakeDownloadPrefs());
     sl.registerSingleton<AiringService>(_FakeAiringService());

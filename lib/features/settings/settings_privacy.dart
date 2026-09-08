@@ -173,6 +173,45 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           SettingsCard(
             children: [
               SettingsTile(
+                icon: Icons.verified_user_outlined,
+                title: 'Privacy Policy & Terms Consent',
+                subtitle: 'Review privacy disclosures and advertising consent',
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.greenAccent.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Accepted',
+                        style: AppText.caption.copyWith(
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textTertiary,
+                    ),
+                  ],
+                ),
+                onTap: () => showPrivacyConsentModal(context, isReview: true),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SettingsCard(
+            children: [
+              SettingsTile(
                 autofocus: true,
                 icon: Icons.visibility_off_outlined,
                 title: context.l10n.incognitoMode,

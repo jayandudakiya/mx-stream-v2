@@ -10,12 +10,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/anilist/anilist_service.dart';
 import '../../core/app_config.dart';
 import '../../core/app_mode.dart';
+import '../../core/environment.dart';
 import '../../core/tracker/tracker_hub.dart';
 import '../../core/zmode/metadata_provider_prefs.dart';
 import '../../core/cache/media_cache.dart';
 import '../../core/logging/app_logger.dart';
 import '../../core/tracker/mal_service.dart';
-import '../../core/tracker/simkl_service.dart';
 import '../../core/tracker/tracker.dart';
 import '../player/player_screen.dart' show openSubtitleStyleSheet;
 import '../player/shader_presets.dart';
@@ -55,13 +55,13 @@ import '../update/update_dialog.dart';
 import '../../core/ui/settings_widgets.dart';
 import '../../core/tv/tv_list_focusable.dart';
 import '../../core/ui/dock_visibility.dart';
-import 'contributors_screen.dart';
 import 'donate_screen.dart';
 import '../auth/auth_cubit.dart';
 import '../backup/backup_screen.dart';
 import '../watch_together/ui/watch_party_lobby_screen.dart';
 import '../auth/auth_screens.dart';
 import '../onboarding/how_it_works.dart';
+import '../onboarding/privacy_consent_modal.dart';
 import '../notify/subscriptions_screen.dart';
 import 'tracker_settings_screen.dart';
 import '../sources/source_health_screen.dart';
@@ -139,9 +139,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static String _animeProviderLabel() =>
       _providerPrefs?.anime == AnimeProvider.mal ? 'MyAnimeList' : 'AniList';
 
-  static String _videoProviderLabel() =>
-      _providerPrefs?.video == VideoProvider.simkl ? 'Simkl' : 'TMDB';
-
   /// MAL browsing works signed out (public reads), but the *list* does not.
   /// The switch-time toast only fires once, so someone who picked MAL months
   /// ago, or signed out since, gets no explanation for the missing list. Say
@@ -152,46 +149,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           sl<TrackerHub>().connected.any(
             (t) => t.displayName.toLowerCase().contains('myanimelist'),
           ));
-
-  /// Movie/TV twin of [_pickAnimeMetadataProvider]. No login nudge: Simkl's
-  /// catalogue is public, and the Simkl tracker is a separate concern the
-  /// Trackers screen already handles.
-  Future<void> _pickVideoMetadataProvider() async {
-    final prefs = _providerPrefs;
-    if (prefs == null) return;
-    final l10n = context.l10n;
-    final picked = await showModalBottomSheet<VideoProvider>(
-      context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheet) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 14),
-            Text(l10n.videoMetadata, style: AppText.headline),
-            const SizedBox(height: 10),
-            for (final p in VideoProvider.values)
-              ListTile(
-                title: Text(
-                  p == VideoProvider.simkl ? 'Simkl' : 'TMDB',
-                  style: AppText.body,
-                ),
-                trailing: prefs.video == p
-                    ? Icon(Icons.check_rounded, color: AppColors.accent)
-                    : null,
-                onTap: () => Navigator.of(sheet).pop(p),
-              ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-    if (picked == null) return;
-    await prefs.setVideo(picked);
-  }
 
   /// Choose who supplies anime/manga metadata.
   ///
@@ -724,7 +681,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final connectedCount = <Tracker>[
       sl<AniListService>(),
       sl<MalService>(),
-      sl<SimklService>(),
     ].where((t) => t.isConnected).length;
 
     // Single source of truth for both the grouped list and the search filter.
@@ -1003,19 +959,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       _SettingsEntry(
         section: SettingsSection.interface,
-        icon: Icons.movie_filter_outlined,
-        title: l10n.videoMetadata,
-        subtitle: l10n.videoMetadataSubtitle,
-        keywords: 'movie tv series metadata provider tmdb simkl fallback '
-            'catalogue',
-        trailing: _value(_videoProviderLabel()),
-        onTap: () async {
-          await _pickVideoMetadataProvider();
-          if (mounted) setState(() {});
-        },
-      ),
-      _SettingsEntry(
-        section: SettingsSection.interface,
         icon: Icons.language_rounded,
         title: l10n.appLanguage,
         subtitle: l10n.appLanguageSubtitle,
@@ -1100,7 +1043,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         keywords: 'logs share diagnostic debug bug report crash',
         onTap: _shareLogs,
       ),
-      // About — a single destination holding the app info, contributors,
+      // About — a single destination holding the app info,
       // social links, updates, beta toggle and support (so the section opens
       // straight to it — no nested "About" sub-page).
       _SettingsEntry(
@@ -1109,7 +1052,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: l10n.about,
         subtitle: 'v$kAppVersion',
         keywords: 'about version app info license developers credits team '
-            'contributors social discord telegram how it works guide '
+            'social discord telegram how it works guide '
             'check updates upgrade latest beta prerelease support donate coffee',
         onTap: () => _push(const AboutSettingsScreen()),
       ),

@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:orcabox/core/anilist/anilist_service.dart';
 import 'package:orcabox/core/tracker/mal_service.dart';
-import 'package:orcabox/core/tracker/simkl_service.dart';
 import 'package:orcabox/features/settings/connections_screen_tv.dart';
 
 // Configurable fake trackers — mirrors the pattern in
@@ -56,29 +55,6 @@ class _FakeMalService extends ChangeNotifier implements MalService {
   Future<void> disconnect() async {}
 }
 
-class _FakeSimklService extends ChangeNotifier implements SimklService {
-  _FakeSimklService({this.connected = false, this.name});
-  final bool connected;
-  final String? name;
-
-  @override
-  noSuchMethod(Invocation i) => super.noSuchMethod(i);
-
-  @override
-  bool get isConnected => connected;
-
-  @override
-  String get displayName => 'Simkl';
-
-  @override
-  String? get viewerName => name;
-
-  @override
-  String? get viewerAvatar => null;
-
-  @override
-  Future<void> disconnect() async {}
-}
 
 void _register(
   GetIt sl, {
@@ -86,37 +62,34 @@ void _register(
   String? aniName,
   bool malConnected = false,
   String? malName,
-  bool simklConnected = false,
-  String? simklName,
 }) {
   sl.registerSingleton<AniListService>(
       _FakeAniListService(connected: aniConnected, name: aniName));
   sl.registerSingleton<MalService>(
       _FakeMalService(connected: malConnected, name: malName));
-  sl.registerSingleton<SimklService>(
-      _FakeSimklService(connected: simklConnected, name: simklName));
 }
 
 void main() {
   final sl = GetIt.instance;
   tearDown(sl.reset);
 
-  testWidgets('lists all three trackers with a Connect action when signed out',
+  testWidgets('lists both trackers with a Connect action when signed out',
       (tester) async {
-    _register(sl, aniConnected: false, malConnected: false, simklConnected: false);
+    _register(sl, aniConnected: false, malConnected: false);
     await tester.pumpWidget(const MaterialApp(home: ConnectionsScreenTv()));
     await tester.pumpAndSettle();
     expect(find.text('AniList'), findsOneWidget);
     expect(find.text('MyAnimeList'), findsOneWidget);
-    expect(find.text('Simkl'), findsOneWidget);
-    expect(find.text('Connect'), findsNWidgets(3));
+    // Two, not three: Simkl was removed with the rest of the tracker (NOTES
+    // task 15), leaving AniList and MyAnimeList.
+    expect(find.text('Connect'), findsNWidgets(2));
   });
 
   testWidgets('shows Connected + viewer name and a Disconnect action',
       (tester) async {
     _register(sl,
         aniConnected: true, aniName: 'ada',
-        malConnected: false, simklConnected: false);
+        malConnected: false);
     await tester.pumpWidget(const MaterialApp(home: ConnectionsScreenTv()));
     await tester.pumpAndSettle();
     expect(find.textContaining('ada'), findsOneWidget);

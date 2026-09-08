@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 
 import '../../core/app_config.dart';
-import '../../core/state/active_source_cubit.dart';
+import '../../core/privacy/privacy_consent_prefs.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
 import '../../core/tv/tv_focusable.dart';
-import '../sources/providers_hub_screen.dart';
+import 'privacy_policy_sheet.dart';
 import '../../l10n/l10n.dart';
 
-Future<void> _markOnboarded() =>
-    Hive.box(ActiveSourceCubit.boxName).put('onboarded', true);
-
-/// TV-adapted first-run onboarding. Same no-install, "add your own sources"
-/// copy as the phone [OnboardingScreen] — only the interaction model changes:
-/// every action button is a [TvFocusable] so the D-pad reaches it and OK
-/// activates it.
+/// TV-adapted first-run onboarding with Privacy Policy, Terms & Ad Consent.
+/// Focusable buttons ensure simple D-pad navigation on Android TV and Fire TV.
 class OnboardingScreenTv extends StatefulWidget {
   const OnboardingScreenTv({super.key, required this.onDone});
 
@@ -26,25 +20,13 @@ class OnboardingScreenTv extends StatefulWidget {
 }
 
 class _OnboardingScreenTvState extends State<OnboardingScreenTv> {
-  /// Marks onboarding done, hands off to the app, then opens Providers so the
-  /// user lands right where they add a repository. No network call, no
-  /// install — the app just navigates.
-  Future<void> _addSourcesNow() async {
-    await _markOnboarded();
-    if (!mounted) return;
-    widget.onDone();
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const ProvidersHubScreen()));
-  }
-
-  Future<void> _later() async {
-    await _markOnboarded();
+  Future<void> _acceptAndContinue() async {
+    await PrivacyConsentPrefs.markAccepted();
     if (mounted) widget.onDone();
   }
 
   Widget _bullet(IconData icon, String label) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 7),
+    padding: const EdgeInsets.symmetric(vertical: 6),
     child: Row(
       children: [
         Icon(icon, color: AppColors.accent, size: 20),
@@ -66,93 +48,161 @@ class _OnboardingScreenTvState extends State<OnboardingScreenTv> {
       body: SafeArea(
         child: Center(
           child: SizedBox(
-            width: 560,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Spacer(flex: 2),
-                Text(
-                  context.l10n.welcomeToApp(kAppName),
-                  style: AppText.title,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  context.l10n.onboardingTvSubtitle(kAppName),
-                  style: AppText.body.copyWith(color: AppColors.textSecondary),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 26),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _bullet(Icons.explore_outlined, context.l10n.openProviders),
-                    _bullet(
-                      Icons.category_outlined,
-                      context.l10n.onboardingPickEcosystem,
+            width: 620,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.verified_user_rounded,
+                    color: AppColors.accent,
+                    size: 40,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    context.l10n.welcomeToApp(kAppName),
+                    style: AppText.title.copyWith(fontSize: 24),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Your privacy is respected. No personal phone data is collected or sold. '
+                    'Ads support server infrastructure and keep $kAppName free.',
+                    style: AppText.body.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
                     ),
-                    _bullet(
-                      Icons.link_rounded,
-                      context.l10n.onboardingAddRepository,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 18),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
-                    _bullet(
-                      Icons.download_outlined,
-                      context.l10n.onboardingBrowseAndInstall,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.surface2),
                     ),
-                  ],
-                ),
-                const Spacer(flex: 3),
-                TvFocusable(
-                  autofocus: true,
-                  onTap: _addSourcesNow,
-                  // ExcludeFocus: a Flutter button is focusable in its own
-                  // right, so without this the D-pad stops on the inner button
-                  // as well as the TvFocusable around it — down from here would
-                  // land on itself instead of the next action. Every other TV
-                  // screen wraps a plain Container for the same reason.
-                  child: ExcludeFocus(
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: FilledButton(
-                        onPressed: _addSourcesNow,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.accent,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _bullet(
+                          Icons.explore_outlined,
+                          context.l10n.openProviders,
+                        ),
+                        _bullet(
+                          Icons.movie_filter_outlined,
+                          'Pick Movies, Series, or Anime',
+                        ),
+                        _bullet(
+                          Icons.download_outlined,
+                          context.l10n.onboardingBrowseAndInstall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TvFocusable(
+                          autofocus: false,
+                          onTap: () => showPrivacyPolicySheet(context),
+                          child: ExcludeFocus(
+                            child: SizedBox(
+                              height: 46,
+                              child: OutlinedButton(
+                                onPressed: () => showPrivacyPolicySheet(context),
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: AppColors.surface,
+                                  foregroundColor: AppColors.textSecondary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Privacy Policy',
+                                  style: AppText.caption.copyWith(
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          context.l10n.addSourcesNow,
-                          style: AppText.button.copyWith(color: Colors.white),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TvFocusable(
+                          autofocus: false,
+                          onTap: () => showTermsOfServiceSheet(context),
+                          child: ExcludeFocus(
+                            child: SizedBox(
+                              height: 46,
+                              child: OutlinedButton(
+                                onPressed: () => showTermsOfServiceSheet(context),
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: AppColors.surface,
+                                  foregroundColor: AppColors.textSecondary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Terms of Service',
+                                  style: AppText.caption.copyWith(
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  TvFocusable(
+                    autofocus: true,
+                    onTap: _acceptAndContinue,
+                    child: ExcludeFocus(
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: FilledButton(
+                          onPressed: _acceptAndContinue,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.accent,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Accept & Continue',
+                                style: AppText.button.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 20),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TvFocusable(
-                  autofocus: false,
-                  onTap: _later,
-                  child: ExcludeFocus(
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: TextButton(
-                        onPressed: _later,
-                        child: Text(
-                          context.l10n.illDoItLater,
-                          style: AppText.caption.copyWith(
-                            color: AppColors.textTertiary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
+                ],
+              ),
             ),
           ),
         ),

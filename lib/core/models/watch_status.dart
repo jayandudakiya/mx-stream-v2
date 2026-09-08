@@ -43,14 +43,6 @@ extension WatchStatusX on WatchStatus {
     WatchStatus.dropped => 'dropped',
   };
 
-  /// Simkl list name (`to` field on /sync/add-to-list).
-  String get simkl => switch (this) {
-    WatchStatus.planning => 'plantowatch',
-    WatchStatus.watching => 'watching',
-    WatchStatus.completed => 'completed',
-    WatchStatus.paused => 'hold',
-    WatchStatus.dropped => 'dropped',
-  };
 }
 
 /// [WatchStatusX.label], but reading-aware: in a reading mode (manga/novel),

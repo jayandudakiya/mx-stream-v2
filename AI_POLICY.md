@@ -85,7 +85,7 @@ To be clear this isn't a discouragement policy — AI tools are genuinely useful
 - Writing and expanding test coverage
 - Boilerplate (DTOs, serialization models, repetitive UI scaffolding)
 - Debugging assistance and explaining unfamiliar code
-- Translation drafts (still needs a fluent human to check accuracy — see `CONTRIBUTING.md`)
+- Translation drafts (still needs a fluent human to check accuracy)
 - Refactoring suggestions you then review and apply deliberately
 
 Use it for these freely, disclosure requirements in Section 1 still apply where relevant.

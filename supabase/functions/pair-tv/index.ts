@@ -3,13 +3,21 @@
 // read/update of that row goes through here via the service-role client.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Tracker OAuth client ids. Set as Supabase function secrets (see
+// supabase/.env.example) so no account-specific id is committed:
+//   supabase secrets set ANILIST_CLIENT_ID=... ANILIST_CLIENT_SECRET=...
+//   supabase secrets set MAL_CLIENT_ID=... SIMKL_CLIENT_ID=... SIMKL_CLIENT_SECRET=...
+const ANILIST_CLIENT_ID = Deno.env.get("ANILIST_CLIENT_ID") ?? "";
+const MAL_CLIENT_ID = Deno.env.get("MAL_CLIENT_ID") ?? "";
+const SIMKL_CLIENT_ID = Deno.env.get("SIMKL_CLIENT_ID") ?? "";
+
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   { auth: { autoRefreshToken: false, persistSession: false } },
 );
 
-// The web tracker-login page (orcabox.online/tv-connect) calls `drop` /
+// The web tracker-login page (SITE_BASE_URL/tv-connect) calls `drop` /
 // `exchange` from a browser, so those need CORS. No cookies/credentials are
 // used (only the public anon key header), so `*` is safe.
 const CORS = {
@@ -56,15 +64,16 @@ Deno.serve(async (req) => {
       try {
         if (tracker === "anilist") {
           // AniList's implicit grant fails on an https web redirect, so the web
-          // page uses response_type=code and we exchange it here with the TV
-          // client's secret (client 48181 — separate from the app's 43052).
+          // page uses response_type=code and we exchange it here with the
+          // client secret — same AniList client the app uses (ANILIST_CLIENT_ID),
+          // which is why the secret has to live server-side.
           const tr = await fetch("https://anilist.co/api/v2/oauth/token", {
             method: "POST",
             headers: { "content-type": "application/json", accept: "application/json" },
             body: JSON.stringify({
               grant_type: "authorization_code",
-              client_id: "48181",
-              client_secret: Deno.env.get("ANILIST_TV_CLIENT_SECRET") ?? "",
+              client_id: ANILIST_CLIENT_ID,
+              client_secret: Deno.env.get("ANILIST_CLIENT_SECRET") ?? "",
               redirect_uri: redirectUri,
               code,
             }),
@@ -98,7 +107,7 @@ Deno.serve(async (req) => {
             method: "POST",
             headers: { "content-type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
-              client_id: "ac006943589381143c4c4e54eac93a89",
+              client_id: MAL_CLIENT_ID,
               grant_type: "authorization_code",
               code,
               code_verifier: codeVerifier ?? "",
@@ -123,7 +132,7 @@ Deno.serve(async (req) => {
           } });
         }
         if (tracker === "simkl") {
-          const CID = "8b847b09206ccdb0b3de4cc1293d6dd7d355821f5c179c57315da8ba9030eb53";
+          const CID = SIMKL_CLIENT_ID;
           const tr = await fetch("https://api.simkl.com/oauth/token", {
             method: "POST",
             headers: { "content-type": "application/json" },

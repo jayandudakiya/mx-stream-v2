@@ -116,9 +116,9 @@ class MetadataEnrichment {
   /// Cast + Relations for [d].
   ///
   /// Cast always comes from AniList or TMDB: MyAnimeList's v2 API serves no
-  /// characters at all (the field is accepted and ignored) and Simkl has no
-  /// people data, so there is nothing to switch to. Relations DO follow the
-  /// user's provider where that provider has them — see [_providerRelations].
+  /// characters at all (the field is accepted and ignored), so there is
+  /// nothing to switch to. Relations DO follow the user's provider where that
+  /// provider has them — see [_providerRelations].
   Future<({List<CastMember> cast, List<MediaRelation> relations})> fetch(
     MediaDetail d,
   ) async {
@@ -169,14 +169,10 @@ class MetadataEnrichment {
   /// Relations from the provider the user actually picked, or null to leave
   /// the AniList/TMDB answer alone.
   ///
-  /// Verified against the live APIs rather than assumed, because both of these
-  /// accept fields they do not serve:
+  /// Verified against the live API rather than assumed, because MAL
+  /// accepts fields it does not serve:
   ///  * MAL has `related_anime` / `related_manga` (with a relation label) and
   ///    `recommendations` — but no characters, so cast never moves.
-  ///  * Simkl has real `relations` on ANIME only. Its movie and TV records
-  ///    carry `users_recommendations` and nothing else, so that is what a
-  ///    Simkl user gets there. Anime never reaches Simkl anyway: it answers
-  ///    for movies and TV, and anime follows the AniList/MAL choice.
   Future<List<MediaRelation>?> _providerRelations(MediaDetail d) async {
     final prefs = _prefs?.call();
     if (prefs == null) return null;
@@ -187,8 +183,9 @@ class MetadataEnrichment {
         if (prefs.anime != AnimeProvider.mal || d.malId == null) return null;
         return await _malRelations(d.malId!, reading: reading);
       }
-      if (prefs.video != VideoProvider.simkl || d.tmdbId == null) return null;
-      return await _simklRelations(d.tmdbId!, isTv: d.tmdbIsTv);
+      // Movies/TV: TMDB is the sole metadata source and its relations are
+      // already attached upstream, so there is nothing extra to fetch here.
+      return null;
     } catch (_) {
       // Any miss falls through to what AniList/TMDB already returned, which is
       // strictly better than an empty Relations tab.
@@ -241,62 +238,6 @@ class MetadataEnrichment {
 
     take(relKey, null);
     take('recommendations', 'Recommended');
-    return out;
-  }
-
-  /// Simkl is keyed by its own id, so a TMDB id costs one lookup hop first.
-  /// Its entries carry no MAL or TMDB id of their own — only a Simkl id and a
-  /// slug — so relations opened from here match on title alone, which is the
-  /// same path an id-less source already takes.
-  Future<List<MediaRelation>> _simklRelations(
-    int tmdbId, {
-    required bool isTv,
-  }) async {
-    const key = {'simkl-api-key': Environment.simklClientId};
-    final found = await _dio.get<dynamic>(
-      'https://api.simkl.com/search/id',
-      queryParameters: {'tmdb': '$tmdbId', 'type': isTv ? 'show' : 'movie'},
-      options: Options(
-        headers: key,
-        validateStatus: (s) => s != null && s < 500,
-      ),
-    );
-    final list = found.data;
-    if (list is! List || list.isEmpty) return const [];
-    final ids = (list.first as Map?)?['ids'];
-    // `simkl_id` on search results, `simkl` on sync payloads — both appear.
-    final simklId = ids is Map ? (ids['simkl'] ?? ids['simkl_id']) : null;
-    if (simklId == null) return const [];
-
-    final full = await _get(
-      'https://api.simkl.com/${isTv ? 'tv' : 'movies'}/$simklId',
-      {'extended': 'full'},
-      key,
-    );
-    if (full == null) return const [];
-
-    final out = <MediaRelation>[];
-    // `relations` is the anime-only field; movies and TV only ever have the
-    // recommendations. Reading both keeps one parser for either shape.
-    for (final key in const ['relations', 'users_recommendations']) {
-      final entries = full[key];
-      if (entries is! List) continue;
-      for (final e in entries.take(20)) {
-        if (e is! Map) continue;
-        final title = ((e['en_title'] ?? e['title']) as String?)?.trim();
-        if (title == null || title.isEmpty) continue;
-        final poster = e['poster'] as String?;
-        out.add(
-          MediaRelation(
-            title: title,
-            cover: (poster != null && poster.isNotEmpty)
-                ? 'https://simkl.in/posters/${poster}_m.jpg'
-                : null,
-            relation: (e['relation_type'] as String?) ?? 'Recommended',
-          ),
-        );
-      }
-    }
     return out;
   }
 
@@ -403,7 +344,7 @@ class MetadataEnrichment {
 
   /// Resolves a TMDB id for a title that exposes none, by searching TMDB by
   /// [title] (+ [year] when known). Used as a fallback so id-less movie/TV
-  /// titles (e.g. some CloudStream sources) can still track on Simkl and pull
+  /// titles (e.g. some CloudStream sources) can still pull
   /// rich Cast/Relations. Conservative: prefers a year-constrained, exact-title
   /// match; returns null when nothing reasonable is found. Best-effort.
   ///

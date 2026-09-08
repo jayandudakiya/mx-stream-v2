@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// A tracker's mark — its brand colour and short name in a rounded tile, the
-/// way AniList/MAL/Simkl are recognised at a glance.
+/// way AniList/MAL are recognised at a glance.
 ///
 /// Drawn rather than shipped as image assets: three more PNGs per density is
 /// weight for something this small, and drawing it keeps the mark crisp at any
@@ -23,8 +23,6 @@ class TrackerBadge extends StatelessWidget {
       case 'myanimelist':
       case 'mal':
         return (bg: const Color(0xFF2E51A2), label: 'MAL', scale: 0.28);
-      case 'simkl':
-        return (bg: const Color(0xFF0B1622), label: 'SK', scale: 0.36);
       default:
         return (
           bg: const Color(0xFF3A3A3C),

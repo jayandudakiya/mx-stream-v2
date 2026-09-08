@@ -27,7 +27,7 @@ class BackupRemote {
 ///
 /// Each signed-in account gets exactly one row in the `backups` table, keyed
 /// by `user_key`. [upload] upserts it directly (no update-then-create dance —
-/// that was an Appwrite-ism; Postgres has native upsert).
+/// that was a legacy-backend-ism; Postgres has native upsert).
 class BackupCloud {
   BackupCloud(SupabaseService service, {BackupRemote? remote})
       : _remote = remote ?? BackupRemote(service);

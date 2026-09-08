@@ -199,7 +199,6 @@ class HomeCubit extends Cubit<HomeState> {
       zModeOn: kind != null,
       browseKind: kind,
       malPreferred: providerPrefs?.anime == AnimeProvider.mal,
-      simklPreferred: providerPrefs?.video == VideoProvider.simkl,
     );
   }
 

@@ -1,7 +1,6 @@
 import '../../features/home/cubit/home_rows_composer.dart';
 import 'anilist_catalogue.dart';
 import 'mal_catalogue.dart';
-import 'simkl_catalogue.dart';
 import 'tmdb_catalogue.dart';
 import 'zmode_ids.dart';
 
@@ -25,7 +24,7 @@ class HomeLayout {
   /// The [HomeRowsPrefs] key — the same string `layoutKeyFor` builds.
   final String key;
 
-  /// Display name of the catalogue behind it ("AniList", "Simkl").
+  /// Display name of the catalogue behind it ("AniList", "TMDB").
   final String provider;
 
   final ZKind kind;
@@ -42,7 +41,7 @@ class HomeLayout {
 /// Every arrangement the app can hold, in picker order.
 ///
 /// Anime, manga and novel come from AniList or MyAnimeList; movies and series
-/// from TMDB or Simkl. Only one side of each pair is live at a time (the
+/// from TMDB. Only one side of each pair is live at a time (the
 /// metadata provider setting decides), but all of them are listed: arranging
 /// the one you are about to switch to shouldn't require switching first.
 List<HomeLayout> allHomeLayouts() => [
@@ -70,17 +69,6 @@ List<HomeLayout> allHomeLayouts() => [
     provider: 'TMDB',
     kind: ZKind.movie,
     sectionTitles: TmdbCatalogue.rowTitles(),
-  ),
-  HomeLayout(
-    key: layoutKeyFor(
-      sourceId: '',
-      zModeOn: true,
-      browseKind: ZKind.movie,
-      simklPreferred: true,
-    ),
-    provider: 'Simkl',
-    kind: ZKind.movie,
-    sectionTitles: SimklCatalogue.rowTitles(),
   ),
 ];
 

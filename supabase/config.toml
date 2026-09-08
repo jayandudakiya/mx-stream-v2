@@ -1,0 +1,22 @@
+# Supabase CLI project config.
+#
+# `project_id` is a LOCAL label only — it distinguishes projects on your
+# machine and is not the remote project ref. The remote project is chosen by
+# `supabase link --project-ref <ref>`, which writes supabase/.temp (gitignored),
+# so no account-specific value is committed here.
+project_id = "orcabox"
+
+[functions.pair-tv]
+# The whole point of this function is to serve callers who are NOT signed in:
+#   • a signed-OUT TV polling for its pairing approval, and
+#   • the tv-connect web page in a phone browser, which has no OrcaBox account
+#     at all and hits the function cross-origin (so the browser sends an
+#     unauthenticated CORS preflight that gateway JWT checks reject).
+#
+# The function does its own authorization instead of relying on the gateway:
+#   • `poll` returns the minted login token only when the caller presents the
+#     tv_secret the TV itself generated — the on-screen code alone is not enough;
+#   • `approve` is the only action that needs an identity, and it validates the
+#     phone's bearer token explicitly via admin.auth.getUser();
+#   • `drop` can only write ciphertext the TV's nonce can decrypt.
+verify_jwt = false

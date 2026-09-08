@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (ok && context.mounted) Navigator.of(context).pop();
   }
 
-  /// context.l10n.forgotPassword — ask for the account email and send an Appwrite
+  /// context.l10n.forgotPassword — ask for the account email and send a Supabase
   /// recovery link (completed on the hosted reset page). Works while signed out.
   Future<void> _forgotPassword(BuildContext context) async {
     final controller = TextEditingController(text: _email.text.trim());
@@ -241,7 +241,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final x = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       // Avatars render at ~40–96px, so 256px is still 2–3× the display size —
-      // keeps the Appwrite bucket tiny (~15–30 KB/pic) with no visible quality loss.
+      // keeps the avatars bucket tiny (~15–30 KB/pic) with no visible quality loss.
       maxWidth: 256,
       maxHeight: 256,
       imageQuality: 80,
@@ -315,7 +315,7 @@ class ProfileScreen extends StatelessWidget {
     final x = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       // Avatars render at ~40–96px, so 256px is still 2–3× the display size —
-      // keeps the Appwrite bucket tiny (~15–30 KB/pic) with no visible quality loss.
+      // keeps the avatars bucket tiny (~15–30 KB/pic) with no visible quality loss.
       maxWidth: 256,
       maxHeight: 256,
       imageQuality: 80,

@@ -195,12 +195,16 @@ void main() {
     expect(al.lastFetchKind, MediaKind.manga);
   });
 
-  testWidgets('a connected Simkl shows it cannot track manga when reading', (
+  // The caption used to dim one tracker and append "(no manga)" because it had
+  // no reading side. That tracker was removed (NOTES task 15) and both
+  // remaining ones do have one, so the note is gone — these pin that the
+  // caption now just lists the connected trackers, whatever the item's kind.
+  testWidgets('the caption carries no no-manga note when reading', (
     tester,
   ) async {
     final al = _FakeTracker('AniList');
-    final simkl = _FakeTracker('Simkl');
-    sl.registerSingleton<TrackerHub>(TrackerHub([al, simkl]));
+    final mal = _FakeTracker('MyAnimeList');
+    sl.registerSingleton<TrackerHub>(TrackerHub([al, mal]));
 
     await tester.pumpWidget(
       harness(
@@ -213,22 +217,20 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('no manga'), findsOneWidget);
+    expect(find.textContaining('no manga'), findsNothing);
+    expect(find.textContaining('AniList'), findsWidgets);
   });
 
-  testWidgets(
-    "Simkl's no-manga note does NOT show for an anime item (unchanged)",
-    (tester) async {
-      final al = _FakeTracker('AniList');
-      final simkl = _FakeTracker('Simkl');
-      sl.registerSingleton<TrackerHub>(TrackerHub([al, simkl]));
+  testWidgets('nor for an anime item', (tester) async {
+    final al = _FakeTracker('AniList');
+    final mal = _FakeTracker('MyAnimeList');
+    sl.registerSingleton<TrackerHub>(TrackerHub([al, mal]));
 
-      await tester.pumpWidget(
-        harness(const TrackerSyncSheet(title: 'Some Anime', isAnime: true)),
-      );
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(
+      harness(const TrackerSyncSheet(title: 'Some Anime', isAnime: true)),
+    );
+    await tester.pumpAndSettle();
 
-      expect(find.textContaining('no manga'), findsNothing);
-    },
-  );
+    expect(find.textContaining('no manga'), findsNothing);
+  });
 }

@@ -7,10 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthException, UserAttributes;
 
-import '../../core/appwrite/appwrite_service.dart';
 import '../../core/supabase/auth_user.dart';
 import '../../core/supabase/supabase_service.dart';
-import 'migration_bridge.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
@@ -62,15 +60,12 @@ class AuthState extends Equatable {
       [status, user?.id, user?.name, user?.email, avatarUrl, busy, error, needsReconnect];
 }
 
-/// Owns Supabase email/password auth + the profile (name + avatar), plus the
-/// invisible migration from the legacy Appwrite account. Other features react
-/// to [isLoggedIn] via BlocBuilder/BlocListener.
+/// Owns Supabase email/password auth + the profile (name + avatar). Other
+/// features react to [isLoggedIn] via BlocBuilder/BlocListener.
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit(this._sb, this._aw, this._bridge) : super(const AuthState());
+  AuthCubit(this._sb) : super(const AuthState());
 
   final SupabaseService _sb;
-  final AppwriteService _aw;
-  final MigrationBridge _bridge;
 
   /// True when the Supabase client holds a session with a VALID (non-expired)
   /// token — i.e. one that can actually write to the cloud. Note a session can
@@ -170,10 +165,9 @@ class AuthCubit extends Cubit<AuthState> {
     await _validate(hadCache: false);
   }
 
-  /// Confirm the session with Supabase and refresh the cached user. If there
-  /// is no Supabase session, try the invisible Case-2 migration (a still
-  /// signed-in Appwrite user) before giving up. Any failure with a cached
-  /// session keeps it — a network blip shouldn't bounce the user to context.l10n.signIn.
+  /// Confirm the session with Supabase and refresh the cached user. Any failure
+  /// with a cached session keeps it — a network blip shouldn't bounce the user
+  /// to context.l10n.signIn.
   Future<void> _validate({required bool hadCache}) async {
     try {
       // Auto-heal: FORCE a fresh token. The stored session can look fine
@@ -193,29 +187,6 @@ class AuthCubit extends Cubit<AuthState> {
         ));
         return;
       }
-
-      // No usable Supabase session — check for a still-signed-in Appwrite user
-      // (Case 2: invisible migration). Guarded so a throw here doesn't skip the
-      // needsReconnect flag below (which would leave sync silently broken).
-      try {
-        final jwt = await _aw.mintJwt();
-        if (jwt != null) {
-          final migrated = await _bridge.trySessionMigration(jwt);
-          if (migrated && hasLiveSession) {
-            final u2 = _sb.client.auth.currentUser!;
-            final profile = await _loadProfile(u2.id);
-            final u = AuthUser.fromSupabase(u2, profile);
-            _writeCachedUser(u);
-            emit(state.copyWith(
-              status: AuthStatus.authenticated,
-              user: () => u,
-              avatarUrl: () => _avatarFromUser(u),
-              needsReconnect: false,
-            ));
-            return;
-          }
-        }
-      } catch (_) {/* Appwrite unavailable — fall through to reconnect */}
 
       if (hadCache) {
         // Keep the user logged-in from cache, but flag that the session is dead
@@ -245,20 +216,11 @@ class AuthCubit extends Cubit<AuthState> {
       await _sb.client.auth.signInWithPassword(email: email, password: password);
       return await _emitFromCurrentUser();
     } on AuthException catch (_) {
-      return _loginViaMigration(email, password);
-    } catch (_) {
-      return _loginViaMigration(email, password);
-    }
-  }
-
-  /// Legacy Appwrite account not yet migrated: heal it (Case 1) then sign in.
-  Future<bool> _loginViaMigration(String email, String password) async {
-    try {
-      final migrated = await _bridge.tryPasswordMigration(email, password);
-      if (migrated) return _emitFromCurrentUser();
+      // Supabase rejected the credentials themselves.
       emit(state.copyWith(busy: false, error: () => 'Invalid email or password'));
       return false;
     } catch (_) {
+      // Anything else (no network, server down) — not the user's password.
       emit(state.copyWith(busy: false, error: () => 'Authentication failed'));
       return false;
     }

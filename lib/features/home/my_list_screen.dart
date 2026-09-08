@@ -177,7 +177,6 @@ class _MyListViewState extends State<_MyListView> {
   PreferredProvider? _providerOf(Tracker? t) => switch (t?.displayName) {
     'AniList' => PreferredProvider.anilist,
     'MyAnimeList' => PreferredProvider.mal,
-    'Simkl' => PreferredProvider.simkl,
     _ => null,
   };
 

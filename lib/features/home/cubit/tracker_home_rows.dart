@@ -33,8 +33,9 @@ bool trackerServesKind(Tracker t, ZKind kind) => switch (kind) {
   ZKind.anime => true,
   // Reading works only where a reading library exists.
   ZKind.manga || ZKind.novel => t.supportsReading,
-  // Only Simkl has movie/series lists.
-  ZKind.movie || ZKind.tv => t.displayName == 'Simkl',
+  // No remaining tracker has movie/series lists: AniList and MyAnimeList both
+  // index anime and manga only (NOTES task 15 removed the one that did).
+  ZKind.movie || ZKind.tv => false,
 };
 
 /// `fetchList()` returns everything a tracker holds — this narrows it to the

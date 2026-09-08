@@ -231,7 +231,7 @@ class WatchHistory {
   /// a row is pushed only when the cloud lacks it or the local copy is newer, so
   /// this can never regress progress that another device saved more recently.
   /// Additive — deletes nothing. Used to seed a fresh device or backfill a
-  /// library orphaned by the Appwrite→Supabase move (rows kept their old id, so
+  /// library orphaned by the original backend move (rows kept their old id, so
   /// a new login couldn't read them). Returns (pushed, failed): `failed` counts
   /// upserts that errored (or a cloud read that failed), so the caller can tell
   /// whether the push was complete.

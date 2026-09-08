@@ -1,4 +1,4 @@
-// Tracker connections: AniList, MyAnimeList, Simkl.
+// Tracker connections: AniList, MyAnimeList.
 part of 'settings_screen.dart';
 
 
@@ -6,7 +6,7 @@ part of 'settings_screen.dart';
 // Connections (trackers)
 // ---------------------------------------------------------------------------
 
-/// Lists the trackers (AniList / MyAnimeList / Simkl); each opens its own
+/// Lists the trackers (AniList / MyAnimeList); each opens its own
 /// connect/disconnect screen.
 class ConnectionsScreen extends StatefulWidget {
   const ConnectionsScreen({super.key});
@@ -21,7 +21,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     final trackers = <Tracker>[
       sl<AniListService>(),
       sl<MalService>(),
-      sl<SimklService>(),
     ];
     return Scaffold(
       backgroundColor: AppColors.bg,

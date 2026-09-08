@@ -53,18 +53,17 @@ String layoutKeyFor({
   required bool zModeOn,
   ZKind? browseKind,
   bool malPreferred = false,
-  bool simklPreferred = false,
 }) {
   if (!zModeOn || browseKind == null) return 'source:$sourceId';
   final isVideo = browseKind == ZKind.movie || browseKind == ZKind.tv;
   final provider = isVideo
-      ? (simklPreferred ? 'simkl' : 'tmdb')
+      ? 'tmdb'
       : (malPreferred ? 'mal' : 'anilist');
   return '$provider::${browseKind.name}';
 }
 
 /// Whether a Z Mode layout can have tracker rows. Reading works on AniList
-/// and MAL; anime additionally so; movies/series only Simkl. TMDB never does
+/// and MAL; anime additionally so. TMDB never does
 /// (there is no TMDB account in the app to read a library from), and a
 /// source-backed home has no tracker rows either.
 bool trackerRowsForKind(ZKind? browseKind) => browseKind != null;

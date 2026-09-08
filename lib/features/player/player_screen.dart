@@ -206,7 +206,7 @@ class PlayerScreen extends StatefulWidget {
   /// Non-null only for anime.
   final String? scrobbleTitle;
 
-  /// TMDB id (movies/series) for Simkl tracking; [tmdbIsTv] selects namespace.
+  /// TMDB id (movies/series); [tmdbIsTv] selects TMDB's movie vs tv namespace.
   final int? tmdbId;
   final bool tmdbIsTv;
 
@@ -214,7 +214,7 @@ class PlayerScreen extends StatefulWidget {
   /// Passed straight through to the cubit, which owns every write.
   final bool peek;
 
-  /// IMDb id (movies/series) for Simkl tracking when no TMDB id is exposed.
+  /// IMDb id (movies/series), used when no TMDB id is exposed.
   final String? imdbId;
 
   /// Sub/Dub categories this title offers. When length <= 1 the player hides

@@ -20,24 +20,28 @@ SourceResultGroup _group(String sourceId, List<ProviderType> types) =>
 
 void main() {
   group('sourceChipGroups (drives the filter chip row)', () {
-    test('ignores the content filter so the chip row survives an empty view',
-        () {
-      // Two sources, each with only movies. With the "Anime" content filter,
-      // visibleGroups goes empty — but sourceChipGroups must keep both so the
-      // chips (and the selected one) stay on screen.
-      final state = SearchState(
-        status: SearchStatus.success,
-        query: 'x',
-        contentFilter: SearchContentFilter.anime,
-        groups: [
-          _group('cs:A', [ProviderType.movie]),
-          _group('cs:B', [ProviderType.movie]),
-        ],
-      );
-      expect(state.visibleGroups, isEmpty); // nothing matches the filter
-      expect(state.sourceChipGroups.map((g) => g.sourceId),
-          ['cs:A', 'cs:B']); // chips still there
-    });
+    test(
+      'ignores the content filter so the chip row survives an empty view',
+      () {
+        // Two sources, each with only movies. With the "Anime" content filter,
+        // visibleGroups goes empty — but sourceChipGroups must keep both so the
+        // chips (and the selected one) stay on screen.
+        final state = SearchState(
+          status: SearchStatus.success,
+          query: 'x',
+          contentFilter: SearchContentFilter.anime,
+          groups: [
+            _group('cs:A', [ProviderType.movie]),
+            _group('cs:B', [ProviderType.movie]),
+          ],
+        );
+        expect(state.visibleGroups, isEmpty); // nothing matches the filter
+        expect(state.sourceChipGroups.map((g) => g.sourceId), [
+          'cs:A',
+          'cs:B',
+        ]); // chips still there
+      },
+    );
 
     test('drops sources that returned nothing', () {
       final state = SearchState(
@@ -51,18 +55,18 @@ void main() {
       expect(state.sourceChipGroups.map((g) => g.sourceId), ['cs:A']);
     });
 
-    test('narrows to the active ecosystem tab', () {
+    test('offers every source that returned results, across ecosystems', () {
       final state = SearchState(
         status: SearchStatus.success,
         query: 'x',
-        ecosystem: SearchEcosystem.aniyomi,
         groups: [
           _group('ani:1', [ProviderType.anime]),
           _group('cs:B', [ProviderType.anime]),
         ],
       );
-      // Only the Aniyomi source's chip shows on the Aniyomi tab.
-      expect(state.sourceChipGroups.map((g) => g.sourceId), ['ani:1']);
+      // One aggregated result set now, so both sources get a chip — the chip
+      // is what narrows the view, not a tab above it.
+      expect(state.sourceChipGroups.map((g) => g.sourceId), ['ani:1', 'cs:B']);
     });
   });
 }

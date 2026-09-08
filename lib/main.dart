@@ -37,6 +37,7 @@ import 'core/theme/theme_controller.dart';
 import 'core/tv/tv_viewport.dart';
 import 'l10n/app_localizations.dart';
 import 'core/ui/global_messenger.dart';
+import 'core/privacy/privacy_consent_prefs.dart';
 import 'features/auth/auth_cubit.dart';
 import 'features/home/cubit/home_cubit.dart';
 import 'features/onboarding/boot_error_screen.dart';
@@ -383,6 +384,7 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
   Future<void> _run() async {
     final start = DateTime.now();
     await initDependencies();
+    await PrivacyConsentPrefs.init();
     if (mounted) {
       setState(() => _depsReady = true);
       if (_bootReady) {
@@ -399,7 +401,7 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
         '===== session started · v${info.version} (build ${info.buildNumber}) =====',
       );
     } catch (_) {}
-    // Restore a persisted Appwrite session (bounded so a slow network can't
+    // Restore a persisted Supabase session (bounded so a slow network can't
     // trap the splash). If signed in, pull the cloud library into the local
     // cache before Home warms so Continue Watching + My List are populated.
     try {
@@ -490,7 +492,7 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
   }
 
   Widget _buildShellHome() {
-    final onboarded = _onboardedOverride ?? isOnboarded();
+    final onboarded = (_onboardedOverride ?? isOnboarded()) && PrivacyConsentPrefs.isAccepted();
     return onboarded
         ? RootShell()
         : OnboardingScreen(

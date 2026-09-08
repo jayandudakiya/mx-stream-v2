@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../core/di/injector.dart';
+import '../../core/environment.dart';
 import '../../core/share/pair_link.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
@@ -15,7 +16,7 @@ import '../../l10n/l10n.dart';
 
 class TvTrackerConnectScreen extends StatefulWidget {
   const TvTrackerConnectScreen({super.key, required this.trackerId});
-  final String trackerId; // 'anilist' | 'mal' | 'simkl'
+  final String trackerId; // 'anilist' | 'mal'
 
   @override
   State<TvTrackerConnectScreen> createState() => _TvTrackerConnectScreenState();
@@ -29,7 +30,6 @@ class _TvTrackerConnectScreenState extends State<TvTrackerConnectScreen> {
   String get _label => switch (widget.trackerId) {
         'anilist' => context.l10n.anilist,
         'mal' => context.l10n.myAnimeList,
-        'simkl' => context.l10n.simkl,
         _ => widget.trackerId,
       };
 
@@ -152,7 +152,7 @@ class _TvTrackerConnectScreenState extends State<TvTrackerConnectScreen> {
                       // $_label login in the phone's browser and relays the token
                       // to this TV (same encrypted-blob path the poll consumes).
                       _qrOption(
-                        data: 'https://orcabox.online/tv-connect/'
+                        data: '${Environment.siteBaseUrl}/tv-connect/'
                             '?code=$_code&nonce=$_nonce&tracker=${widget.trackerId}',
                         title: context.l10n.noApp,
                         subtitle: 'Scan to log in with\n$_label in your browser',

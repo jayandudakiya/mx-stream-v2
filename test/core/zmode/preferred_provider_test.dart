@@ -10,7 +10,6 @@ import 'package:orcabox/core/zmode/metadata_provider_prefs.dart';
 PreferredProvider? providerOf(String? trackerName) => switch (trackerName) {
   'AniList' => PreferredProvider.anilist,
   'MyAnimeList' => PreferredProvider.mal,
-  'Simkl' => PreferredProvider.simkl,
   _ => null,
 };
 
@@ -18,7 +17,6 @@ void main() {
   test('each tracker names its own catalogue', () {
     expect(providerOf('AniList'), PreferredProvider.anilist);
     expect(providerOf('MyAnimeList'), PreferredProvider.mal);
-    expect(providerOf('Simkl'), PreferredProvider.simkl);
   });
 
   test('a tracker with no catalogue falls back', () {
@@ -39,7 +37,6 @@ void main() {
     'AniList' => PreferredProvider.anilist,
     'MyAnimeList' => PreferredProvider.mal,
     'TMDB' => PreferredProvider.tmdb,
-    'Simkl' => PreferredProvider.simkl,
     _ => null,
   };
 
@@ -47,7 +44,6 @@ void main() {
     expect(preferFromName('AniList'), PreferredProvider.anilist);
     expect(preferFromName('MyAnimeList'), PreferredProvider.mal);
     expect(preferFromName('TMDB'), PreferredProvider.tmdb);
-    expect(preferFromName('Simkl'), PreferredProvider.simkl);
   });
 
   test('a source name is not a catalogue', () {

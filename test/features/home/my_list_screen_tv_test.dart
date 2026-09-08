@@ -20,7 +20,7 @@ import 'package:orcabox/features/home/my_list_screen_tv.dart';
 // ── Minimal fakes ─────────────────────────────────────────────────────────────
 
 /// Stub [MyListStore]: returns a fixed list of [MediaItem]s with no Hive or
-/// Appwrite dependency. Only [all] and [revision] are called by [MyListCubit].
+/// backend dependency. Only [all] and [revision] are called by [MyListCubit].
 class _FakeMyListStore implements MyListStore {
   _FakeMyListStore(this._items) : revision = ValueNotifier<int>(0);
 

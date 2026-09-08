@@ -85,7 +85,6 @@ class _HomeRowsScreenState extends State<HomeRowsScreen> {
         zModeOn: _kind != null,
         browseKind: _kind,
         malPreferred: providerPrefs?.anime == AnimeProvider.mal,
-        simklPreferred: providerPrefs?.video == VideoProvider.simkl,
       ),
     );
     // Only a source-backed home can be un-editable on arrival: its rows come

@@ -7,7 +7,6 @@ import '../../core/theme/app_text.dart';
 import '../../core/tracker/mal_service.dart';
 import '../../core/tracker/relay/tracker_relay.dart';
 import '../../core/tracker/relay/tracker_relay_crypto.dart';
-import '../../core/tracker/simkl_service.dart';
 import '../../core/tracker/tracker.dart';
 import 'tv_pairing_service.dart';
 import '../../l10n/l10n.dart';
@@ -33,13 +32,14 @@ class _SendTrackersToTvScreenState extends State<SendTrackersToTvScreen> {
   late final _rows = <({String id, Tracker t})>[
     (id: 'anilist', t: sl<AniListService>()),
     (id: 'mal', t: sl<MalService>()),
-    (id: 'simkl', t: sl<SimklService>()),
   ];
 
   String _labelFor(String id, AppLocalizations l10n) => switch (id) {
     'anilist' => l10n.anilist,
     'mal' => l10n.myAnimeList,
-    _ => l10n.simkl,
+    // A switch on String needs a default; the id is a reasonable last resort
+    // if a tracker is ever added to _rows without a label here.
+    _ => id,
   };
   final _selected = <String>{};
   bool _busy = false;

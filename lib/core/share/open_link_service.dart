@@ -16,7 +16,7 @@ import 'pair_link.dart';
 import 'share_link.dart';
 
 /// Listens for incoming share links (`orcabox://open?…`) and pairing links
-/// (`orcabox://pair?…` or `https://orcabox.online/pair/?…`) and opens the
+/// (`orcabox://pair?…` or `$SITE_BASE_URL/pair/?…`) and opens the
 /// matching screen. Tracker OAuth listeners share the same [AppLinks] stream
 /// and ignore anything they don't own.
 class OpenLinkService {

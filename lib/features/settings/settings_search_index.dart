@@ -132,7 +132,7 @@ final settingsLeaves = <SettingsLeaf>[
   SettingsLeaf(
     LeafParent.playback,
     (l) => l.autoTrack,
-    keywords: 'scrobble anilist mal simkl',
+    keywords: 'scrobble anilist mal',
   ),
   SettingsLeaf(
     LeafParent.playback,

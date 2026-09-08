@@ -7,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:orcabox/core/app_mode.dart';
-import 'package:orcabox/core/appwrite/appwrite_service.dart';
 import 'package:orcabox/core/locale/locale_controller.dart';
 import 'package:orcabox/core/playback/playback_prefs.dart';
 import 'package:orcabox/core/playback/search_prefs.dart';
@@ -17,15 +16,8 @@ import 'package:orcabox/core/supabase/supabase_service.dart';
 import 'package:orcabox/core/tv/tv_focusable.dart';
 import 'package:orcabox/core/tv/tv_list_focusable.dart';
 import 'package:orcabox/features/auth/auth_cubit.dart';
-import 'package:orcabox/features/auth/migration_bridge.dart';
 import 'package:orcabox/features/settings/settings_screen_tv.dart';
 import 'package:orcabox/l10n/app_localizations.dart';
-
-MigrationBridge _fakeBridge() => MigrationBridge(
-      invoke: (_, __) async => const {'ok': false},
-      signInPassword: (_, __) async => false,
-      verifyOtp: (_, __) async => false,
-    );
 
 // ── Minimal stubs ─────────────────────────────────────────────────────────────
 
@@ -69,8 +61,8 @@ Future<void> _registerStubs() async {
     ..registerSingleton<PlaybackPrefs>(PlaybackPrefs());
 }
 
-/// Mocks the path_provider platform channel so that [AppwriteService] —
-/// which internally creates an Appwrite [Client] that asynchronously requests
+/// Mocks the path_provider platform channel so that the Supabase client —
+/// which asynchronously requests
 /// the app documents directory — does not throw [MissingPluginException]
 /// during tests. Called inside each [testWidgets] body after the binding is
 /// initialized (it cannot be called in [setUp] before the binding exists).
@@ -124,9 +116,9 @@ void main() {
   testWidgets(
     'SettingsScreenTv renders key tile titles and the first TvFocusable has autofocus',
     (tester) async {
-      // Mock path_provider before AppwriteService is created (Client async init).
+      // Mock path_provider before the Supabase client is created (async init).
       _mockPathProvider(tester);
-      final authCubit = AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge());
+      final authCubit = AuthCubit(SupabaseService());
       addTearDown(authCubit.close);
 
       // Taller than any real panel on purpose: the list builds lazily, so a
@@ -181,7 +173,7 @@ void main() {
     'SettingsScreenTv shows Sign-in tile when unauthenticated',
     (tester) async {
       _mockPathProvider(tester);
-      final authCubit = AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge());
+      final authCubit = AuthCubit(SupabaseService());
       addTearDown(authCubit.close);
 
       await tester.pumpWidget(
@@ -200,7 +192,7 @@ void main() {
     'SettingsScreenTv only the first TvFocusable has autofocus=true',
     (tester) async {
       _mockPathProvider(tester);
-      final authCubit = AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge());
+      final authCubit = AuthCubit(SupabaseService());
       addTearDown(authCubit.close);
 
       await tester.pumpWidget(
@@ -230,7 +222,7 @@ void main() {
     'duplicate-text nodes',
     (tester) async {
       _mockPathProvider(tester);
-      final authCubit = AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge());
+      final authCubit = AuthCubit(SupabaseService());
       addTearDown(authCubit.close);
       final handle = tester.ensureSemantics();
 

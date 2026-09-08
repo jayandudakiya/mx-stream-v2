@@ -15,7 +15,6 @@ import '../playback/playback_prefs.dart';
 import 'episode_number.dart';
 import 'metadata_filters.dart';
 import 'metadata_provider_prefs.dart';
-import 'simkl_catalogue.dart';
 import 'video_catalogue.dart';
 import 'match_store.dart';
 import 'source_matcher.dart';
@@ -33,13 +32,11 @@ class MetadataRepository implements CatalogueRepository {
     required SourceMatcher matcher,
     required ZKind Function() browseKind,
     MalCatalogue? mal,
-    SimklCatalogue? simkl,
     MetadataProviderPrefs? providerPrefs,
     void Function(String message)? onProviderFallback,
   }) : _al = anilist,
        _tmdb = tmdb,
        _mal = mal,
-       _simkl = simkl,
        _providerPrefs = providerPrefs,
        _onFallback = onProviderFallback,
        _src = sources,
@@ -48,7 +45,6 @@ class MetadataRepository implements CatalogueRepository {
 
   final AniListCatalogue _al;
   final MalCatalogue? _mal;
-  final SimklCatalogue? _simkl;
   final MetadataProviderPrefs? _providerPrefs;
 
   /// Told when a request had to be served by the other provider, so the UI can
@@ -121,44 +117,14 @@ class MetadataRepository implements CatalogueRepository {
   static String _fallbackName(AnimeCatalogue c) =>
       c is MalCatalogue ? 'MyAnimeList' : 'AniList';
 
-  /// The movie/TV twin of [_animeChain].
-  (VideoCatalogue, VideoCatalogue?) get _videoChain {
-    final simkl = _simkl;
-    if (simkl == null) return (_tmdb, null);
-    return _providerPrefs?.video == VideoProvider.simkl
-        ? (simkl, _tmdb)
-        : (_tmdb, simkl);
-  }
-
-  /// The movie/TV twin of [_viaAnime]. Interchangeable for the same reason:
-  /// Simkl carries a TMDB id on nearly everything, so both speak `tmdb:`.
+  /// The movie/TV twin of [_viaAnime] — except there is nothing to choose
+  /// between: TMDB is the sole movie/TV catalogue (NOTES task 15), so there is
+  /// no chain and no fallback. [prefer] is accepted so callers stay uniform
+  /// with the anime path; the only value it can name here is TMDB.
   Future<T> _viaVideo<T>(
     Future<T> Function(VideoCatalogue c) op, {
     PreferredProvider? prefer,
-  }) async {
-    var (primary, backup) = _videoChain;
-    final forced = switch (prefer) {
-      PreferredProvider.tmdb => _tmdb,
-      PreferredProvider.simkl => _simkl,
-      _ => null,
-    };
-    if (forced != null && forced != primary) {
-      backup = primary;
-      primary = forced;
-    }
-    try {
-      return await op(primary);
-    } catch (primaryError, primaryStack) {
-      if (backup == null) rethrow;
-      try {
-        final out = await op(backup);
-        _onFallback?.call(backup is SimklCatalogue ? 'Simkl' : 'TMDB');
-        return out;
-      } catch (_) {
-        Error.throwWithStackTrace(primaryError, primaryStack);
-      }
-    }
-  }
+  }) => op(_tmdb);
 
   // ── identity ─────────────────────────────────────────────────────────────
 
@@ -173,7 +139,7 @@ class MetadataRepository implements CatalogueRepository {
 
   /// The provider actually answering right now, so an error can name what
   /// failed. Hardcoding TMDB/AniList here stopped being true the moment MAL
-  /// and Simkl could stand in for them.
+  /// could stand in for them.
   @override
   String displayName(String sourceId) => nameForKind(_browseKind());
 
@@ -182,10 +148,10 @@ class MetadataRepository implements CatalogueRepository {
   /// Separate from [displayName] because that one only gets a source id, and
   /// the browse kind is the wrong answer for a title you opened from
   /// somewhere else — an anime opened while browsing movies was labelled
-  /// Simkl, which is a provider that never saw it.
+  /// the movie provider, which never saw it.
   String nameForKind(ZKind kind) {
     if (_isTmdb(kind)) {
-      return _providerPrefs?.video == VideoProvider.simkl ? 'Simkl' : 'TMDB';
+      return 'TMDB';
     }
     return _providerPrefs?.anime == AnimeProvider.mal
         ? 'MyAnimeList'
@@ -223,10 +189,10 @@ class MetadataRepository implements CatalogueRepository {
   ///
   /// Deliberately the chosen one, not the chain: the fallback only runs when a
   /// request fails, so a filter button must not appear because the backup
-  /// could have honoured it. AniList and TMDB can; MAL and Simkl accept filter
+  /// could have honoured it. AniList and TMDB can; MAL accepts filter
   /// parameters and return unfiltered results, which is worse than refusing.
   bool get supportsFilters => _isTmdb(_browseKind())
-      ? _videoChain.$1.supportsFilters
+      ? _tmdb.supportsFilters
       : _animeChain.$1.supportsFilters;
 
   /// Search and/or browse with filters. An empty [query] plus filters is a
@@ -414,7 +380,7 @@ class MetadataRepository implements CatalogueRepository {
 
   /// [e] with its display kept but id/url/number replaced by the canonical,
   /// position-numbered form — see the comment in [detail]. [number] in
-  /// particular is read as ground truth by trackers (AniList/MAL/Simkl
+  /// particular is read as ground truth by trackers (AniList/MAL
   /// scrobbling), filler lookups and skip-time lookups — all keyed by the
   /// canonical episode count, not whatever the source calls it (a source
   /// that restarts numbering per season would otherwise scrobble the wrong

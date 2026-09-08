@@ -120,6 +120,10 @@ android/app/src/test/resources/aniyomi/*.apk
 *.local
 supabase/.env
 supabase/.temp/
+# ...but the value-free templates DO ship, so a fresh clone knows what to fill
+# in. `.env.*` above would otherwise swallow them.
+!.env.example
+!supabase/.env.example
 
 # FVM Version Cache
 .fvm/

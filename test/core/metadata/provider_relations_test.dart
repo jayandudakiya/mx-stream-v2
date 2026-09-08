@@ -1,5 +1,5 @@
 // Relations follow the metadata provider the user picked; cast cannot, because
-// neither MAL nor Simkl serves any. The payloads below are trimmed copies of
+// MAL serves none. The payloads below are trimmed copies of
 // what the live endpoints actually returned when this was written — both APIs
 // accept fields they do not answer with, so the shapes are worth pinning.
 
@@ -63,16 +63,6 @@ const _malManga = {
   ],
 };
 
-const _simklFull = {
-  'users_recommendations': [
-    {
-      'title': 'Interstellar',
-      'poster': '20/2052598c2716ef054',
-      'ids': {'simkl': 250822},
-    },
-  ],
-};
-
 MediaDetail _detail({
   required ProviderType type,
   int? malId,
@@ -106,11 +96,9 @@ void main() {
 
   Future<MetadataProviderPrefs> prefsWith({
     AnimeProvider? anime,
-    VideoProvider? video,
   }) async {
     final p = await MetadataProviderPrefs.open();
     if (anime != null) await p.setAnime(anime);
-    if (video != null) await p.setVideo(video);
     return p;
   }
 
@@ -167,31 +155,6 @@ void main() {
     expect(out.relations, isEmpty);
   });
 
-  test('Simkl answers for a movie, resolving its own id first', () async {
-    final a = _Adapter((uri) {
-      if (uri.path == '/search/id') {
-        return [
-          {
-            'ids': {'simkl': 472214},
-          },
-        ];
-      }
-      if (uri.path == '/movies/472214') return _simklFull;
-      return null;
-    });
-    final out = await build(
-      a,
-      await prefsWith(video: VideoProvider.simkl),
-    ).fetch(_detail(type: ProviderType.movie, tmdbId: 27205));
-
-    expect(a.seen.map((u) => u.path), contains('/movies/472214'));
-    expect(out.relations.single.title, 'Interstellar');
-    expect(out.relations.single.cover, contains('simkl.in/posters/'));
-  });
-
-  // The two TMDB calls go out together now. The whole reason that is safe is
-  // that a dead request answers null rather than throwing — if it threw, one
-  // failure would take the other's result with it and blank both tabs.
   group('one failed TMDB call does not blank the other', () {
     const credits = {
       'cast': [

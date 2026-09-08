@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:orcabox/core/anilist/anilist_service.dart';
 import 'package:orcabox/core/tracker/mal_service.dart';
 import 'package:orcabox/core/tracker/relay/tracker_relay.dart';
-import 'package:orcabox/core/tracker/simkl_service.dart';
 import 'package:orcabox/features/auth/send_trackers_to_tv_screen.dart';
 import 'package:orcabox/features/auth/tv_pairing_service.dart';
 
@@ -56,28 +55,6 @@ class _FakeMalService extends ChangeNotifier implements MalService {
       isConnected ? {'token': 'fake-mal-token'} : null;
 }
 
-class _FakeSimklService extends ChangeNotifier implements SimklService {
-  _FakeSimklService({required this.isConnected, this.viewerName});
-
-  @override
-  noSuchMethod(Invocation i) => super.noSuchMethod(i);
-
-  @override
-  final bool isConnected;
-
-  @override
-  String get displayName => 'Simkl';
-
-  @override
-  final String? viewerName;
-
-  @override
-  String? get viewerAvatar => null;
-
-  @override
-  Map<String, dynamic>? exportSession() =>
-      isConnected ? {'token': 'fake-simkl-token'} : null;
-}
 
 /// Stub — the widget test never taps Send, so `approve` is never invoked.
 class _FakeTvPairingService implements TvPairingService {
@@ -92,16 +69,13 @@ void _register(
   GetIt sl, {
   required bool aniConnected,
   required bool malConnected,
-  required bool simklConnected,
 }) {
   final ani = _FakeAniListService(isConnected: aniConnected, viewerName: aniConnected ? 'kai' : null);
   final mal = _FakeMalService(isConnected: malConnected, viewerName: malConnected ? 'kai' : null);
-  final simkl = _FakeSimklService(isConnected: simklConnected, viewerName: simklConnected ? 'kai' : null);
   sl.registerSingleton<AniListService>(ani);
   sl.registerSingleton<MalService>(mal);
-  sl.registerSingleton<SimklService>(simkl);
   sl.registerSingleton<TrackerRelay>(
-      TrackerRelay({'anilist': ani, 'mal': mal, 'simkl': simkl}));
+      TrackerRelay({'anilist': ani, 'mal': mal}));
   sl.registerSingleton<TvPairingService>(_FakeTvPairingService());
 }
 
@@ -111,7 +85,7 @@ void main() {
 
   testWidgets('lists connected trackers as selectable and shows a Send button',
       (tester) async {
-    _register(sl, aniConnected: true, malConnected: false, simklConnected: false);
+    _register(sl, aniConnected: true, malConnected: false);
     await tester.pumpWidget(
       const MaterialApp(home: SendTrackersToTvScreen(code: 'ABCD2345', nonce: 'x')),
     );

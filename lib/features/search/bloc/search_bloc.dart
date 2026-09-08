@@ -38,7 +38,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<SearchSortChanged>(_onSortChanged);
     on<SearchScopeChanged>(_onScopeChanged);
     on<SearchSourceFilterChanged>(_onSourceFilterChanged);
-    on<SearchEcosystemChanged>(_onEcosystemChanged);
+    on<SearchScopeSourceChanged>(_onScopeSourceChanged);
     on<SearchContentFilterChanged>(_onContentFilterChanged);
     on<SearchAudioFilterChanged>(_onAudioFilterChanged);
     on<SearchGenreFilterChanged>(_onGenreFilterChanged);
@@ -164,7 +164,20 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       genreFilter: prefs.genre,
       statusFilter: statusFilter,
       currentSourceOnly: prefs.currentSourceOnly,
+      // Seeded ONCE from the active source so Search opens scoped to whatever
+      // the user was browsing. From here on it is Search's own state: the
+      // picker moves it via SearchScopeSourceChanged and Home is never told.
+      searchSourceId: _initialScopeSourceId(),
     );
+  }
+
+  /// The active source at construction time, or null when nothing is
+  /// registered yet (tests, and the window before boot finishes). Read exactly
+  /// once — never live, or Search would follow Home again.
+  static String? _initialScopeSourceId() {
+    if (!sl.isRegistered<ActiveSourceCubit>()) return null;
+    final id = sl<ActiveSourceCubit>().state;
+    return id.isEmpty ? null : id;
   }
 
   /// Debounce for the LIGHTWEIGHT autocomplete only — never the heavy search.
@@ -272,7 +285,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       state.copyWith(
         currentSourceOnly: event.currentSourceOnly,
         sourceFilter: kAllSources,
-        ecosystem: SearchEcosystem.all,
       ),
     );
     _prefs.setCurrentSourceOnly(event.currentSourceOnly);
@@ -288,15 +300,36 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     emit(state.copyWith(sourceFilter: event.sourceId));
   }
 
-  /// Switches the ecosystem tab. This is a pure VIEW filter over the loaded
-  /// groups (no re-search). Switching tabs can hide the source group the
-  /// per-source chip pointed at, so reset that chip to "all sources" — the user
-  /// never lands on an empty filtered view.
-  void _onEcosystemChanged(
-    SearchEcosystemChanged event,
+  /// Points the search at one source and re-runs it.
+  ///
+  /// Deliberately does NOT touch `ActiveSourceCubit`: that singleton drives the
+  /// Home channel, and writing to it here is what used to reload Home when you
+  /// picked a source in Search. Scoping to a source also turns scoping ON, so
+  /// this covers both "All sources -> one source" and "one source -> another"
+  /// in a single event; [SearchScopeChanged] alone could not, because it no-ops
+  /// when the flag is already true.
+  Future<void> _onScopeSourceChanged(
+    SearchScopeSourceChanged event,
     Emitter<SearchState> emit,
-  ) {
-    emit(state.copyWith(ecosystem: event.ecosystem, sourceFilter: kAllSources));
+  ) async {
+    if (state.currentSourceOnly && state.searchSourceId == event.sourceId) {
+      return;
+    }
+    emit(
+      state.copyWith(
+        searchSourceId: event.sourceId,
+        currentSourceOnly: true,
+        // The per-source chip is meaningless once scoped to a single source.
+        sourceFilter: kAllSources,
+      ),
+    );
+    // Persist the TOGGLE only. WHICH source is Search's own session state on
+    // purpose: it is seeded from the active source on open, so persisting it
+    // would let a stale pick outrank what the user is actually browsing.
+    if (!_prefs.currentSourceOnly) _prefs.setCurrentSourceOnly(true);
+    if (state.query.trim().isNotEmpty) {
+      await _runSearch(state.query.trim(), emit);
+    }
   }
 
   void _onContentFilterChanged(
@@ -355,15 +388,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     _suggestDebounce?.cancel();
     final q = (event.query ?? state.query).trim();
     if (q.isEmpty) return;
-    // Reset only the per-search source chip + ecosystem tab — the user's
-    // remembered sort and content/audio/genre filters persist across searches
-    // (and screen opens); a fresh search always lands on the "All" tab.
+    // Reset only the per-search source chip — the user's remembered sort and
+    // content/audio/genre filters persist across searches (and screen opens).
     emit(
       state.copyWith(
         query: q,
         suggestions: const [],
         sourceFilter: kAllSources,
-        ecosystem: SearchEcosystem.all,
       ),
     );
     await _runSearch(q, emit);
@@ -407,8 +438,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     // switched off for search (search-only — doesn't affect Home use).
     List<({String id, String name})> sources;
     if (state.currentSourceOnly) {
-      final activeId = sl<ActiveSourceCubit>().state;
-      sources = [(id: activeId, name: _repo.displayName(activeId))];
+      // Search's OWN scope — deliberately NOT ActiveSourceCubit, which Home
+      // listens to. The fallback covers a bloc built before any source was
+      // registered, so nothing seeded the scope.
+      final scopedId =
+          state.searchSourceId ??
+          (sl.isRegistered<ActiveSourceCubit>()
+              ? sl<ActiveSourceCubit>().state
+              : '');
+      sources = scopedId.isEmpty
+          ? const []
+          : [(id: scopedId, name: _repo.displayName(scopedId))];
     } else {
       final prefs = sl<SearchSourcePrefs>();
       sources = _modeSources().where((s) => prefs.isIncluded(s.id)).toList();
@@ -873,7 +913,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         respondedSources: const {},
         suggestions: const [],
         sourceFilter: kAllSources,
-        ecosystem: SearchEcosystem.all,
       ),
     );
   }

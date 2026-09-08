@@ -1,5 +1,5 @@
 // Switching metadata provider has to clear search results. The Z Mode source
-// id is 'zm' whichever of AniList/MAL/TMDB/Simkl answered, so nothing about a
+// id is 'zm' whichever of AniList/MAL/TMDB answered, so nothing about a
 // stale result looks stale — it carries the same source id the new provider
 // would use.
 
@@ -43,11 +43,7 @@ void main() {
     expect(MetadataProviderPrefs.revision.value, after);
   });
 
-  test('the video provider bumps it too', () async {
-    final before = MetadataProviderPrefs.revision.value;
-
-    await prefs.setVideo(VideoProvider.simkl);
-
-    expect(MetadataProviderPrefs.revision.value, greaterThan(before));
-  });
+  // A "the video provider bumps it too" test used to sit here. Movie/TV
+  // metadata has no setting any more (TMDB only, NOTES task 15), so there is
+  // no second axis to bump the revision.
 }

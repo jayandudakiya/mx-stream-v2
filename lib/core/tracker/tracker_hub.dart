@@ -6,7 +6,7 @@ import '../privacy/incognito_mode.dart';
 import 'tracker.dart';
 
 /// Fans every list/progress write out to all connected trackers at once
-/// (AniList + MyAnimeList + Simkl). Each tracker self-gates (skips when
+/// (AniList + MyAnimeList). Each tracker self-gates (skips when
 /// disconnected / auto-sync off / type not applicable), and a failure in one
 /// never blocks the others.
 class TrackerHub {
@@ -18,7 +18,7 @@ class TrackerHub {
   bool get anyConnected => connected.isNotEmpty;
 
   /// Trackers that can actually sync in [mode]. In a reading mode this drops
-  /// video-only trackers (Simkl), which would otherwise be offered as an
+  /// video-only trackers, which would otherwise be offered as an
   /// account that can never sync a single title there. Anime mode returns
   /// every tracker, so today's behaviour is unchanged.
   ///

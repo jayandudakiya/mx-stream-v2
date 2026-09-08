@@ -1,26 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:orcabox/core/appwrite/appwrite_service.dart';
 import 'package:orcabox/core/supabase/supabase_service.dart';
 import 'package:orcabox/core/tv/tv_focusable.dart';
 import 'package:orcabox/features/auth/auth_cubit.dart';
 import 'package:orcabox/features/auth/auth_screens_tv.dart';
-import 'package:orcabox/features/auth/migration_bridge.dart';
 
 // ── Minimal fakes ─────────────────────────────────────────────────────────────
-
-MigrationBridge _fakeBridge() => MigrationBridge(
-      invoke: (_, __) async => const {'ok': false},
-      signInPassword: (_, __) async => false,
-      verifyOtp: (_, __) async => false,
-    );
 
 /// Extends [AuthCubit] with stub dependencies and a preset initial state.
 /// Overrides [login], [logout], and [signUp] so no network calls are made.
 class _FakeAuthCubit extends AuthCubit {
   _FakeAuthCubit(AuthState preset)
-      : super(SupabaseService(), AppwriteService(), _fakeBridge()) {
+      : super(SupabaseService()) {
     emit(preset);
   }
 
@@ -166,10 +158,10 @@ void main() {
       // the gate — and that a focusable button IS shown for a logged-in state
       // via a direct check on the widget tree shape.
       //
-      // Since constructing a real appwrite User is non-trivial in a unit test,
+      // Since constructing a real Supabase User is non-trivial in a unit test,
       // we verify the unauthenticated guard and the TvFocusable count for an
       // unauthenticated state here. The logged-in path is covered in
-      // integration tests that use a mocked Appwrite session.
+      // integration tests that use a mocked auth session.
       final cubit = _FakeAuthCubit(
         const AuthState(status: AuthStatus.unauthenticated),
       );

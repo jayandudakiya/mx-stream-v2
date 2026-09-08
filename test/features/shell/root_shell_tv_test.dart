@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:orcabox/core/zmode/zmode_prefs.dart';
-import 'package:orcabox/core/appwrite/appwrite_service.dart';
 import 'package:orcabox/core/anilist/anilist_service.dart';
 import 'package:orcabox/core/announce/announcement.dart';
 import 'package:orcabox/core/announce/announcement_service.dart';
@@ -39,20 +38,12 @@ import 'package:orcabox/core/state/active_source_cubit.dart';
 import 'package:orcabox/core/supabase/supabase_service.dart';
 import 'package:orcabox/core/theme/theme_controller.dart';
 import 'package:orcabox/core/tracker/mal_service.dart';
-import 'package:orcabox/core/tracker/simkl_service.dart';
 import 'package:orcabox/core/tracker/tracker_hub.dart';
 import 'package:orcabox/core/tv/tv_focusable.dart';
 import 'package:orcabox/core/tv/tv_viewport.dart';
 import 'package:orcabox/features/auth/auth_cubit.dart';
-import 'package:orcabox/features/auth/migration_bridge.dart';
 import 'package:orcabox/features/home/cubit/home_cubit.dart';
 import 'package:orcabox/features/shell/root_shell_tv.dart';
-
-MigrationBridge _fakeBridge() => MigrationBridge(
-      invoke: (_, __) async => const {'ok': false},
-      signInPassword: (_, __) async => false,
-      verifyOtp: (_, __) async => false,
-    );
 
 // ── Minimal fakes (no platform channels, no Hive) ──────────────────────────
 
@@ -205,22 +196,6 @@ class _FakeMalService extends ChangeNotifier implements MalService {
   String? get viewerAvatar => null;
 }
 
-class _FakeSimklService extends ChangeNotifier implements SimklService {
-  @override
-  noSuchMethod(Invocation i) => super.noSuchMethod(i);
-
-  @override
-  bool get isConnected => false;
-
-  @override
-  String get displayName => 'Simkl';
-
-  @override
-  String? get viewerName => null;
-
-  @override
-  String? get viewerAvatar => null;
-}
 
 /// Fake DownloadPrefs — always null (default location), no Hive box.
 class _FakeDownloadPrefs extends DownloadPrefs {
@@ -283,13 +258,13 @@ void main() {
 
   setUpAll(() {
     // Ensure the test binding is initialised so we can mock platform channels
-    // before AppwriteService starts its async Appwrite Client init (which
+    // before the Supabase client starts its async init (which
     // calls getApplicationDocumentsDirectory via path_provider).
     TestWidgetsFlutterBinding.ensureInitialized();
   });
 
   setUp(() async {
-    // Mock path_provider so AppwriteService's async ClientIO init does not
+    // Mock path_provider so the client's async storage init does not
     // throw MissingPluginException across test boundaries.
     TestWidgetsFlutterBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
@@ -319,7 +294,7 @@ void main() {
     final dio = Dio();
     final fakeRepo = _FakeSourceRepository();
     activeSource = ActiveSourceCubit(); // nullable box → no Hive
-    authCubit = AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge()); // cache box is nullable → no Hive
+    authCubit = AuthCubit(SupabaseService()); // cache box is nullable → no Hive
 
     sl.registerSingleton<AppMode>(const AppMode(isTv: false));
     sl.registerSingleton<HomeCubit>(HomeCubit(fakeRepo));
@@ -342,7 +317,6 @@ void main() {
     sl.registerSingleton<AniyomiManager>(AniyomiManager());
     sl.registerSingleton<AniListService>(_FakeAniListService());
     sl.registerSingleton<MalService>(_FakeMalService());
-    sl.registerSingleton<SimklService>(_FakeSimklService());
     sl.registerSingleton<TitleSuggestionService>(TitleSuggestionService(dio));
     sl.registerSingleton<DownloadPrefs>(_FakeDownloadPrefs());
     sl.registerSingleton<AiringService>(_FakeAiringService());
@@ -353,7 +327,7 @@ void main() {
     // fakes report isConnected == false, so `connected` is empty and every
     // read path safely no-ops — same construction as the injector.
     sl.registerSingleton<TrackerHub>(
-      TrackerHub([sl<AniListService>(), sl<MalService>(), sl<SimklService>()]),
+      TrackerHub([sl<AniListService>(), sl<MalService>()]),
     );
     // App-wide content mode (read by Home + Search). Wraps the ActiveSourceCubit
     // above; opens its own tiny 'content_mode' Hive box.

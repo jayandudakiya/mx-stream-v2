@@ -84,13 +84,8 @@ void main() {
         'tmdb::movie',
       );
       expect(
-        layoutKeyFor(
-          sourceId: 'zm',
-          zModeOn: true,
-          browseKind: ZKind.tv,
-          simklPreferred: true,
-        ),
-        'simkl::tv',
+        layoutKeyFor(sourceId: 'zm', zModeOn: true, browseKind: ZKind.tv),
+        'tmdb::tv',
       );
     });
 

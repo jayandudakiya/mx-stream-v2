@@ -92,11 +92,23 @@ static const String apiKey = String.fromEnvironment(
 
 ### Other Configurable Dart Defines
 
+Every one of these lives in `.env` (gitignored) and is passed with
+`--dart-define-from-file=.env`. Copy `.env.example` and fill it in. Nothing in
+this table has a value baked into the source any more — a missing key means the
+feature that needs it degrades, it does not silently fall back to someone's key.
+
 | Environment Variable | Location | Purpose | Default |
 |---|---|---|---|
-| `TMDB_API_KEY` | [`lib/core/metadata/tmdb.dart`](lib/core/metadata/tmdb.dart) | TMDB API v3 key for search/trailers/enrichment | Embedded public fallback |
-| `SUPABASE_URL` | [`lib/core/environment.dart`](lib/core/environment.dart) | Supabase project endpoint | OrcaBox public endpoint |
-| `SUPABASE_ANON_KEY` | [`lib/core/environment.dart`](lib/core/environment.dart) | Supabase client anon public key | Embedded public anon key |
+| `SUPABASE_URL` | [`lib/core/environment.dart`](lib/core/environment.dart) | Supabase project endpoint | none — auth/sync off |
+| `SUPABASE_ANON_KEY` | [`lib/core/environment.dart`](lib/core/environment.dart) | Supabase client anon public key | none — auth/sync off |
+| `TMDB_API_KEY` | [`lib/core/metadata/tmdb.dart`](lib/core/metadata/tmdb.dart) | TMDB API v3 key for search/trailers/enrichment | none — movie/TV metadata off |
+| `ANILIST_CLIENT_ID` | [`lib/core/environment.dart`](lib/core/environment.dart) | AniList OAuth client (implicit grant) | none — AniList login off |
+| `ANILIST_CLIENT_SECRET` | — (server-side only) | Needed by the `pair-tv` edge function for the TV web login; the app never reads it | none |
+| `MAL_CLIENT_ID` | [`lib/core/environment.dart`](lib/core/environment.dart) | MyAnimeList OAuth2 PKCE client + `X-MAL-CLIENT-ID` header | none — MAL login off |
+| `SITE_BASE_URL` | [`lib/core/environment.dart`](lib/core/environment.dart) | Deployed site origin: share/open, TV pairing, password reset | `https://orcabox.vercel.app` |
+| `APP_REPO` | [`lib/core/app_config.dart`](lib/core/app_config.dart) | `owner/name` for the updater, announcements feed and About links | `jayandudakiya8100/mx-stream-app` |
+| `DISCORD_APPLICATION_ID` | [`lib/core/discord/discord_config.dart`](lib/core/discord/discord_config.dart) | Discord Rich Presence application | none — Rich Presence off |
+| `DISCORD_INVITE_URL` | [`lib/core/app_config.dart`](lib/core/app_config.dart) | Community Discord invite | `''` — every Discord entry point hidden |
 | `SUBDL_API_KEY` | [`lib/core/playback/subtitle_download_service.dart`](lib/core/playback/subtitle_download_service.dart) | SubDL API key for subtitle downloads | `''` (empty) |
 | `EXO_SPIKE` | [`lib/features/player/tv_exo_spike_screen.dart`](lib/features/player/tv_exo_spike_screen.dart) | Enable experimental ExoPlayer spike | `false` |
 

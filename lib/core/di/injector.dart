@@ -68,12 +68,10 @@ import '../anilist/anilist_network_policy.dart';
 import '../anilist/anilist_service.dart';
 import '../anilist/anilist_store.dart';
 import '../tracker/mal_service.dart';
-import '../tracker/simkl_service.dart';
 import '../tracker/tracker_binding_store.dart';
 import '../tracker/tracker_hub.dart';
 import '../tracker/relay/tracker_relay.dart';
 import '../app_mode.dart';
-import '../appwrite/appwrite_service.dart';
 import '../backup/backup_service.dart';
 import '../backup/sources_backup.dart';
 import '../backup/library_backup.dart';
@@ -100,7 +98,6 @@ import '../mihon/mihon_extension_service.dart';
 import '../mihon/mihon_manager.dart';
 import '../mihon/mihon_provider.dart';
 import '../../features/auth/auth_cubit.dart';
-import '../../features/auth/migration_bridge.dart';
 import '../../features/auth/tv_pairing_service.dart';
 import '../../features/home/cubit/home_cubit.dart';
 import '../../features/watch_together/watch_room_service.dart';
@@ -108,7 +105,6 @@ import '../../features/watch_together/watch_together_controller.dart';
 import '../cast/cast_controller.dart';
 import '../cast/cast_proxy.dart';
 import '../supabase/supabase_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' show OtpType;
 
 final GetIt sl = GetIt.instance;
 
@@ -198,9 +194,6 @@ Future<void> initDependencies() async {
   await openBoxSafely(AuthCubit.cacheBoxName);
   await ProviderDownloader.init();
 
-  // Appwrite first (no network on construct) — kept for mintJwt (the
-  // legacy-session-migration path in MigrationBridge/AuthCubit).
-  sl.registerSingleton<AppwriteService>(AppwriteService());
   // Supabase is already Supabase.initialize()d in main.dart; this is just the
   // thin client wrapper the stores/services depend on.
   sl.registerSingleton<SupabaseService>(SupabaseService());
@@ -210,44 +203,6 @@ Future<void> initDependencies() async {
   // Resolved lazily at call time; null when signed out so the stores stay
   // local-only.
   String? currentUserId() => sl<SupabaseService>().currentUserId();
-
-  // Client half of the invisible Appwrite→Supabase account migration. Wired
-  // with real closures here (not in migration_bridge.dart) so the bridge
-  // itself stays Supabase-type-free and unit-testable.
-  sl.registerSingleton<MigrationBridge>(
-    MigrationBridge(
-      invoke: (name, body) async {
-        final r = await sl<SupabaseService>().client.functions.invoke(
-          name,
-          body: body,
-        );
-        return (r.data as Map).cast<String, dynamic>();
-      },
-      signInPassword: (email, pw) async {
-        try {
-          await sl<SupabaseService>().client.auth.signInWithPassword(
-            email: email,
-            password: pw,
-          );
-          return sl<SupabaseService>().client.auth.currentUser != null;
-        } catch (_) {
-          return false;
-        }
-      },
-      verifyOtp: (email, token) async {
-        try {
-          await sl<SupabaseService>().client.auth.verifyOTP(
-            email: email,
-            token: token,
-            type: OtpType.email,
-          );
-          return sl<SupabaseService>().client.auth.currentUser != null;
-        } catch (_) {
-          return false;
-        }
-      },
-    ),
-  );
 
   await ResumeStore.init();
   sl.registerSingleton<ResumeStore>(ResumeStore());
@@ -430,14 +385,12 @@ Future<void> initDependencies() async {
   // Retry any scrobbles that queued while offline/disconnected last session.
   sl<AniListService>().flushPending();
 
-  // Additional trackers (MyAnimeList, Simkl) + the fan-out hub. Each writes to
+  // Additional trackers (MyAnimeList) + the fan-out hub. Each writes to
   // its own service; the hub pushes every list/progress change to all connected.
   await MalService.init();
   sl.registerSingleton<MalService>(MalService(dio));
-  await SimklService.init();
-  sl.registerSingleton<SimklService>(SimklService(dio));
   sl.registerSingleton<TrackerHub>(
-    TrackerHub([sl<AniListService>(), sl<MalService>(), sl<SimklService>()]),
+    TrackerHub([sl<AniListService>(), sl<MalService>()]),
   );
   // Manual match corrections (the sync sheet's "Change match"): show → chosen
   // tracker entry id, persisted so a fixed match sticks.
@@ -448,7 +401,6 @@ Future<void> initDependencies() async {
     () => TrackerRelay({
       'anilist': sl<AniListService>(),
       'mal': sl<MalService>(),
-      'simkl': sl<SimklService>(),
     }),
   );
 
@@ -457,16 +409,9 @@ Future<void> initDependencies() async {
   // boot; navigation is deferred until the root Navigator exists.
   sl.registerSingleton<OpenLinkService>(OpenLinkService());
 
-  // AuthCubit is global so any widget can gate on login. SupabaseService,
-  // AppwriteService (mintJwt for migration) and MigrationBridge are already
-  // registered above.
-  sl.registerSingleton<AuthCubit>(
-    AuthCubit(
-      sl<SupabaseService>(),
-      sl<AppwriteService>(),
-      sl<MigrationBridge>(),
-    ),
-  );
+  // AuthCubit is global so any widget can gate on login. SupabaseService is
+  // already registered above.
+  sl.registerSingleton<AuthCubit>(AuthCubit(sl<SupabaseService>()));
 
   final manager = ProviderManager(dio: dio);
   sl.registerSingleton<ProviderManager>(manager);

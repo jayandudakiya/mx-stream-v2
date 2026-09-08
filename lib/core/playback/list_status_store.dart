@@ -7,7 +7,7 @@ import '../models/watch_status.dart';
 
 /// Local, device-side status for every title in My List, keyed by
 /// `sourceId::id`. Deliberately a SEPARATE box from [MyListStore] (which clears
-/// + repopulates on Appwrite login) so a cloud pull never wipes statuses. For
+/// + repopulates on login) so a cloud pull never wipes statuses. For
 /// anime the authoritative copy lives on AniList; this is the local mirror that
 /// also covers movies and offline use.
 class ListStatusStore {

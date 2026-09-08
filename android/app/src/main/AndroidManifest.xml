@@ -85,12 +85,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
-            <!-- Tracker OAuth redirects (AniList / MyAnimeList / Simkl), shared
+            <!-- Tracker OAuth redirects (AniList / MyAnimeList), shared
                  titles, watch rooms and TV pairing, all captured by app_links.
 
                  `orcabox` is the app's only scheme. The upstream project's
                  scheme was dropped in the OrcaBox rebrand, which means tracker
-                 sign-in stays inert until OrcaBox's own AniList / MAL / Simkl
+                 sign-in stays inert until OrcaBox's own AniList / MAL
                  OAuth apps are registered with `orcabox://…` redirect URIs, and
                  the share/pair pages emit `orcabox://` too. See REBRANDING.md
                  for the ordered checklist. -->
@@ -100,7 +100,6 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="orcabox" android:host="anilist-auth"/>
                 <data android:scheme="orcabox" android:host="mal-auth"/>
-                <data android:scheme="orcabox" android:host="simkl-auth"/>
                 <!-- Shared-title deep link: …://open?d=…&t=… (see OpenLinkService). -->
                 <data android:scheme="orcabox" android:host="open"/>
                 <data android:scheme="orcabox" android:host="room"/>

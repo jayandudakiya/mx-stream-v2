@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:orcabox/core/app_mode.dart';
-import 'package:orcabox/core/appwrite/appwrite_service.dart';
 import 'package:orcabox/core/backup/backup_service.dart';
 import 'package:orcabox/core/backup/library_backup.dart';
 import 'package:orcabox/core/backup/settings_backup.dart';
@@ -17,14 +16,7 @@ import 'package:orcabox/core/provider/provider_repo_registry.dart';
 import 'package:orcabox/core/supabase/supabase_service.dart';
 import 'package:orcabox/core/tv/tv_focusable.dart';
 import 'package:orcabox/features/auth/auth_cubit.dart';
-import 'package:orcabox/features/auth/migration_bridge.dart';
 import 'package:orcabox/features/backup/backup_screen.dart';
-
-MigrationBridge _fakeBridge() => MigrationBridge(
-      invoke: (_, __) async => const {'ok': false},
-      signInPassword: (_, __) async => false,
-      verifyOtp: (_, __) async => false,
-    );
 
 // ── Stubs ─────────────────────────────────────────────────────────────────────
 
@@ -52,7 +44,7 @@ class _StubReposRegistry implements ProviderReposRegistry {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-// A REAL temp dir path_provider is mocked to. Must exist on disk: the Appwrite
+// A REAL temp dir path_provider is mocked to. Must exist on disk: the client
 // Client creates a `cookies` subdir under the app-documents dir, so a fake path
 // (the old hardcoded '/tmp/test') threw PathNotFoundException.
 late Directory _appDir;
@@ -70,16 +62,15 @@ void _mockPathProvider(WidgetTester tester) {
 void main() {
   setUp(() {
     _appDir = Directory.systemTemp.createTempSync('backup_test');
-    // Mock path_provider before AppwriteService is constructed: its Appwrite
+    // Mock path_provider before the Supabase client is constructed: its
     // Client asynchronously requests the app documents directory, and doing
     // this here (rather than only in the test body) avoids a cross-test race
-    // once more than one test in this file constructs an AppwriteService.
+    // storage init needs a real temp dir once more than one test uses it.
     const channel = MethodChannel('plugins.flutter.io/path_provider');
     TestWidgetsFlutterBinding.ensureInitialized()
         .defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async => _appDir.path);
     sl
-      ..registerSingleton<AppwriteService>(AppwriteService())
       ..registerSingleton<AppMode>(const AppMode(isTv: false))
       ..registerSingleton<BackupService>(BackupService(
         SourcesBackup(_StubReposRegistry(), _StubRegistry(), null),
@@ -102,7 +93,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(1000, 2200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      final auth = AuthCubit(SupabaseService(), sl<AppwriteService>(), _fakeBridge());
+      final auth = AuthCubit(SupabaseService());
       addTearDown(auth.close);
 
       await tester.pumpWidget(
@@ -132,7 +123,7 @@ void main() {
     _mockPathProvider(tester);
     await tester.binding.setSurfaceSize(const Size(1000, 2200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    final auth = AuthCubit(SupabaseService(), sl<AppwriteService>(), _fakeBridge());
+    final auth = AuthCubit(SupabaseService());
     addTearDown(auth.close);
     await tester.pumpWidget(
       MaterialApp(

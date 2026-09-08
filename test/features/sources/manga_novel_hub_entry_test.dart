@@ -22,7 +22,6 @@ import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:orcabox/core/anilist/anilist_service.dart';
 import 'package:orcabox/core/app_mode.dart';
-import 'package:orcabox/core/appwrite/appwrite_service.dart';
 import 'package:orcabox/core/download/download_prefs.dart';
 import 'package:orcabox/core/mihon/mihon_manager.dart';
 import 'package:orcabox/core/playback/playback_prefs.dart';
@@ -36,9 +35,7 @@ import 'package:orcabox/core/supabase/supabase_service.dart';
 import 'package:orcabox/core/theme/theme_controller.dart';
 import 'package:orcabox/core/torrent/torrent_prefs.dart';
 import 'package:orcabox/core/tracker/mal_service.dart';
-import 'package:orcabox/core/tracker/simkl_service.dart';
 import 'package:orcabox/features/auth/auth_cubit.dart';
-import 'package:orcabox/features/auth/migration_bridge.dart';
 import 'package:orcabox/features/settings/settings_screen.dart';
 import 'package:orcabox/features/sources/providers_hub_screen.dart';
 import 'package:orcabox/features/sources/orcabox_sources_screen.dart';
@@ -288,7 +285,6 @@ void main() {
         ))
         ..registerSingleton<AniListService>(_StubAniList())
         ..registerSingleton<MalService>(_StubMal())
-        ..registerSingleton<SimklService>(_StubSimkl())
         ..registerSingleton<PlaybackPrefs>(PlaybackPrefs())
         ..registerSingleton<DownloadPrefs>(DownloadPrefs())
         ..registerSingleton<TorrentPrefs>(TorrentPrefs());
@@ -312,7 +308,7 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       final authCubit =
-          AuthCubit(SupabaseService(), AppwriteService(), _fakeBridge());
+          AuthCubit(SupabaseService());
       addTearDown(authCubit.close);
       GetIt.instance.registerSingleton<AuthCubit>(authCubit);
 
@@ -372,12 +368,6 @@ void main() {
   });
 }
 
-MigrationBridge _fakeBridge() => MigrationBridge(
-      invoke: (_, __) async => const {'ok': false},
-      signInPassword: (_, __) async => false,
-      verifyOtp: (_, __) async => false,
-    );
-
 class _StubSearchPrefs extends SearchPrefs {
   @override
   SearchLayout get layout => SearchLayout.vertical;
@@ -397,9 +387,3 @@ class _StubMal implements MalService {
   noSuchMethod(Invocation i) => super.noSuchMethod(i);
 }
 
-class _StubSimkl implements SimklService {
-  @override
-  bool get isConnected => false;
-  @override
-  noSuchMethod(Invocation i) => super.noSuchMethod(i);
-}
