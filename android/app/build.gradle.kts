@@ -1,3 +1,16 @@
+// ============================================================================
+// Small APK Build Command (with .env configuration):
+//
+// 1. Split-per-ABI (Smallest per-device APKs, ~35-45 MB each):
+//    fvm flutter build apk --split-per-abi --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env
+//
+// 2. Single 64-bit ARM APK (for 99% of modern phones & TV devices):
+//    fvm flutter build apk --target-platform android-arm64 --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env
+//
+// 3. Standard Flutter (without FVM):
+//    flutter build apk --split-per-abi --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env
+// ============================================================================
+
 import java.util.Properties
 import java.io.FileInputStream
 

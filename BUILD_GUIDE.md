@@ -224,20 +224,30 @@ fvm flutter run -d windows --dart-define-from-file=tmdb.env.json
 
 ### Android Builds
 
-#### Option A: Split-per-ABI APKs (Recommended)
-Produces separate, highly-optimized APKs for each architecture (~35–50 MB each instead of ~100+ MB universal):
+#### Option A: Ultra-Compact Split-per-ABI APKs (Recommended - Smallest Size)
+Produces separate, highly-optimized, and obfuscated APKs for each architecture (~35–45 MB each instead of 100+ MB universal) configured with your `.env` file:
 ```powershell
-fvm flutter build apk --split-per-abi --release --dart-define-from-file=tmdb.env.json
+fvm flutter build apk --split-per-abi --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env
 ```
+*(Or without FVM: `flutter build apk --split-per-abi --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env`)*
+
 **Output artifacts:**
-- `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (For 99% modern phones & TV devices)
+- `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (For 99% modern phones & Android TV devices)
 - `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` (For older 32-bit devices)
 - `build/app/outputs/flutter-apk/app-x86_64-release.apk` (For x86_64 emulators/devices)
 
-#### Option B: Fat Universal APK
+#### Option B: Single 64-bit ARM APK (Modern Devices Only)
+Builds exclusively for `arm64-v8a` to save compilation time and disk space:
+```powershell
+fvm flutter build apk --target-platform android-arm64 --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env
+```
+**Output artifact:**
+- `build/app/outputs/flutter-apk/app-release.apk` (arm64-v8a only)
+
+#### Option C: Fat Universal APK
 Produces a single APK compatible with all architectures:
 ```powershell
-fvm flutter build apk --release --dart-define-from-file=tmdb.env.json
+fvm flutter build apk --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env
 ```
 **Output artifact:**
 - `build/app/outputs/flutter-apk/app-release.apk`
@@ -245,7 +255,7 @@ fvm flutter build apk --release --dart-define-from-file=tmdb.env.json
 #### Google Play App Bundle (.aab)
 Required if publishing to the Google Play Store:
 ```powershell
-fvm flutter build appbundle --release --dart-define-from-file=tmdb.env.json
+fvm flutter build appbundle --release --obfuscate --split-debug-info=build/app/outputs/symbols --dart-define-from-file=.env
 ```
 **Output artifact:**
 - `build/app/outputs/bundle/release/app-release.aab`
