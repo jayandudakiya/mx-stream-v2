@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/anilist/anilist_service.dart';
+import '../../core/app_features.dart';
 import '../../core/di/injector.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
@@ -57,6 +58,11 @@ class _ConnectionsScreenTvState extends State<ConnectionsScreenTv> {
               itemBuilder: (context, i) {
                 final r = _rows[i];
                 final connected = r.t.isConnected;
+                // Connecting a tracker on TV is a phone→TV QR handoff over the
+                // Supabase pair relay, so it is unavailable while accounts are
+                // off. Disconnect is local and stays available for a session
+                // imported earlier.
+                final canConnect = AppFeatures.cloudAccounts || connected;
                 final who = connected
                     ? (r.t.viewerName != null
                         ? context.l10n.connectedAs(r.t.viewerName!)
@@ -65,7 +71,10 @@ class _ConnectionsScreenTvState extends State<ConnectionsScreenTv> {
                 return TvListFocusable(
                   autofocus: i == 0,
                   semanticLabel: '${r.label}, $who',
-                  onTap: () => connected ? _disconnect(r.t) : _connect(r.id),
+                  onTap: () {
+                    if (!canConnect) return; // no relay while accounts are off
+                    connected ? _disconnect(r.t) : _connect(r.id);
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                     decoration: BoxDecoration(
@@ -94,15 +103,16 @@ class _ConnectionsScreenTvState extends State<ConnectionsScreenTv> {
                             ],
                           ),
                         ),
-                        Text(
-                          connected ? context.l10n.disconnect : context.l10n.connect,
-                          style: AppText.body.copyWith(
-                            color: connected
-                                ? Colors.redAccent
-                                : AppColors.textPrimary,
-                            fontWeight: FontWeight.w700,
+                        if (canConnect)
+                          Text(
+                            connected ? context.l10n.disconnect : context.l10n.connect,
+                            style: AppText.body.copyWith(
+                              color: connected
+                                  ? Colors.redAccent
+                                  : AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),

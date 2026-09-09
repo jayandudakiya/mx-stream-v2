@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../core/app_features.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
 import '../../core/tv/tv_focusable.dart';
@@ -41,8 +42,10 @@ class _BootErrorScreenState extends State<BootErrorScreen> {
 
   /// Deletes the local Hive data and asks the user to reopen the app.
   ///
-  /// Only ever reached from an explicit, confirmed tap. Nothing here touches
-  /// the account or the cloud copy — signing back in restores the library.
+  /// Only ever reached from an explicit, confirmed tap. With accounts enabled
+  /// nothing here touches the account or the cloud copy — signing back in
+  /// restores the library. In a local-only build there is no cloud copy, so the
+  /// confirmation says so ([AppLocalizations.resetAppDataBodyLocal]).
   Future<void> _reset() async {
     final ok = await showDialog<bool>(
       context: context,
@@ -50,7 +53,11 @@ class _BootErrorScreenState extends State<BootErrorScreen> {
         backgroundColor: AppColors.surface,
         title: Text(ctx.l10n.resetAppDataTitle, style: AppText.title),
         content: Text(
-          ctx.l10n.resetAppDataBody,
+          // Local-only build: there is no cloud copy behind an account, so the
+          // warning must say the data is actually gone.
+          AppFeatures.cloudAccounts
+              ? ctx.l10n.resetAppDataBody
+              : ctx.l10n.resetAppDataBodyLocal,
           style: AppText.body,
         ),
         actions: [
@@ -140,7 +147,9 @@ class _BootErrorScreenState extends State<BootErrorScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    context.l10n.bootErrorBody,
+                    AppFeatures.cloudAccounts
+                        ? context.l10n.bootErrorBody
+                        : context.l10n.bootErrorBodyLocal,
                     style: AppText.body,
                   ),
                   const SizedBox(height: 24),

@@ -12,10 +12,10 @@ import '../platform/app_paths.dart';
 
 /// Returns a file name like `orcabox-backup-20260702-0905.json`.
 String backupFileName(DateTime now) {
-  final y  = now.year.toString().padLeft(4, '0');
+  final y = now.year.toString().padLeft(4, '0');
   final mo = now.month.toString().padLeft(2, '0');
-  final d  = now.day.toString().padLeft(2, '0');
-  final h  = now.hour.toString().padLeft(2, '0');
+  final d = now.day.toString().padLeft(2, '0');
+  final h = now.hour.toString().padLeft(2, '0');
   final mi = now.minute.toString().padLeft(2, '0');
   return 'orcabox-backup-$y$mo$d-$h$mi.json';
 }
@@ -30,7 +30,9 @@ Map<String, dynamic> parseBackupJson(String raw) {
     throw const FormatException('Backup file is not valid JSON');
   }
   if (decoded is! Map<String, dynamic>) {
-    throw const FormatException('Backup JSON must be a JSON object, not an array or primitive');
+    throw const FormatException(
+      'Backup JSON must be a JSON object, not an array or primitive',
+    );
   }
   return decoded;
 }
@@ -46,9 +48,9 @@ class BackupFile {
     Map<String, dynamic> payload, {
     bool keepLocalCopy = false,
   }) async {
-    final name    = backupFileName(DateTime.now());
-    final tmpDir  = await getTemporaryDirectory();
-    final file    = File('${tmpDir.path}/$name');
+    final name = backupFileName(DateTime.now());
+    final tmpDir = await getTemporaryDirectory();
+    final file = File('${tmpDir.path}/$name');
     await file.writeAsString(jsonEncode(payload));
 
     // TV boxes usually have no document-picker UI, so restore-from-file can't
@@ -59,8 +61,11 @@ class BackupFile {
     if (keepLocalCopy) {
       try {
         final dir = await _localBackupDir();
-        if (dir != null) localCopyPath = (await file.copy('${dir.path}/$name')).path;
-      } catch (_) {/* best-effort — never block the primary export */}
+        if (dir != null)
+          localCopyPath = (await file.copy('${dir.path}/$name')).path;
+      } catch (_) {
+        /* best-effort — never block the primary export */
+      }
     }
 
     // Move into public Downloads/OrcaBox for the user's file manager. On TV
@@ -76,7 +81,9 @@ class BackupFile {
         directory: 'OrcaBox',
       );
       if (shared != null && shared.isNotEmpty) return shared;
-    } catch (_) {/* shared storage unavailable (common on TV) */}
+    } catch (_) {
+      /* shared storage unavailable (common on TV) */
+    }
     return localCopyPath;
   }
 
@@ -106,14 +113,16 @@ class BackupFile {
             found[e.uri.pathSegments.last] = e;
           }
         }
-      } catch (_) {/* unreadable dir (scoped storage) — skip */}
+      } catch (_) {
+        /* unreadable dir (scoped storage) — skip */
+      }
     }
 
     await scan(await _localBackupDir());
     await scan(Directory('/storage/emulated/0/Download/OrcaBox'));
     // Pre-rename download folders, so backups a user already has on disk still
     // show up in the TV restore list. Write only ever targets OrcaBox above.
-    for (final legacy in const ['MXStream', 'Zangetsu']) {
+    for (final legacy in const ['OrcaBox']) {
       await scan(Directory('/storage/emulated/0/Download/$legacy'));
     }
 

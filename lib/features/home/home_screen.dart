@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../core/app_features.dart';
 import '../../core/app_mode.dart';
 import '../../core/di/injector.dart';
 import '../../core/platform/apple_tv.dart';
@@ -1013,10 +1014,13 @@ class _HomeViewState extends State<_HomeView>
   Widget build(BuildContext context) {
     if (sl<AppMode>().isTv) return const HomeScreenTv();
     // Continue Watching is a logged-in feature; hide the row when signed out.
+    // With accounts off the history is local-only and there is no way to sign
+    // in, so the row is always shown (gating it would hide it for good).
     final authState = context.watch<AuthCubit>().state;
-    final loggedIn = authState.isLoggedIn;
+    final loggedIn = !AppFeatures.cloudAccounts || authState.isLoggedIn;
     // Session lapsed (logged-in from cache only) → cloud sync is silently off.
-    final needsReconnect = loggedIn && authState.needsReconnect;
+    final needsReconnect =
+        AppFeatures.cloudAccounts && loggedIn && authState.needsReconnect;
 
     return BlocListener<ActiveSourceCubit, String>(
       listenWhen: (prev, curr) => prev != curr,

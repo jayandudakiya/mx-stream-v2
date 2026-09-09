@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/app_config.dart';
+import '../../core/app_features.dart';
 import '../../core/di/injector.dart';
 import '../../core/locale/app_language_picker.dart';
 import '../../core/platform/apple_tv.dart';
@@ -164,6 +165,8 @@ class _SettingsScreenTvState extends State<SettingsScreenTv> {
   }
 
   Widget _accountCard(BuildContext context) {
+    // No accounts while the backend is off — no sign-in tile, no profile row.
+    if (!AppFeatures.cloudAccounts) return const SizedBox.shrink();
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, auth) {
         if (auth.isLoggedIn) {
@@ -238,11 +241,14 @@ class _SettingsScreenTvState extends State<SettingsScreenTv> {
                 padding: const EdgeInsets.only(top: 4, bottom: 24),
                 children: [
                   _accountCard(context),
-                  const SizedBox(height: 8),
+                  if (AppFeatures.cloudAccounts) const SizedBox(height: 8),
                   _sectionLabel(SettingsSection.account, first: true),
                   SettingsCard(
                     children: [
                       SettingsTile(
+                        // The account card normally takes first focus; with it
+                        // hidden this row is the top of the screen.
+                        autofocus: !AppFeatures.cloudAccounts,
                         icon: Icons.sync_alt_rounded,
                         title: l10n.connections,
                         subtitle: l10n.connectionsTvSubtitle,
@@ -267,12 +273,14 @@ class _SettingsScreenTvState extends State<SettingsScreenTv> {
                         subtitle: l10n.backupAndRestoreSubtitle,
                         onTap: () => _push(const BackupScreen()),
                       ),
-                      SettingsTile(
-                        icon: Icons.cloud_upload_outlined,
-                        title: l10n.syncLibraryToCloud,
-                        subtitle: l10n.syncLibraryToCloudSubtitle,
-                        onTap: _syncLibraryToCloud,
-                      ),
+                      // Cross-device sync needs an account (backend not live).
+                      if (AppFeatures.cloudAccounts)
+                        SettingsTile(
+                          icon: Icons.cloud_upload_outlined,
+                          title: l10n.syncLibraryToCloud,
+                          subtitle: l10n.syncLibraryToCloudSubtitle,
+                          onTap: _syncLibraryToCloud,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 8),

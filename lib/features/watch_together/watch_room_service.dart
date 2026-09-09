@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/app_features.dart';
 import '../../core/supabase/supabase_service.dart';
 import '../../core/ui/global_messenger.dart';
 import 'model/room_state.dart';
@@ -16,16 +17,31 @@ import 'sync_math.dart';
 /// transfer / end (see [updateRoom]). No UI or player knowledge lives here.
 class WatchRoomService {
   WatchRoomService(this._sb) {
-    // Subscribing a channel before the websocket is connected leaves its join
-    // stuck (this SDK doesn't re-send it on open). So we queue subscribes made
-    // while disconnected and flush them here, once the socket is actually up.
-    _c.realtime.onOpen(() {
-      final pending = List<String>.from(_pendingSubscribe);
-      _pendingSubscribe.clear();
-      for (final code in pending) {
-        _doSubscribe(code);
-      }
-    });
+    // Rooms are a cloud feature. With accounts off Supabase was never
+    // initialized, and touching the client here would assert during
+    // initDependencies and take the whole app down to the boot-error screen —
+    // this service is constructed eagerly at startup, long before any Watch
+    // Party screen exists. Every method below is unreachable in that state
+    // (the lobby is hidden, and the controller no-ops with room == null), so
+    // leaving the socket hook unregistered costs nothing.
+    if (!AppFeatures.cloudAccounts) return;
+    // Same defence for the flag-on case: a boot-time Supabase.initialize that
+    // timed out on a dead network leaves the singleton unset, and this ran
+    // before that was survivable.
+    try {
+      // Subscribing a channel before the websocket is connected leaves its join
+      // stuck (this SDK doesn't re-send it on open). So we queue subscribes made
+      // while disconnected and flush them here, once the socket is actually up.
+      _c.realtime.onOpen(() {
+        final pending = List<String>.from(_pendingSubscribe);
+        _pendingSubscribe.clear();
+        for (final code in pending) {
+          _doSubscribe(code);
+        }
+      });
+    } catch (_) {
+      // No client yet — Watch Party stays unavailable this session.
+    }
   }
   final SupabaseService _sb;
 

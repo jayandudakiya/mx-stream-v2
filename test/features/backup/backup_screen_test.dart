@@ -85,7 +85,7 @@ void main() {
   });
 
   testWidgets(
-    'BackupScreen renders three bundle checkboxes and four action buttons',
+    'BackupScreen renders three bundle checkboxes and the two local actions',
     (tester) async {
       _mockPathProvider(tester);
       // Tall surface so the lazy ListView builds every tile (the screen is
@@ -111,11 +111,12 @@ void main() {
       expect(find.text('Library'), findsOneWidget);
       expect(find.text('App settings'), findsOneWidget);
 
-      // Four action buttons (SettingsTile labels).
-      expect(find.text('Back up to cloud'), findsOneWidget);
+      // The two file actions (SettingsTile labels). The cloud pair is hidden
+      // while AppFeatures.cloudAccounts is off — there is no account to save to.
       expect(find.text('Save to a file'), findsOneWidget);
-      expect(find.text('Restore from cloud'), findsOneWidget);
       expect(find.text('Restore from a file'), findsOneWidget);
+      expect(find.text('Back up to cloud'), findsNothing);
+      expect(find.text('Restore from cloud'), findsNothing);
     },
   );
 

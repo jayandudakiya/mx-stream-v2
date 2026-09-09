@@ -73,16 +73,19 @@ void main() {
   final sl = GetIt.instance;
   tearDown(sl.reset);
 
-  testWidgets('lists both trackers with a Connect action when signed out',
+  testWidgets('lists both trackers, with no Connect action while accounts are off',
       (tester) async {
     _register(sl, aniConnected: false, malConnected: false);
     await tester.pumpWidget(const MaterialApp(home: ConnectionsScreenTv()));
     await tester.pumpAndSettle();
+    // Two rows, not three: Simkl was removed with the rest of the tracker
+    // (NOTES task 15), leaving AniList and MyAnimeList.
     expect(find.text('AniList'), findsOneWidget);
     expect(find.text('MyAnimeList'), findsOneWidget);
-    // Two, not three: Simkl was removed with the rest of the tracker (NOTES
-    // task 15), leaving AniList and MyAnimeList.
-    expect(find.text('Connect'), findsNWidgets(2));
+    // Connecting a tracker on TV is a phone->TV QR handoff over the Supabase
+    // pair relay, so the action is hidden while AppFeatures.cloudAccounts is
+    // off. Flip that flag back on and the two Connect actions return.
+    expect(find.text('Connect'), findsNothing);
   });
 
   testWidgets('shows Connected + viewer name and a Disconnect action',

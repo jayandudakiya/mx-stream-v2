@@ -456,7 +456,7 @@ void main() {
   );
 
   testWidgets(
-    'RootShellTv shows the profile row at the top of the nav',
+    'RootShellTv hides the profile row while accounts are off',
     (tester) async {
       await tester.pumpWidget(
         MultiBlocProvider(
@@ -469,8 +469,10 @@ void main() {
       );
       await tester.pumpAndSettle();
       // The account/profile row (avatar + name / "Sign in") is keyed
-      // 'tv-nav-avatar' and sits at the top of the nav.
-      expect(find.byKey(const ValueKey('tv-nav-avatar')), findsOneWidget);
+      // 'tv-nav-avatar' and normally sits at the top of the nav. It is the TV's
+      // only sign-in entry point, so it is dropped entirely while
+      // AppFeatures.cloudAccounts is off.
+      expect(find.byKey(const ValueKey('tv-nav-avatar')), findsNothing);
     },
   );
 

@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthException, UserAttributes;
 
+import '../../core/app_features.dart';
 import '../../core/supabase/auth_user.dart';
 import '../../core/supabase/supabase_service.dart';
 
@@ -75,8 +76,13 @@ class AuthCubit extends Cubit<AuthState> {
   /// [AuthState.isLoggedIn] can be true (from cache) while this is false — the
   /// "reconnect" state. Check this before a cloud sync.
   bool get hasLiveSession {
-    final s = _sb.client.auth.currentSession;
-    return s != null && !s.isExpired;
+    if (!AppFeatures.cloudAccounts) return false;
+    try {
+      final s = _sb.client.auth.currentSession;
+      return s != null && !s.isExpired;
+    } catch (_) {
+      return false; // Supabase never initialized
+    }
   }
 
   /// Force a fresh, SERVER-VERIFIED session token. This is the only RELIABLE
@@ -88,6 +94,7 @@ class AuthCubit extends Cubit<AuthState> {
   /// - network error → keep whatever we have ([hasLiveSession]) so being offline
   ///   doesn't nag for a password.
   Future<bool> ensureFreshSession() async {
+    if (!AppFeatures.cloudAccounts) return false;
     if (_sb.client.auth.currentSession == null) return false; // nothing to refresh
     try {
       final res = await _sb.client.auth.refreshSession();
@@ -152,6 +159,13 @@ class AuthCubit extends Cubit<AuthState> {
   /// validate against Supabase in the background. Only when there is no cache
   /// (first run / signed out) do we await the network check.
   Future<void> restore() async {
+    // Accounts are switched off: Supabase was never initialized, so touching the
+    // client would assert. Settle on "signed out" — the stores are local-only
+    // and every screen already has a signed-out rendering.
+    if (!AppFeatures.cloudAccounts) {
+      emit(const AuthState(status: AuthStatus.unauthenticated));
+      return;
+    }
     final cached = _readCachedUser();
     if (cached != null) {
       emit(state.copyWith(

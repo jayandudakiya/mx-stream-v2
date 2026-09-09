@@ -4,25 +4,22 @@
 
 <img src="assets/icon/app_icon.png" width="120" alt="OrcaBox" />
 
-### A modern, open-source app for anime, movies, manga & light novels — on Android, TV and iOS
-
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&pause=1200&color=FF4D57&center=true&vCenter=true&width=600&lines=Track+your+watch+history+%F0%9F%93%88;Read+manga+%26+light+novels+%F0%9F%93%9A;Sync+progress+across+devices+%F0%9F%94%84;Discover+anime+%26+movies+%F0%9F%94%8D;100%25+open+source+%E2%9D%A4%EF%B8%8F" alt="Typing SVG" />
+### A modern, open-source app for anime, movies & series — on Android, TV and windows
 
 <br/>
 
-[![Latest Release](https://img.shields.io/github/v/release/jayandudakiya8100/mx-stream-app?style=for-the-badge&label=Release&color=FF4D57&logo=github)](https://github.com/jayandudakiya8100/mx-stream-app/releases/latest)
+<!-- [![Latest Release](https://img.shields.io/github/v/release/jayandudakiya8100/mx-stream-app?style=for-the-badge&label=Release&color=FF4D57&logo=github)](https://github.com/jayandudakiya8100/mx-stream-app/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/jayandudakiya8100/mx-stream-app/total?style=for-the-badge&color=FF4D57&logo=android&logoColor=white)](https://github.com/jayandudakiya8100/mx-stream-app/releases)
 [![Stars](https://img.shields.io/github/stars/jayandudakiya8100/mx-stream-app?style=for-the-badge&color=FF4D57&logo=github)](https://github.com/jayandudakiya8100/mx-stream-app/stargazers)
 [![Forks](https://img.shields.io/github/forks/jayandudakiya8100/mx-stream-app?style=for-the-badge&color=FF4D57&logo=github)](https://github.com/jayandudakiya8100/mx-stream-app/network/members)
 [![License](https://img.shields.io/github/license/jayandudakiya8100/mx-stream-app?style=for-the-badge&color=FF4D57)](LICENSE)
-[![Issues](https://img.shields.io/github/issues/jayandudakiya8100/mx-stream-app?style=for-the-badge&color=FF4D57&logo=github)](https://github.com/jayandudakiya8100/mx-stream-app/issues)
+[![Issues](https://img.shields.io/github/issues/jayandudakiya8100/mx-stream-app?style=for-the-badge&color=FF4D57&logo=github)](https://github.com/jayandudakiya8100/mx-stream-app/issues) -->
 
 <br/>
 
 ![Platform](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![Platform](https://img.shields.io/badge/Android_TV-FF4D57?style=for-the-badge&logo=youtube&logoColor=white)
 ![Platform](https://img.shields.io/badge/Windows-Soon-0078D4?style=for-the-badge&logo=windows&logoColor=white)
-![Platform](https://img.shields.io/badge/iOS-Beta-000000?style=for-the-badge&logo=apple&logoColor=white)
 ![Flutter](https://img.shields.io/badge/Built%20with-Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 
@@ -61,9 +58,10 @@ It focuses on **discovery**, **tracking**, **syncing**, and **personal library m
 
 <div align="center">
 
-| 🎬 Watch | 📚 Read | 📈 Track | 🔄 Sync |
-|:---:|:---:|:---:|:---:|
-| Anime, movies & series | Manga & light novels | Progress & history | Across devices |
+| 🎬 Watch |
+| :------: |
+
+| Anime, movies & series
 
 </div>
 
@@ -104,12 +102,11 @@ Get the latest version from the **[GitHub Releases](https://github.com/jayanduda
 
 <div align="center">
 
-| APK | Recommended for |
-|---|---|
+| APK                               | Recommended for                                 |
+| --------------------------------- | ----------------------------------------------- |
 | 🟢 `OrcaBox-vX.Y.Z-arm64-v8a.apk` | Modern 64-bit Android devices — **Recommended** |
-| 🟡 `OrcaBox-vX.Y.Z-armeabi-v7a.apk` | Older 32-bit Android devices |
-| 🔵 `OrcaBox-vX.Y.Z-universal.apk` | Not sure which one to use? Works on everything, but larger |
-| 📺 `OrcaBox-vX.Y.Z-tv.apk` | Android TV devices |
+| 📺 `OrcaBox-vX.Y.Z-tv.apk`        | Android TV devices                              |
+| 💻 `OrcaBox-vX.Y.Z-windows.exe`   | Windows devices - **Soon**                      |
 
 </div>
 
@@ -123,23 +120,20 @@ Get the latest version from the **[GitHub Releases](https://github.com/jayanduda
 
 <div align="center">
 
-| Platform | Status |
-|---|:---:|
-| 🤖 Android | ✅ Available |
-| 📺 Android TV | ✅ Available |
-| 🍎 iOS | 🧪 Beta (TestFlight) |
-| 🪟 Windows | 🚧 In progress |
+| Platform      |     Status     |
+| ------------- | :------------: |
+| 🤖 Android    |  ✅ Available  |
+| 📺 Android TV |  ✅ Available  |
+| 🪟 Windows    | 🚧 In progress |
 
 </div>
 
-> On iOS, CloudStream, Aniyomi and Mihon extensions can't be loaded — iOS
+> On Windows, CloudStream, Aniyomi and Mihon extensions can't be loaded
 > doesn't allow that kind of plugin. OrcaBox's own JavaScript sources, the
 > player, downloads and trackers all work.
 
 - [x] Android release
 - [x] Android TV release
-- [x] iOS beta
-- [ ] iOS release
 - [ ] Windows release
 
 ---
@@ -148,7 +142,7 @@ Get the latest version from the **[GitHub Releases](https://github.com/jayanduda
 
 <div align="center">
 
-<img src="https://skillicons.dev/icons?i=flutter,dart,androidstudio,git,github,discord" alt="Tech Stack"/>
+<img src="https://skillicons.dev/icons?i=flutter,dart,androidstudio,git,github" alt="Tech Stack"/>
 
 </div>
 
@@ -195,14 +189,7 @@ Open an <a href="https://github.com/jayandudakiya8100/mx-stream-app/issues">issu
 
 ## 🌐 Communities
 
-OrcaBox's community channels aren't set up yet. The Discord, Telegram and
-Reddit links that used to sit here belonged to the upstream project and were
-removed rather than renamed — a find/replace would only have invented dead
-handles. Once the real channels exist, add them here and set
-`kDiscordInviteUrl` in `lib/core/app_config.dart` plus `_telegramUrl` in
-`lib/features/settings/settings_about.dart` and
-`lib/features/community/community_sheet.dart`; the in-app entry points are
-already gated on those values and will appear on their own.
+OrcaBox's community channels aren't set up yet. Soon you can find
 
 ---
 
@@ -222,12 +209,6 @@ already gated on those values and will appear on their own.
 
 OrcaBox is licensed under the **[GNU GPL-3.0](LICENSE)**, with additional terms under GPLv3 Section 7. See the included license file for the complete terms, and **[NOTICE.md](NOTICE.md)** for the full third-party attribution record.
 
-### Origin
-
-> **OrcaBox is an independent, unofficial fork.** It is not the Zangetsu project, and it is not endorsed, certified or supported by Zangetsu's author.
-
-OrcaBox is derived from **[Zangetsu](https://github.com/Spyou/Zangetsu)**, created by Krishna Vishwakarma ([@Spyou](https://github.com/Spyou)) and licensed under GPL-3.0. That original work is gratefully credited here as required by the license it was released under.
-
 OrcaBox also incorporates **[CloudStream](https://github.com/recloudstream/cloudstream)** (GPL-3.0) and extension-loading code derived from **[Aniyomi / Tachiyomi](https://github.com/aniyomiorg/aniyomi)** (Apache-2.0). Because CloudStream is copyleft, OrcaBox as a combined work is likewise GPL-3.0 and ships with its source available.
 
 <div align="center">
@@ -237,7 +218,8 @@ OrcaBox also incorporates **[CloudStream](https://github.com/recloudstream/cloud
 <img src="assets/icon/app_icon.png" width="70" alt="OrcaBox"/>
 
 ### OrcaBox
-*Made with ❤️ for anime, movie & manga fans.*
+
+_Made with ❤️ for anime, movie & manga fans._
 
 <br/>
 

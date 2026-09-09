@@ -862,6 +862,10 @@ class AppLocalizationsJa extends AppLocalizations {
       'この端末に保存されたデータが原因で開けません。データは失われていません。アカウントとクラウド同期分はそのままです。';
 
   @override
+  String get bootErrorBodyLocal =>
+      'Something saved on this device is stopping it from opening. Try again first — a reset clears the library saved on this device.';
+
+  @override
   String get resetAppData => 'アプリデータをリセット';
 
   @override
@@ -870,6 +874,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get resetAppDataBody =>
       'OrcaBox がこの端末に保存したデータを消して、まっさらな状態で起動できるようにします。\n\nアカウントとクラウド同期分はそのままです。再サインインすればライブラリが戻ります。';
+
+  @override
+  String get resetAppDataBodyLocal =>
+      'This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour list, history and sources live only on this device, so they are erased for good unless you have a backup file.';
 
   @override
   String get resetAppDataDone => 'OrcaBox を完全に終了して、もう一度開いてください。';

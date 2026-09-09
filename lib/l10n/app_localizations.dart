@@ -1699,6 +1699,12 @@ abstract class AppLocalizations {
   /// **'Something saved on this device is stopping it from opening. Nothing is lost — your account and anything synced to the cloud are safe.'**
   String get bootErrorBody;
 
+  /// Boot-failure explanation for a local-only build (no account, no cloud copy). Used instead of bootErrorBody when AppFeatures.cloudAccounts is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Something saved on this device is stopping it from opening. Try again first — a reset clears the library saved on this device.'**
+  String get bootErrorBodyLocal;
+
   /// No description provided for @resetAppData.
   ///
   /// In en, this message translates to:
@@ -1716,6 +1722,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour account and anything synced to the cloud are not touched — sign in again and your library comes back.'**
   String get resetAppDataBody;
+
+  /// Reset confirmation for a local-only build: there is no cloud copy to restore from, so the warning has to say the data is gone. Used instead of resetAppDataBody when AppFeatures.cloudAccounts is off.
+  ///
+  /// In en, this message translates to:
+  /// **'This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour list, history and sources live only on this device, so they are erased for good unless you have a backup file.'**
+  String get resetAppDataBodyLocal;
 
   /// No description provided for @resetAppDataDone.
   ///

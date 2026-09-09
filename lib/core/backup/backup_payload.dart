@@ -16,19 +16,21 @@ const _kVersion = 1;
 /// make every backup a user already holds unreadable ("This isn't an OrcaBox
 /// backup"). Reads accept the old names; writes only ever emit [_kApp], so the
 /// set stops growing and old files convert on the next backup.
-const _kLegacyApps = {'mxstream', 'zangetsu'};
+const _kLegacyApps = {'orcabox', 'OrcaBox'};
 
 Map<String, dynamic> wrapPayload(
   Map<BackupBundle, Map<String, dynamic>> bundles, {
   required String createdAtIso,
 }) => {
-      'app': _kApp,
-      'version': _kVersion,
-      'createdAt': createdAtIso,
-      'bundles': {for (final e in bundles.entries) e.key.name: e.value},
-    };
+  'app': _kApp,
+  'version': _kVersion,
+  'createdAt': createdAtIso,
+  'bundles': {for (final e in bundles.entries) e.key.name: e.value},
+};
 
-Map<BackupBundle, Map<String, dynamic>> unwrapPayload(Map<String, dynamic> raw) {
+Map<BackupBundle, Map<String, dynamic>> unwrapPayload(
+  Map<String, dynamic> raw,
+) {
   final app = raw['app'];
   if (app != _kApp && !_kLegacyApps.contains(app)) {
     throw const BackupFormatException("This isn't an OrcaBox backup.");

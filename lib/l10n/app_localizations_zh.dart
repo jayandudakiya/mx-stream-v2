@@ -855,6 +855,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bootErrorBody => '此设备上保存的数据导致无法打开。内容没有丢失 — 账号和已同步到云端的数据都是安全的。';
 
   @override
+  String get bootErrorBodyLocal =>
+      'Something saved on this device is stopping it from opening. Try again first — a reset clears the library saved on this device.';
+
+  @override
   String get resetAppData => '重置应用数据';
 
   @override
@@ -863,6 +867,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get resetAppDataBody =>
       '这将清除 OrcaBox 在此设备上保存的数据，以便重新启动。\n\n不会改动你的账号和已同步到云端的内容 — 重新登录后资料库就会回来。';
+
+  @override
+  String get resetAppDataBodyLocal =>
+      'This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour list, history and sources live only on this device, so they are erased for good unless you have a backup file.';
 
   @override
   String get resetAppDataDone => '请完全关闭 OrcaBox 后再打开。';

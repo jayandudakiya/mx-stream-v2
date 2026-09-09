@@ -19,7 +19,9 @@ bool isOnboarded() {
   if (!Hive.isBoxOpen(ActiveSourceCubit.boxName)) return false;
   final box = Hive.box(ActiveSourceCubit.boxName);
   final onboarded = box.get('onboarded', defaultValue: false) as bool;
-  final consent = box.get(PrivacyConsentPrefs.keyConsentAccepted, defaultValue: false) as bool;
+  final consent =
+      box.get(PrivacyConsentPrefs.keyConsentAccepted, defaultValue: false)
+          as bool;
   return onboarded && consent;
 }
 
@@ -45,12 +47,18 @@ class _SplashScreenState extends State<SplashScreen>
 
   // Glow eases in; the wordmark fades in and "draws" left→right (wipe reveal)
   // while settling up to full scale; the loader appears last.
-  late final Animation<double> _glow =
-      CurvedAnimation(parent: _c, curve: const Interval(0.0, 0.55, curve: Curves.easeOut));
-  late final Animation<double> _fade =
-      CurvedAnimation(parent: _c, curve: const Interval(0.12, 0.5, curve: Curves.easeOut));
-  late final Animation<double> _reveal =
-      CurvedAnimation(parent: _c, curve: const Interval(0.12, 1.0, curve: Curves.easeOutCubic));
+  late final Animation<double> _glow = CurvedAnimation(
+    parent: _c,
+    curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
+  );
+  late final Animation<double> _fade = CurvedAnimation(
+    parent: _c,
+    curve: const Interval(0.12, 0.5, curve: Curves.easeOut),
+  );
+  late final Animation<double> _reveal = CurvedAnimation(
+    parent: _c,
+    curve: const Interval(0.12, 1.0, curve: Curves.easeOutCubic),
+  );
 
   @override
   void dispose() {
@@ -520,7 +528,6 @@ class _Step extends StatelessWidget {
 }
 
 /// Page 3 — Privacy Policy, Terms of Service & Ad Consent.
-/// Explains that MXStream respects user privacy and does not collect or sell
 /// personal phone data, transparently states that ads support infrastructure,
 /// and provides links to full documents before proceeding.
 class _PrivacyConsentPage extends StatelessWidget {

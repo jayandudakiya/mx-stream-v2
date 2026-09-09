@@ -884,6 +884,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Algo guardado en este dispositivo impide que se abra. No se ha perdido nada — tu cuenta y lo sincronizado en la nube están a salvo.';
 
   @override
+  String get bootErrorBodyLocal =>
+      'Something saved on this device is stopping it from opening. Try again first — a reset clears the library saved on this device.';
+
+  @override
   String get resetAppData => 'Borrar datos de la app';
 
   @override
@@ -892,6 +896,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get resetAppDataBody =>
       'Esto borra lo que OrcaBox ha guardado en este dispositivo para que pueda empezar de cero.\n\nTu cuenta y lo sincronizado en la nube no se tocan — inicia sesión otra vez y tu biblioteca vuelve.';
+
+  @override
+  String get resetAppDataBodyLocal =>
+      'This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour list, history and sources live only on this device, so they are erased for good unless you have a backup file.';
 
   @override
   String get resetAppDataDone =>

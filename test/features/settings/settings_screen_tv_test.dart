@@ -138,10 +138,11 @@ void main() {
 
       // Section labels and tiles visible in the TV viewport set above.
       expect(find.text('ACCOUNT & SYNC'), findsOneWidget);
-      expect(find.text('Sign in'), findsOneWidget);
       expect(find.text('Connections'), findsOneWidget);
       expect(find.text('Backup & Restore'), findsOneWidget);
-      expect(find.text('Sync library to cloud'), findsOneWidget);
+      // Account-only rows are hidden while AppFeatures.cloudAccounts is off.
+      expect(find.text('Sign in'), findsNothing);
+      expect(find.text('Sync library to cloud'), findsNothing);
       expect(find.text('SOURCES'), findsOneWidget);
       expect(find.text('Providers'), findsOneWidget);
       expect(find.text('Active source'), findsOneWidget);
@@ -163,14 +164,15 @@ void main() {
       expect(focusables.length, greaterThanOrEqualTo(5));
       expect(find.byType(TvListFocusable), findsWidgets);
 
-      // The very first TvFocusable (the Sign-in / account tile) carries
-      // autofocus=true so the D-pad lands on it when the Settings page opens.
+      // The very first TvFocusable carries autofocus=true so the D-pad lands
+      // on it when the Settings page opens. With the account card hidden that
+      // is the Connections tile.
       expect(focusables.first.autofocus, isTrue);
     },
   );
 
   testWidgets(
-    'SettingsScreenTv shows Sign-in tile when unauthenticated',
+    'SettingsScreenTv shows no account card while accounts are off',
     (tester) async {
       _mockPathProvider(tester);
       final authCubit = AuthCubit(SupabaseService());
@@ -181,9 +183,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // In the unauthenticated state the Sign-in tile is the first item.
-      expect(find.text('Sign in'), findsOneWidget);
-      // Profile-specific text must not appear in the guest state.
+      // AppFeatures.cloudAccounts is off, so neither half of the account card
+      // renders — no Sign-in tile and no profile row.
+      expect(find.text('Sign in'), findsNothing);
       expect(find.text('Profile'), findsNothing);
     },
   );
@@ -231,12 +233,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Guest state: the Sign-in tile is first and carries autofocus. Its
-      // ListTile/SettingsTile content is excluded, so this is the only node.
+      // Accounts are off, so Connections is the first tile and carries
+      // autofocus. Its ListTile/SettingsTile content is excluded, so this is
+      // the only node.
       expect(
-        tester.getSemantics(find.bySemanticsLabel('Sign in')),
+        tester.getSemantics(find.bySemanticsLabel('Connections')),
         matchesSemantics(
-          label: 'Sign in',
+          label: 'Connections',
           isButton: true,
           isFocusable: true,
           isFocused: true,
@@ -249,7 +252,7 @@ void main() {
 
       // A few more tiles visible in the default test viewport, each a
       // single announced node (no separate title/subtitle Text nodes).
-      for (final label in ['Connections', 'Providers', 'Active source']) {
+      for (final label in ['Providers', 'Active source']) {
         expect(
           tester.getSemantics(find.bySemanticsLabel(label)),
           matchesSemantics(

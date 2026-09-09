@@ -11,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 import 'core/analytics/analytics.dart';
 import 'core/app_config.dart';
+import 'core/app_features.dart';
 import 'core/app_mode.dart';
 import 'core/di/injector.dart';
 import 'core/discord/discord_rpc.dart';
@@ -91,28 +92,35 @@ Future<void> main() async {
     // runner. Must run before Supabase: its default auth deep-link observer uses
     // app_links, which has no tvOS plugin (MissingPluginException).
     final appleTv = await resolveAppleTv();
-    // Bounded + guarded like Firebase/MediaKit: on a dead/slow network the
-    // session-restore inside initialize can HANG (a hang never throws, so a
-    // try/catch alone wouldn't save us), and this runs BEFORE runApp — an
-    // unbounded hang here traps the app on the splash forever. Time it out so
-    // boot always proceeds; cloud features degrade to local-only until the next
-    // launch on a live network (SupabaseService.currentUserId tolerates an
-    // uninitialized client).
-    var supabaseOk = false;
-    try {
-      await Supabase.initialize(
-        url: Environment.supabaseUrl,
-        anonKey: Environment.supabaseAnonKey,
-        // TV auth uses QR pairing, not OAuth redirect deep links.
-          authOptions: FlutterAuthClientOptions(detectSessionInUri: !appleTv),
-      ).timeout(const Duration(seconds: 8));
-      supabaseOk = true;
-    } catch (e, st) {
-      AppLogger.instance.logError(e, st);
+    // Accounts + cloud sync are switched off ([AppFeatures.cloudAccounts]):
+    // skip Supabase entirely. The client stays uninitialized for the whole
+    // session and every store falls back to the local-only branch it already
+    // had for the signed-out case, so the library runs out of Hive alone.
+    if (AppFeatures.cloudAccounts) {
+      // Bounded + guarded like Firebase/MediaKit: on a dead/slow network the
+      // session-restore inside initialize can HANG (a hang never throws, so a
+      // try/catch alone wouldn't save us), and this runs BEFORE runApp — an
+      // unbounded hang here traps the app on the splash forever. Time it out so
+      // boot always proceeds; cloud features degrade to local-only until the
+      // next launch on a live network (SupabaseService.currentUserId tolerates
+      // an uninitialized client).
+      var supabaseOk = false;
+      try {
+        await Supabase.initialize(
+          url: Environment.supabaseUrl,
+          anonKey: Environment.supabaseAnonKey,
+          // TV auth uses QR pairing, not OAuth redirect deep links.
+          authOptions:
+              FlutterAuthClientOptions(detectSessionInUri: !appleTv),
+        ).timeout(const Duration(seconds: 8));
+        supabaseOk = true;
+      } catch (e, st) {
+        AppLogger.instance.logError(e, st);
+      }
+      // Boot init failed (dead/slow network) → keep retrying in the background
+      // so login + cloud sync self-heal when the network returns, no restart.
+      if (!supabaseOk) unawaited(_retrySupabaseInit());
     }
-    // Boot init failed (dead/slow network) → keep retrying in the background so
-    // login + cloud sync self-heal when the network returns, no restart needed.
-    if (!supabaseOk) unawaited(_retrySupabaseInit());
     // media_kit (libmpv) has no tvOS libs — Apple TV plays via AVPlayer instead.
     // Calling ensureInitialized here prints + throws and used to derail boot.
     // On old Android 8 / Fire TV the native libs can also fail to load; guard
@@ -366,6 +374,8 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
   /// [MyListStore.pullFromCloudIfStale], so rapid app-switching doesn't hammer
   /// the DB). Also flushes any un-synced My List adds.
   void _syncOnResume() {
+    // Local-only build: there is no account and no cloud rows to re-pull.
+    if (!AppFeatures.cloudAccounts) return;
     if (!sl.isRegistered<AuthCubit>() || !sl<AuthCubit>().state.isLoggedIn) {
       return;
     }
@@ -404,32 +414,36 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
     // Restore a persisted Supabase session (bounded so a slow network can't
     // trap the splash). If signed in, pull the cloud library into the local
     // cache before Home warms so Continue Watching + My List are populated.
-    try {
-      await sl<AuthCubit>().restore().timeout(const Duration(seconds: 5));
-      if (sl<AuthCubit>().state.isLoggedIn) {
-        Future<void> cloudSync() async {
-        await Future.wait([
-          sl<MyListStore>().seedCloudIfNeeded(),
-          sl<WatchHistory>().seedCloudIfNeeded(),
-          sl<ReadHistory>().seedCloudIfNeeded(),
-        ]).timeout(const Duration(seconds: 8));
-        await Future.wait([
-          sl<MyListStore>().pullFromCloudIfStale(maxAge: _syncFreshness),
-          sl<WatchHistory>().pullFromCloudIfStale(maxAge: _syncFreshness),
-          sl<ReadHistory>().pullFromCloudIfStale(maxAge: _syncFreshness),
-          sl<CategoryStore>().pullFromCloud(),
-        ]).timeout(const Duration(seconds: 6));
-        unawaited(sl<MyListStore>().retryPending());
-      }
+    // Skipped wholesale while accounts are off — the local Hive cache IS the
+    // library then, so there is nothing to restore or seed.
+    if (AppFeatures.cloudAccounts) {
+      try {
+        await sl<AuthCubit>().restore().timeout(const Duration(seconds: 5));
+        if (sl<AuthCubit>().state.isLoggedIn) {
+          Future<void> cloudSync() async {
+            await Future.wait([
+              sl<MyListStore>().seedCloudIfNeeded(),
+              sl<WatchHistory>().seedCloudIfNeeded(),
+              sl<ReadHistory>().seedCloudIfNeeded(),
+            ]).timeout(const Duration(seconds: 8));
+            await Future.wait([
+              sl<MyListStore>().pullFromCloudIfStale(maxAge: _syncFreshness),
+              sl<WatchHistory>().pullFromCloudIfStale(maxAge: _syncFreshness),
+              sl<ReadHistory>().pullFromCloudIfStale(maxAge: _syncFreshness),
+              sl<CategoryStore>().pullFromCloud(),
+            ]).timeout(const Duration(seconds: 6));
+            unawaited(sl<MyListStore>().retryPending());
+          }
 
-        // tvOS: never block the splash on cloud I/O — sync after the shell is up.
-        if (isAppleTv) {
-          unawaited(cloudSync().catchError((_) {}));
-        } else {
-          await cloudSync();
+          // tvOS: never block the splash on cloud I/O — sync after the shell is up.
+          if (isAppleTv) {
+            unawaited(cloudSync().catchError((_) {}));
+          } else {
+            await cloudSync();
+          }
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
     if (isOnboarded()) {
       // tvOS: Home fetch waits until provider JS is loaded (deferred boot task).
       if (!isAppleTv) sl<HomeCubit>().load();
@@ -568,7 +582,9 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
           : const [],
       home: _buildHome(),
       builder: (_, child) {
-        final content = shellFeatures
+        // The party bar only ever draws when a Watch Party room is live, and
+        // rooms are a cloud feature — skip the overlay entirely while it's off.
+        final content = shellFeatures && AppFeatures.cloudAccounts
             ? Stack(
                 children: [
                   ?child,
@@ -606,11 +622,16 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
         BlocProvider<ActiveSourceCubit>.value(value: sl<ActiveSourceCubit>()),
         BlocProvider<AuthCubit>.value(value: sl<AuthCubit>()),
       ],
-      child: BlocListener<AuthCubit, AuthState>(
-        listenWhen: (p, c) => p.status != c.status,
-        listener: _onAuthChange,
-        child: app,
-          ),
+      // While accounts are off nothing can change auth state, and the listener's
+      // unauthenticated branch wipes the local library — so it is not mounted at
+      // all rather than merely never firing.
+      child: AppFeatures.cloudAccounts
+          ? BlocListener<AuthCubit, AuthState>(
+              listenWhen: (p, c) => p.status != c.status,
+              listener: _onAuthChange,
+              child: app,
+            )
+          : app,
         );
   }
 }

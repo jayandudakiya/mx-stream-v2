@@ -6,6 +6,7 @@ import '../../core/ui/settings_widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/app_features.dart';
 import '../../core/app_mode.dart';
 import '../../core/di/injector.dart';
 import '../../core/theme/app_colors.dart';
@@ -20,7 +21,12 @@ import '../../l10n/ui_strings.dart';
 
 /// Returns true if logged in. Otherwise shows a "Sign in to {action}" snackbar
 /// with a Sign-in action and returns false — the gate for My List / history.
+///
+/// Always true while [AppFeatures.cloudAccounts] is off: there is no account to
+/// sign into, and the features behind this gate (My List, history) are purely
+/// local then, so gating them would just make them unusable.
 bool requireLogin(BuildContext context, {String? action}) {
+  if (!AppFeatures.cloudAccounts) return true;
   if (context.read<AuthCubit>().state.isLoggedIn) return true;
   final act = action ?? context.l10n.signInToUseThis;
   ScaffoldMessenger.of(context)

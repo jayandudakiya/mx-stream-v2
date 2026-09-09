@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../core/app_features.dart';
 import '../../core/cache/app_image_cache.dart';
 import '../../core/di/injector.dart';
 import '../../core/platform/apple_tv.dart';
@@ -413,7 +414,10 @@ class _HomeScreenTvState extends State<HomeScreenTv> {
     final heroItem = heroItems.isNotEmpty ? heroItems.first : null;
 
     // Continue Watching — same login-gated local history the phone home uses.
-    final loggedIn = context.watch<AuthCubit>().state.isLoggedIn;
+    // Ungated while accounts are off: the history is local, and with no sign-in
+    // available the gate would hide the rail permanently.
+    final loggedIn = !AppFeatures.cloudAccounts ||
+        context.watch<AuthCubit>().state.isLoggedIn;
 
     // The scroll view, parameterised by the current history so a single source
     // drives both the Continue Watching rail and the rails' autofocus.

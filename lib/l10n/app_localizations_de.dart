@@ -881,6 +881,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Etwas auf diesem Gerät verhindert den Start. Nichts ist weg — dein Konto und alles in der Cloud sind sicher.';
 
   @override
+  String get bootErrorBodyLocal =>
+      'Something saved on this device is stopping it from opening. Try again first — a reset clears the library saved on this device.';
+
+  @override
   String get resetAppData => 'App-Daten zurücksetzen';
 
   @override
@@ -889,6 +893,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get resetAppDataBody =>
       'Das löscht, was OrcaBox auf diesem Gerät gespeichert hat, damit es neu starten kann.\n\nDein Konto und alles in der Cloud bleiben unberührt — meld dich wieder an und deine Bibliothek ist da.';
+
+  @override
+  String get resetAppDataBodyLocal =>
+      'This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour list, history and sources live only on this device, so they are erased for good unless you have a backup file.';
 
   @override
   String get resetAppDataDone =>

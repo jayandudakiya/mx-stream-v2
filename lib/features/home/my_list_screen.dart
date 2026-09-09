@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/zmode/metadata_provider_prefs.dart';
 import '../../core/zmode/zmode_ids.dart';
 import '../../core/models/provider_info.dart';
+import '../../core/app_features.dart';
 import '../../core/app_mode.dart';
 import '../../core/di/injector.dart';
 import '../../core/mode/content_mode.dart';
@@ -1056,8 +1057,11 @@ class _MyListViewState extends State<_MyListView> {
   // ── Empty / sign-in ────────────────────────────────────────────────────────
 
   Widget _empty(BuildContext context) {
-    final auth = context.watch<AuthCubit>().state;
-    if (!auth.isLoggedIn) {
+    // With accounts off My List is a purely local Hive list, so an empty list
+    // means "nothing saved yet" — never "sign in first".
+    final signedOut = AppFeatures.cloudAccounts &&
+        !context.watch<AuthCubit>().state.isLoggedIn;
+    if (signedOut) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),

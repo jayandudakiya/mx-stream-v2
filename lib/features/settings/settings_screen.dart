@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/anilist/anilist_service.dart';
 import '../../core/app_config.dart';
+import '../../core/app_features.dart';
 import '../../core/app_mode.dart';
 import '../../core/environment.dart';
 import '../../core/tracker/tracker_hub.dart';
@@ -496,6 +497,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// clear "Sign in" call-to-action → Login (its own card, so it no longer
   /// reads as a flat duplicate of the "Account & sync" row below it).
   Widget _accountCard(BuildContext context) {
+    // No accounts while the backend is off — no sign-in card, no profile row.
+    if (!AppFeatures.cloudAccounts) return const SizedBox.shrink();
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, auth) {
         final Widget row;
@@ -710,6 +713,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (mounted) setState(() {});
         },
       ),
+      // Watch Party rooms live in Supabase — hidden with the rest of the cloud
+      // features until the backend is live.
+      if (AppFeatures.cloudAccounts)
       _SettingsEntry(
         section: SettingsSection.account,
         icon: Icons.groups_2_outlined,
@@ -728,6 +734,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           );
         },
       ),
+      // Cross-device sync needs an account; the library is local-only for now.
+      if (AppFeatures.cloudAccounts)
       _SettingsEntry(
         section: SettingsSection.account,
         icon: Icons.cloud_upload_outlined,

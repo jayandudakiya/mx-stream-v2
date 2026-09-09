@@ -6,6 +6,7 @@ import '../zmode/zmode_ids.dart';
 import '../../features/auth/pair_tv_screen.dart';
 import '../../features/auth/send_trackers_to_tv_screen.dart';
 import '../../features/detail/detail_screen.dart';
+import '../app_features.dart';
 import '../di/injector.dart';
 import '../models/media_item.dart';
 import '../platform/apple_tv.dart';
@@ -46,7 +47,11 @@ class OpenLinkService {
     }
     // orcabox://pair?code=… (TV QR) or HTTPS /pair/?code=… (web share /
     // landing page). Same payload either way.
-    final pair = PairLink.parse(uri);
+    // TV pairing rides the Supabase `pair-tv` Edge Function, so while accounts
+    // are off a pair link is dropped rather than opening a screen that can't
+    // finish. (The manifest intent-filter is left alone so re-enabling the
+    // flag is a one-line change.)
+    final pair = AppFeatures.cloudAccounts ? PairLink.parse(uri) : null;
     if (pair != null) {
       if (pair.trackers) {
         _openSendTrackers(pair.code, pair.nonce);

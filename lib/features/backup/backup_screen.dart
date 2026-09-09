@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/app_features.dart';
 import '../../core/app_mode.dart';
 import '../../core/backup/backup_cloud.dart';
 import '../../core/backup/backup_file.dart';
@@ -296,7 +297,10 @@ class _BackupScreenState extends State<BackupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.watch<AuthCubit>().state.user?.id;
+    // Null while accounts are off — the cloud rows below are hidden with it.
+    final uid = AppFeatures.cloudAccounts
+        ? context.watch<AuthCubit>().state.user?.id
+        : null;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -309,9 +313,14 @@ class _BackupScreenState extends State<BackupScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                 child: Text(
-                  'Save your sources, list and settings — to a file on your '
-                  'device or to your OrcaBox account. Restoring only adds '
-                  'things back; it never deletes what you already have.',
+                  AppFeatures.cloudAccounts
+                      ? 'Save your sources, list and settings — to a file on '
+                          'your device or to your OrcaBox account. Restoring '
+                          'only adds things back; it never deletes what you '
+                          'already have.'
+                      : 'Save your sources, list and settings to a file on your '
+                          'device. Restoring only adds things back; it never '
+                          'deletes what you already have.',
                   style: AppText.caption,
                 ),
               ),
@@ -336,12 +345,14 @@ class _BackupScreenState extends State<BackupScreen> {
                     subtitle: context.l10n.saveABackupFileToYourDownloadsFolder,
                     onTap: _busy ? null : _saveToFile,
                   ),
-                  SettingsTile(
-                    icon: Icons.cloud_upload_outlined,
-                    title: context.l10n.backUpToCloud,
-                    subtitle: context.l10n.saveACopyToYourAccountNeedsSignIn,
-                    onTap: _busy ? null : _backupToCloud,
-                  ),
+                  // Cloud backup needs an account (backend not live yet).
+                  if (AppFeatures.cloudAccounts)
+                    SettingsTile(
+                      icon: Icons.cloud_upload_outlined,
+                      title: context.l10n.backUpToCloud,
+                      subtitle: context.l10n.saveACopyToYourAccountNeedsSignIn,
+                      onTap: _busy ? null : _backupToCloud,
+                    ),
                 ],
               ),
               const SettingsSectionLabel('Restore a backup'),
@@ -353,12 +364,13 @@ class _BackupScreenState extends State<BackupScreen> {
                     subtitle: context.l10n.pickABackupFileYouSavedEarlier,
                     onTap: _busy ? null : _restoreFromFile,
                   ),
-                  SettingsTile(
-                    icon: Icons.cloud_download_outlined,
-                    title: context.l10n.restoreFromCloud,
-                    subtitle: context.l10n.bringBackYourLatestCloudBackup,
-                    onTap: _busy ? null : _restoreFromCloud,
-                  ),
+                  if (AppFeatures.cloudAccounts)
+                    SettingsTile(
+                      icon: Icons.cloud_download_outlined,
+                      title: context.l10n.restoreFromCloud,
+                      subtitle: context.l10n.bringBackYourLatestCloudBackup,
+                      onTap: _busy ? null : _restoreFromCloud,
+                    ),
                 ],
               ),
               if (uid != null)

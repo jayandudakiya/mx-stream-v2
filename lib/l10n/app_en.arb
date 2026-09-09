@@ -356,9 +356,17 @@
 	},
 	"bootErrorTitle": "OrcaBox didn't finish starting",
 	"bootErrorBody": "Something saved on this device is stopping it from opening. Nothing is lost — your account and anything synced to the cloud are safe.",
+	"bootErrorBodyLocal": "Something saved on this device is stopping it from opening. Try again first — a reset clears the library saved on this device.",
+	"@bootErrorBodyLocal": {
+		"description": "Boot-failure explanation for a local-only build (no account, no cloud copy). Used instead of bootErrorBody when AppFeatures.cloudAccounts is off."
+	},
 	"resetAppData": "Reset app data",
 	"resetAppDataTitle": "Reset app data?",
 	"resetAppDataBody": "This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour account and anything synced to the cloud are not touched — sign in again and your library comes back.",
+	"resetAppDataBodyLocal": "This clears what OrcaBox has saved on this device so it can start fresh.\n\nYour list, history and sources live only on this device, so they are erased for good unless you have a backup file.",
+	"@resetAppDataBodyLocal": {
+		"description": "Reset confirmation for a local-only build: there is no cloud copy to restore from, so the warning has to say the data is gone. Used instead of resetAppDataBody when AppFeatures.cloudAccounts is off."
+	},
 	"resetAppDataDone": "Close OrcaBox completely and open it again.",
 	"detailsCopied": "Details copied — send them to us",
 	"copyDetails": "Copy details",

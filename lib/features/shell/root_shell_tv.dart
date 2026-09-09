@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/app_features.dart';
 import '../../core/di/injector.dart';
 import '../../core/platform/apple_tv.dart';
 import '../../core/provider/cloudstream_provider.dart';
@@ -746,8 +747,12 @@ class _RootShellTvState extends State<RootShellTv> with WidgetsBindingObserver {
             const SizedBox(height: 12),
             _brand(), // OrcaBox wordmark, revealed when open
             const SizedBox(height: 8),
-            _avatarBlock(), // profile
-            const SizedBox(height: 6),
+            // The profile row is the TV's only sign-in entry point — dropped
+            // entirely while accounts are off.
+            if (AppFeatures.cloudAccounts) ...[
+              _avatarBlock(), // profile
+              const SizedBox(height: 6),
+            ],
             _sourceIndicator(), // source switch right under the profile
             const SizedBox(height: 6),
             const Divider(
