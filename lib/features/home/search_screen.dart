@@ -628,9 +628,7 @@ class _SearchViewState extends State<_SearchView>
             // Library scope queries the metadata catalogue, not a source, so
             // this (and the picker it opens) is Sources-only.
             if (widget.scope == SearchScope.sources) _sourceLine(),
-            // Control row — result count on the left, sort + filter actions on
-            // the right.
-            _controlRow(),
+            if (widget.scope == SearchScope.library) _controlRow(),
             // What the catalogue is currently narrowed to, spelled out.
             // Arriving here from a genre or tag chip, the results are already
             // filtered before you have typed anything — without this the
@@ -832,10 +830,29 @@ class _SearchViewState extends State<_SearchView>
   /// single source. The whole row opens the source picker sheet. Shown in
   /// idle state too, so the scope is always visible up front.
   ///
-  /// Reads [SearchState.searchSourceId] — Search's own scope. It used to watch
-  /// [ActiveSourceCubit], the same singleton Home listens to, which is why the
-  /// two screens moved together.
+  /// Displays the search scope ("Searching" + source name, tapping opens
+  /// source picker sheet), result count when results are available, and the
+  /// filter button(s) on the right on a single clean row.
   Widget _sourceLine() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 4, 0),
+      child: SizedBox(
+        height: 40,
+        child: Row(
+          children: [
+            Flexible(child: _sourcePickerTrigger()),
+            _sourceResultCount(),
+            const Spacer(),
+            _sourceFilterAction(),
+            _filterAction(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Tappable scope trigger: "Searching" + value + down arrow.
+  Widget _sourcePickerTrigger() {
     return BlocBuilder<SearchBloc, SearchState>(
       buildWhen: (p, c) =>
           p.currentSourceOnly != c.currentSourceOnly ||
@@ -851,43 +868,67 @@ class _SearchViewState extends State<_SearchView>
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => _openSourcePicker(context),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            // Tighter above than below: the search field already carries
-            // its own bottom gap, so an even 11/11 left the line sitting
-            // lower than it looked like it should.
-            padding: const EdgeInsets.only(top: 5, bottom: 11),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.hairline)),
-            ),
-            child: Row(
-              children: [
-                Text(
-                  context.l10n.searching,
-                  style: AppText.caption.copyWith(fontSize: 12.5),
-                ),
-                const SizedBox(width: 5),
-                Flexible(
-                  child: Text(
-                    value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppText.caption.copyWith(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: currentOnly
-                          ? AppColors.accent
-                          : AppColors.textPrimary,
-                    ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                context.l10n.searching,
+                style: AppText.caption.copyWith(fontSize: 12.5),
+              ),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.caption.copyWith(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: currentOnly
+                        ? AppColors.accent
+                        : AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(width: 5),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 16,
-                  color: AppColors.textTertiary,
-                ),
-              ],
+              ),
+              const SizedBox(width: 4),
+              const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 16,
+                color: AppColors.textTertiary,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Result count shown next to the source selector when a search succeeds.
+  Widget _sourceResultCount() {
+    return BlocBuilder<SearchBloc, SearchState>(
+      buildWhen: (p, c) =>
+          p.status != c.status ||
+          p.suggestions != c.suggestions ||
+          p.groups != c.groups ||
+          p.contentFilter != c.contentFilter ||
+          p.audioFilter != c.audioFilter ||
+          p.genreFilter != c.genreFilter ||
+          p.statusFilter != c.statusFilter,
+      builder: (context, state) {
+        final showingSuggestions =
+            state.status != SearchStatus.success &&
+            state.suggestions.isNotEmpty;
+        if (showingSuggestions || state.status != SearchStatus.success) {
+          return const SizedBox.shrink();
+        }
+        final n = state.totalCount;
+        return Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Text(
+            '•  $n result${n == 1 ? '' : 's'}',
+            style: AppText.caption.copyWith(
+              fontSize: 12.5,
+              color: AppColors.textTertiary,
             ),
           ),
         );
