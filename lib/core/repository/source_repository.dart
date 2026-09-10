@@ -17,6 +17,7 @@ import '../models/video_source.dart';
 import '../playback/playback_prefs.dart';
 import '../playback/source_health_store.dart';
 import '../provider/base_provider.dart';
+import '../provider/cloudstream_kt/cs_adapter.dart';
 import '../provider/native/native_provider_adapter.dart';
 import '../provider/native/native_provider_manager.dart';
 import '../i18n/source_languages.dart';
@@ -548,9 +549,17 @@ class SourceRepository implements CatalogueRepository {
               ? p.browseMainPage(more.categoryId!, page)
               : const [];
         case 'native_mainpage':
-          return (p is NativeMovieAdapterBase && more.categoryId != null)
-              ? p.browseMainPage(more.categoryId!, page)
-              : const [];
+          if (more.categoryId == null) return const [];
+          // Two engines answer to `native:` — OrcaBox's original scrapers and
+          // the providers ported from Kotlin CloudStream — and both paginate
+          // their Home rows the same way.
+          if (p is NativeMovieAdapterBase) {
+            return p.browseMainPage(more.categoryId!, page);
+          }
+          if (p is CsProviderAdapter) {
+            return p.browseMainPage(more.categoryId!, page);
+          }
+          return const [];
         default:
           return const [];
       }

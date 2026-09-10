@@ -1,18 +1,32 @@
 import '../base_provider.dart';
+import '../cloudstream_kt/cs_providers.dart';
 import 'native_provider_adapter.dart';
 
 /// Holds the built-in native movie providers (`native:*` source ids) — the
-/// movie twin of `MihonManager`/`AniyomiManager`, except these two are always
+/// movie twin of `MihonManager`/`AniyomiManager`, except these are always
 /// pre-installed rather than user-added from a repo (per the "auto-install /
 /// pre-install" requirement carried over from OrcaBox: a user should never
 /// see a manual install screen just to get Hollywood/Bollywood browsing).
 ///
 /// Deliberately as small as [MihonManager] is NOT — there's no repo, no
-/// update checking, no enable/disable persistence. Both providers are always
+/// update checking, no enable/disable persistence. Every provider is always
 /// on; that's the whole point of "pre-install".
+///
+/// Two engines feed it, both presenting the same `BaseProvider` contract:
+///  * VegaMovies/RogMovies, OrcaBox's original hand-written Dart scrapers;
+///  * the providers ported from Kotlin CloudStream through
+///    `lib/core/provider/cloudstream_kt/` (MultiMovies, HDHub4u, UHDMovies,
+///    4KHDHub).
+///
+/// The originals are listed first so nothing about their ordering, ids or
+/// behaviour changes as ported providers are added alongside them.
 class NativeProviderManager {
   NativeProviderManager() {
-    registerAll([VegaMoviesAdapter(), RogMoviesAdapter()]);
+    registerAll([
+      VegaMoviesAdapter(),
+      RogMoviesAdapter(),
+      ...buildCloudStreamProviders(),
+    ]);
   }
 
   final Map<String, BaseProvider> _sources = {};
