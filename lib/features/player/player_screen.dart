@@ -2126,33 +2126,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   void _openSourceSheet() {
-    final kinds = availableKinds(_c.state.sources);
     _sheet<void>(
-      _SheetColumn(
-        header: context.l10n.sources,
-        children: [
-          for (final k in kinds)
-            for (final s in sortByQuality(sourcesForKind(_c.state.sources, k)))
-              _SheetRow(
-                // Prefer the provider's own per-mirror name (e.g. a HubCloud
-                // server) AND append its resolution (e.g. "… · 1080p"), matching
-                // how CloudStream shows it; fall back to kind + quality/container
-                // when the source has no name of its own.
-                label: s.label?.isNotEmpty == true
-                    ? _sourceLabelWithQuality(s.label!, s.quality)
-                    // Only prefix the audio kind when it's a real sub/dub — an
-                    // `unknown` kind (e.g. Aniyomi sources) would otherwise read
-                    // as a stray "UNKNOWN •".
-                    : '${k != AudioKind.unknown ? '${k.name.toUpperCase()} • ' : ''}'
-                          '${s.quality?.isNotEmpty == true ? s.quality : s.container.name}',
-                active: s == _c.state.active,
-                onTap: () {
-                  Navigator.pop(context);
-                  _c.selectSource(s); // remembers this source for the title
-                  _bumpControls();
-                },
-              ),
-        ],
+      SourcesSheet(
+        controller: _c,
+        onSelect: (s) {
+          Navigator.pop(context);
+          _c.selectSource(s); // remembers this source for the title
+          _bumpControls();
+        },
       ),
     );
   }

@@ -362,37 +362,104 @@ class _ControlsOverlay extends StatelessWidget {
     final c = controller;
     final ep = c.currentEpisode;
     final epNum = ep.number?.toInt() ?? state.currentIndex + 1;
-    // The episode's own name, but only when it's more than a generic
-    // "Episode N" / bare number (many sources just echo the number there).
-    final epName = ep.title.trim();
-    final hasEpName =
-        epName.isNotEmpty &&
-        epName.toLowerCase() != 'episode $epNum' &&
-        epName != '$epNum';
-    // Line 1 = show name (falls back to "Episode N" when no show title).
-    final primaryTitle = showTitle ?? 'Episode $epNum';
-    // Line 2 = "E5 · Episode Name" — only when there's a show name above it to
-    // pair with (otherwise line 1 already carries the episode number).
-    final secondaryTitle = showTitle == null
-        ? null
-        : 'E$epNum${hasEpName ? ' · $epName' : ''}';
-    // Quality appended to the E-line when enabled — prefers
-    // the source's quality label, else the live video height (e.g. "1080p").
-    String? qualityLabel;
-    if (showQuality) {
-      final q = state.active?.quality?.trim();
-      if (q != null && q.isNotEmpty && q.toLowerCase() != 'auto') {
-        qualityLabel = q;
+    final epTitle = ep.title.trim();
+    final epTitleLower = epTitle.toLowerCase();
+
+    // Distinguish Movie vs TV Show / Web Series
+    final isMovie = epTitleLower == 'movie' ||
+        epTitleLower == 'full movie' ||
+        (!c.tmdbIsTv &&
+            c.episodes.length <= 1 &&
+            (ep.season == null || ep.season == 0));
+
+    // Season extraction
+    final int? seasonNum = ep.season ?? () {
+      final m = RegExp(r'\b(?:s|season\s*)(\d{1,2})\b', caseSensitive: false).firstMatch(epTitle) ??
+          RegExp(r'\b(?:s|season\s*)(\d{1,2})\b', caseSensitive: false).firstMatch(ep.id) ??
+          (c.showUrl != null ? RegExp(r'\b(?:s|season\s*)(\d{1,2})\b', caseSensitive: false).firstMatch(c.showUrl!) : null);
+      return m != null ? int.tryParse(m.group(1)!) : null;
+    }();
+
+    // Clean episode title
+    final cleanEpName = stripEpisodePrefix(epTitle, epNum).trim();
+    final hasEpName = cleanEpName.isNotEmpty &&
+        cleanEpName.toLowerCase() != 'movie' &&
+        cleanEpName.toLowerCase() != 'full movie';
+
+    // Primary Title (Line 1):
+    // For MOVIE: [movie Title]
+    // For TV Show / Series: [Title season | current EPISODE ]
+    final String primaryTitle;
+    if (isMovie) {
+      primaryTitle = (showTitle?.trim().isNotEmpty ?? false)
+          ? showTitle!.trim()
+          : (epTitleLower != 'movie' && epTitle.isNotEmpty
+              ? epTitle
+              : 'Movie');
+    } else {
+      final show = (showTitle?.trim().isNotEmpty ?? false) ? showTitle!.trim() : '';
+      final showHasSeason = RegExp(r'\b(?:s|season\s*)\d{1,2}\b', caseSensitive: false).hasMatch(show);
+      final String seasonEpPart;
+      if (seasonNum != null && seasonNum > 0 && !showHasSeason) {
+        seasonEpPart = 'S$seasonNum | E$epNum';
       } else {
-        final h = c.player.state.height ?? 0;
-        if (h > 0) qualityLabel = '${h}p';
+        seasonEpPart = 'E$epNum';
+      }
+
+      final epSuffix = hasEpName ? ' · $cleanEpName' : '';
+      if (show.isNotEmpty) {
+        if (seasonNum != null && seasonNum > 0 && !showHasSeason) {
+          primaryTitle = '$show $seasonEpPart$epSuffix';
+        } else {
+          primaryTitle = '$show | $seasonEpPart$epSuffix';
+        }
+      } else {
+        primaryTitle = '$seasonEpPart$epSuffix';
       }
     }
-    final secondaryLine = qualityLabel == null
-        ? secondaryTitle
-        : (secondaryTitle == null
-              ? qualityLabel
-              : '$secondaryTitle · $qualityLabel');
+
+    // Secondary Line (Line 2): [ select source ]
+    final active = state.active;
+    String? secondaryLine;
+    if (active != null) {
+      final raw = active.label?.trim();
+      String serverName;
+      if (raw != null && raw.isNotEmpty) {
+        serverName = raw.replaceAll(
+          RegExp(
+            r'\s*·\s*(?:2160p|4k|1440p|1080p|720p|480p|360p)\b',
+            caseSensitive: false,
+          ),
+          '',
+        );
+        if (RegExp(r'^\d{3,4}p?$', caseSensitive: false).hasMatch(serverName)) {
+          serverName = 'Server';
+        } else if (serverName.contains('.') &&
+            !serverName.contains(' ') &&
+            RegExp(r's\d{1,2}e\d{1,2}', caseSensitive: false).hasMatch(serverName)) {
+          serverName = 'Stream Server';
+        }
+      } else if (active.kind != AudioKind.unknown) {
+        serverName = '${active.kind.name.toUpperCase()} Stream';
+      } else if (active.container != SourceContainer.unknown) {
+        serverName = '${active.container.name.toUpperCase()} Stream';
+      } else {
+        serverName = 'Stream';
+      }
+
+      final res = SourcesSheet.extractResolution(active.quality, active.label) ??
+          (c.player.state.height != null && c.player.state.height! > 0
+              ? '${c.player.state.height}p'
+              : null);
+
+      if (res != null && res.isNotEmpty) {
+        secondaryLine = '$serverName · $res';
+      } else {
+        secondaryLine = serverName;
+      }
+    } else if (state.loadingSources) {
+      secondaryLine = 'Resolving source…';
+    }
     final hasNext = state.currentIndex + 1 < c.episodes.length;
     // Movies and one-off items have nowhere to step, so they get a lone play
     // button rather than two arrows that can never do anything.

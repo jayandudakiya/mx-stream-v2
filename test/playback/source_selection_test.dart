@@ -7,9 +7,33 @@ VideoSource _s(String q, AudioKind k) =>
 
 void main() {
   test('sortByQuality orders high→low, unknown last', () {
-    final out = sortByQuality([_s('480p', AudioKind.sub), _s('1080p', AudioKind.sub),
-      _s('', AudioKind.sub), _s('720p', AudioKind.sub)]);
-    expect(out.map((s) => s.quality).toList(), ['1080p', '720p', '480p', '']);
+    final out = sortByQuality([
+      _s('480p', AudioKind.sub),
+      _s('1080p', AudioKind.sub),
+      _s('', AudioKind.sub),
+      _s('720p', AudioKind.sub),
+      _s('4K', AudioKind.sub),
+      const VideoSource(
+        url: 'https://x/reacher',
+        quality: 'REACHER.2026.S04E01.CITY.2160P.WEB-DL',
+      ),
+      const VideoSource(
+        url: 'https://x/label-fhd',
+        label: 'V-Cloud [FSL Server] · 1080p',
+      ),
+    ]);
+    expect(
+      out.map((s) => s.url).toList(),
+      [
+        'https://x/4K',
+        'https://x/reacher',
+        'https://x/1080p',
+        'https://x/label-fhd',
+        'https://x/720p',
+        'https://x/480p',
+        'https://x/',
+      ],
+    );
   });
 
   test('availableKinds lists distinct kinds present', () {

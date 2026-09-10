@@ -1476,15 +1476,910 @@ class _SheetColumn extends StatelessWidget {
   }
 }
 
-/// Source-picker row label: the provider's per-source name with its resolution
-/// appended (e.g. "MovieBox (Hindi Audio) · 1080p"), so the quality shows even
-/// when the source carries its own name. Skips a non-resolution quality
-/// ("auto"/empty) and never doubles up a resolution the name already contains.
-String _sourceLabelWithQuality(String label, String? quality) {
-  final q = (quality ?? '').trim();
-  if (q.isEmpty || q.toLowerCase() == 'auto') return label;
-  if (label.toLowerCase().contains(q.toLowerCase())) return label;
-  return '$label · $q';
+
+/// Modern, media-first bottom sheet for selecting video playback sources and mirrors.
+class SourcesSheet extends StatefulWidget {
+  const SourcesSheet({
+    super.key,
+    required this.controller,
+    required this.onSelect,
+  });
+
+  final PlayerCubit controller;
+  final ValueChanged<VideoSource> onSelect;
+
+  /// Extracts clean resolution (e.g. "4K", "1080P", "720P", "480P").
+  /// Never returns raw file names or long strings.
+  static String? extractResolution(String? quality, String? label) {
+    final combined = '${quality ?? ''} ${label ?? ''}'.toLowerCase();
+    if (combined.contains('2160') ||
+        combined.contains('4k') ||
+        combined.contains('uhd')) {
+      return '4K';
+    }
+    if (combined.contains('1440') || combined.contains('2k')) {
+      return '1440P';
+    }
+    if (combined.contains('1080') || combined.contains('fhd')) {
+      return '1080P';
+    }
+    if (combined.contains('720') || combined.contains('hd')) {
+      return '720P';
+    }
+    if (combined.contains('480')) {
+      return '480P';
+    }
+    if (combined.contains('360')) {
+      return '360P';
+    }
+    final q = quality?.trim();
+    if (q != null &&
+        q.isNotEmpty &&
+        q.length <= 6 &&
+        !q.contains('.') &&
+        !q.contains(' ') &&
+        q.toLowerCase() != 'auto') {
+      return q.toUpperCase();
+    }
+    return null;
+  }
+
+  /// Extracts secondary stream tags (WEB-DL, HDR, ATMOS, 5.1, HEVC, etc.)
+  /// without cluttering the UI with scene titles.
+  static List<String> extractTags(String? quality, String? label) {
+    final combined = '${quality ?? ''} ${label ?? ''}'.toLowerCase();
+    final tags = <String>[];
+
+    // Source / Rip type
+    if (combined.contains('remux')) {
+      tags.add('REMUX');
+    } else if (combined.contains('bluray') || combined.contains('bdrip')) {
+      tags.add('BluRay');
+    } else if (combined.contains('web-dl') ||
+        combined.contains('webdl') ||
+        combined.contains('webrip') ||
+        combined.contains('web-rip')) {
+      tags.add('WEB-DL');
+    }
+
+    // Dynamic range
+    if (combined.contains('hdr10+') || combined.contains('hdr10plus')) {
+      tags.add('HDR10+');
+    } else if (combined.contains('hdr')) {
+      tags.add('HDR');
+    }
+    if (combined.contains('dovi') ||
+        combined.contains('dolby vision') ||
+        RegExp(r'\bdv\b').hasMatch(combined)) {
+      tags.add('DV');
+    }
+
+    // Audio format
+    if (combined.contains('atmos')) {
+      tags.add('ATMOS');
+    } else if (combined.contains('5.1') ||
+        combined.contains('ddp5') ||
+        combined.contains('dts')) {
+      tags.add('5.1');
+    }
+
+    // Video Codec
+    if (combined.contains('hevc') ||
+        combined.contains('h.265') ||
+        combined.contains('x265') ||
+        combined.contains('h265')) {
+      tags.add('HEVC');
+    } else if (combined.contains('av1')) {
+      tags.add('AV1');
+    }
+
+    // File size if present (e.g. 2.4 GB, 850 MB)
+    final sizeMatch = RegExp(
+      r'(\d+(?:\.\d+)?\s*(?:gb|mb))',
+      caseSensitive: false,
+    ).firstMatch(combined);
+    if (sizeMatch != null) {
+      final size = sizeMatch.group(1)!.trim().toUpperCase();
+      if (size.length <= 8) {
+        tags.add(size);
+      }
+    }
+
+    return tags;
+  }
+
+  static ({Color text, Color bg, Color border}) qualityColors(String res) {
+    final l = res.toLowerCase();
+    if (l.contains('4k') || l.contains('2160')) {
+      return (
+        text: const Color(0xFFFFB300),
+        bg: const Color(0x22FFB300),
+        border: const Color(0x45FFB300),
+      );
+    } else if (l.contains('1080') || l.contains('fhd')) {
+      return (
+        text: const Color(0xFF00E5FF),
+        bg: const Color(0x2000E5FF),
+        border: const Color(0x4000E5FF),
+      );
+    } else if (l.contains('720') || l.contains('hd')) {
+      return (
+        text: const Color(0xFF00E676),
+        bg: const Color(0x2000E676),
+        border: const Color(0x4000E676),
+      );
+    } else {
+      return (
+        text: const Color(0xFFB0B3C6),
+        bg: const Color(0x18FFFFFF),
+        border: const Color(0x25FFFFFF),
+      );
+    }
+  }
+
+  static ({Color text, Color bg, Color border}) formatColors(
+    SourceContainer container,
+  ) {
+    switch (container) {
+      case SourceContainer.hls:
+        return (
+          text: const Color(0xFF82B1FF),
+          bg: const Color(0x2082B1FF),
+          border: const Color(0x4082B1FF),
+        );
+      case SourceContainer.mp4:
+        return (
+          text: const Color(0xFFB39DDB),
+          bg: const Color(0x20B39DDB),
+          border: const Color(0x40B39DDB),
+        );
+      case SourceContainer.torrent:
+        return (
+          text: const Color(0xFFFF7043),
+          bg: const Color(0x20FF7043),
+          border: const Color(0x40FF7043),
+        );
+      case SourceContainer.unknown:
+        return (
+          text: const Color(0xFFB0B3C6),
+          bg: const Color(0x14FFFFFF),
+          border: const Color(0x20FFFFFF),
+        );
+    }
+  }
+
+  static ({Color text, Color bg, Color border}) kindColors(AudioKind kind) {
+    switch (kind) {
+      case AudioKind.sub:
+        return (
+          text: const Color(0xFF40C4FF),
+          bg: const Color(0x2040C4FF),
+          border: const Color(0x4040C4FF),
+        );
+      case AudioKind.dub:
+        return (
+          text: const Color(0xFFEA80FC),
+          bg: const Color(0x20EA80FC),
+          border: const Color(0x40EA80FC),
+        );
+      case AudioKind.raw:
+        return (
+          text: const Color(0xFFFFAB40),
+          bg: const Color(0x20FFAB40),
+          border: const Color(0x40FFAB40),
+        );
+      case AudioKind.unknown:
+        return (
+          text: const Color(0xFFB0B3C6),
+          bg: const Color(0x14FFFFFF),
+          border: const Color(0x20FFFFFF),
+        );
+    }
+  }
+
+  @override
+  State<SourcesSheet> createState() => _SourcesSheetState();
+}
+
+class _SourcesSheetState extends State<SourcesSheet> {
+  AudioKind? _selectedKind;
+
+  String _formatActiveSummary(VideoSource s) {
+    final raw = s.label?.trim();
+    final title = (raw != null && raw.isNotEmpty)
+        ? raw.replaceAll(
+            RegExp(
+              r'\s*·\s*(?:2160p|4k|1440p|1080p|720p|480p|360p)\b',
+              caseSensitive: false,
+            ),
+            '',
+          )
+        : (s.kind != AudioKind.unknown
+            ? '${s.kind.name.toUpperCase()} Stream'
+            : 'Default Stream');
+    final res = SourcesSheet.extractResolution(s.quality, s.label);
+    if (res != null) {
+      return '$title · $res';
+    }
+    return title;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PlayerCubit, PlayerState>(
+      bloc: widget.controller,
+      builder: (context, state) {
+        final sources = state.sources;
+        final active = state.active;
+        final kinds = availableKinds(sources);
+
+        // Filter sources by audio kind if a filter chip is active, always sorted high->low quality
+        final List<VideoSource> list;
+        if (_selectedKind != null && kinds.contains(_selectedKind)) {
+          list = sortByQuality(sourcesForKind(sources, _selectedKind!));
+        } else {
+          list = sortByQuality(sources);
+        }
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Drag handle pill
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Center(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: const SizedBox(width: 36, height: 3.5),
+                ),
+              ),
+            ),
+
+            // Header Row: icon, title, count badge, active summary, close button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 2, 12, 10),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.accent.withValues(alpha: 0.22),
+                          AppColors.accent.withValues(alpha: 0.08),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppColors.accent.withValues(alpha: 0.35),
+                        width: 0.8,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.layers_rounded,
+                      color: AppColors.accent,
+                      size: 19,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              context.l10n.sources,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                            if (sources.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.07),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.08),
+                                  ),
+                                ),
+                                child: Text(
+                                  '${sources.length}',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        if (active != null) ...[
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Container(
+                                width: 5,
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.accent,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Text(
+                                  'Active: ${_formatActiveSummary(active)}',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.55),
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Material(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    shape: const CircleBorder(),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: const Padding(
+                        padding: EdgeInsets.all(7),
+                        child: Icon(
+                          Icons.close_rounded,
+                          color: Colors.white70,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Kind filter chips (when multiple audio kinds exist)
+            if (kinds.length > 1) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _SourceFilterChip(
+                        label: 'All (${sources.length})',
+                        selected: _selectedKind == null,
+                        onTap: () => setState(() => _selectedKind = null),
+                      ),
+                      for (final k in kinds) ...[
+                        const SizedBox(width: 6),
+                        _SourceFilterChip(
+                          label:
+                              '${k.name.toUpperCase()} (${sourcesForKind(sources, k).length})',
+                          selected: _selectedKind == k,
+                          onTap: () => setState(() => _selectedKind = k),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ] else
+              const SizedBox(height: 2),
+
+            // Scrollable list of sources or states
+            Flexible(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.62,
+                ),
+                child: state.loadingSources && sources.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 36),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 28,
+                                height: 28,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.accent,
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              const Text(
+                                'Resolving sources…',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : list.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 32,
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.cloud_off_rounded,
+                                    size: 40,
+                                    color: AppColors.textTertiary,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    'No alternate sources',
+                                    style: AppText.headline.copyWith(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Only the current stream is available for this title.',
+                                    textAlign: TextAlign.center,
+                                    style: AppText.caption.copyWith(
+                                      color: AppColors.textTertiary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.fromLTRB(14, 2, 14, 12),
+                            itemCount: list.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 8),
+                            itemBuilder: (context, index) {
+                              final s = list[index];
+                              return _SourceCard(
+                                source: s,
+                                index: index,
+                                isActive: s == active,
+                                onTap: () => widget.onSelect(s),
+                              );
+                            },
+                          ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _SourceCard extends StatelessWidget {
+  const _SourceCard({
+    required this.source,
+    required this.index,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final VideoSource source;
+  final int index;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  String _cleanServerTitle() {
+    final raw = source.label?.trim();
+    if (raw != null && raw.isNotEmpty) {
+      if (RegExp(r'^\d{3,4}p?$', caseSensitive: false).hasMatch(raw)) {
+        return 'Server ${index + 1}';
+      }
+      // If label is a raw scene release filename (dots, season/episode tags)
+      if (raw.contains('.') &&
+          !raw.contains(' ') &&
+          RegExp(r's\d{1,2}e\d{1,2}', caseSensitive: false).hasMatch(raw)) {
+        return 'Stream Server ${index + 1}';
+      }
+      return raw.replaceAll(
+        RegExp(
+          r'\s*·\s*(?:2160p|4k|1440p|1080p|720p|480p|360p)\b',
+          caseSensitive: false,
+        ),
+        '',
+      );
+    }
+    if (source.kind != AudioKind.unknown) {
+      return '${source.kind.name.toUpperCase()} Server ${index + 1}';
+    }
+    return 'Server ${index + 1}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = _cleanServerTitle();
+    final res = SourcesSheet.extractResolution(source.quality, source.label);
+    final resColors = res != null ? SourcesSheet.qualityColors(res) : null;
+    final tags = SourcesSheet.extractTags(source.quality, source.label);
+    final kColors = SourcesSheet.kindColors(source.kind);
+    final cColors = SourcesSheet.formatColors(source.container);
+
+    final String? containerLabel = switch (source.container) {
+      SourceContainer.hls => 'HLS',
+      SourceContainer.mp4 => 'MP4',
+      SourceContainer.torrent => 'TORRENT',
+      SourceContainer.unknown => null,
+    };
+
+    final IconData streamIcon;
+    final Color streamIconColor;
+    if (isActive) {
+      streamIcon = Icons.play_arrow_rounded;
+      streamIconColor = AppColors.accent;
+    } else if (source.container == SourceContainer.torrent) {
+      streamIcon = Icons.cloud_download_rounded;
+      streamIconColor = const Color(0xFFFF7043);
+    } else if (source.container == SourceContainer.hls) {
+      streamIcon = Icons.sensors_rounded;
+      streamIconColor = const Color(0xFF82B1FF);
+    } else if (source.container == SourceContainer.mp4) {
+      streamIcon = Icons.movie_outlined;
+      streamIconColor = const Color(0xFFB39DDB);
+    } else {
+      streamIcon = Icons.play_circle_outline_rounded;
+      streamIconColor = Colors.white54;
+    }
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        autofocus: isActive,
+        splashColor: AppColors.accent.withValues(alpha: 0.15),
+        highlightColor: Colors.white.withValues(alpha: 0.04),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          decoration: BoxDecoration(
+            color: isActive
+                ? const Color(0xFF1B1D28)
+                : const Color(0xFF13141B),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isActive
+                  ? AppColors.accent.withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.06),
+              width: isActive ? 1.2 : 1.0,
+            ),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: AppColors.accent.withValues(alpha: 0.15),
+                      blurRadius: 14,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              // Active left accent indicator bar
+              if (isActive) ...[
+                Container(
+                  width: 3.5,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accent.withValues(alpha: 0.6),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
+
+              // Stream icon container
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? AppColors.accent.withValues(alpha: 0.15)
+                      : Colors.white.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(
+                    color: isActive
+                        ? AppColors.accent.withValues(alpha: 0.35)
+                        : Colors.white.withValues(alpha: 0.06),
+                  ),
+                ),
+                child: Icon(
+                  streamIcon,
+                  color: streamIconColor,
+                  size: isActive ? 21 : 18,
+                ),
+              ),
+              const SizedBox(width: 11),
+
+              // Title and metadata badges
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+                        color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.9),
+                        fontSize: 14.5,
+                        letterSpacing: -0.1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 5),
+                    Wrap(
+                      spacing: 5,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        if (res != null && resColors != null)
+                          _SourceBadgePill(
+                            label: res,
+                            text: resColors.text,
+                            bg: resColors.bg,
+                            border: resColors.border,
+                          ),
+                        if (source.kind != AudioKind.unknown)
+                          _SourceBadgePill(
+                            label: source.kind.name.toUpperCase(),
+                            text: kColors.text,
+                            bg: kColors.bg,
+                            border: kColors.border,
+                          ),
+                        if (source.audioLang != null &&
+                            source.audioLang!.trim().isNotEmpty)
+                          _SourceBadgePill(
+                            label: source.audioLang!.trim().toUpperCase(),
+                            text: const Color(0xFFB0B3C6),
+                            bg: const Color(0x14FFFFFF),
+                            border: const Color(0x1FFFFFFF),
+                          ),
+                        for (final tag in tags.take(2))
+                          _SourceBadgePill(
+                            label: tag,
+                            text: const Color(0xFFB0B3C6),
+                            bg: const Color(0x14FFFFFF),
+                            border: const Color(0x1AFFFFFF),
+                          ),
+                        if (containerLabel != null)
+                          _SourceBadgePill(
+                            label: containerLabel,
+                            text: cColors.text,
+                            bg: cColors.bg,
+                            border: cColors.border,
+                          ),
+                        if (source.subtitles.isNotEmpty)
+                          _SourceBadgePill(
+                            label:
+                                '${source.subtitles.length} ${source.subtitles.length == 1 ? "sub" : "subs"}',
+                            icon: Icons.subtitles_rounded,
+                            text: const Color(0xFFB0B3C6),
+                            bg: const Color(0x14FFFFFF),
+                            border: const Color(0x1FFFFFFF),
+                          ),
+                        if (source.isDrm)
+                          const _SourceBadgePill(
+                            label: 'DRM',
+                            icon: Icons.lock_rounded,
+                            text: Color(0xFFFFAB40),
+                            bg: Color(0x18FFAB40),
+                            border: Color(0x38FFAB40),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // Trailing Active indicator or Chevron
+              if (isActive)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.35),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.accent,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.accent.withValues(alpha: 0.8),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        'ACTIVE',
+                        style: TextStyle(
+                          color: AppColors.accent,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: Colors.white.withValues(alpha: 0.25),
+                  size: 20,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SourceBadgePill extends StatelessWidget {
+  const _SourceBadgePill({
+    required this.label,
+    required this.text,
+    required this.bg,
+    this.border,
+    this.icon,
+  });
+
+  final String label;
+  final Color text;
+  final Color bg;
+  final Color? border;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 100),
+      padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(5),
+        border: border != null ? Border.all(color: border!, width: 0.8) : null,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 10, color: text),
+            const SizedBox(width: 3.5),
+          ],
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: text,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SourceFilterChip extends StatelessWidget {
+  const _SourceFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.accent.withValues(alpha: 0.18)
+                : Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected
+                  ? AppColors.accent.withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.08),
+              width: selected ? 1.0 : 0.8,
+            ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.accent.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                    ),
+                  ]
+                : null,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? AppColors.accent : Colors.white70,
+              fontSize: 11.5,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SheetRow extends StatelessWidget {

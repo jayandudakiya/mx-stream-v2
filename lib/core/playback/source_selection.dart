@@ -1,12 +1,20 @@
 import '../models/video_source.dart';
 
-/// Parses a quality label like `'1080p'` into a comparable int (height in px).
+/// Parses a quality/label string into a comparable int (height in px).
 /// Unknown/empty → -1 so it sorts last.
-int qualityRank(String? quality) {
+int qualityRank(String? quality, [String? label]) {
+  final px = resolutionPx(quality) ?? resolutionPx(label);
+  if (px != null) return px;
   if (quality == null) return -1;
-  final m = RegExp(r'(\d{3,4})').firstMatch(quality);
-  if (m == null) return -1;
-  return int.tryParse(m.group(1)!) ?? -1;
+  final m = RegExp(r'\b(\d{3,4})p?\b').firstMatch(quality.toLowerCase());
+  if (m != null) {
+    final val = int.tryParse(m.group(1)!);
+    if (val != null &&
+        (val < 1900 || val > 2099 || quality.toLowerCase().contains('${val}p'))) {
+      return val;
+    }
+  }
+  return -1;
 }
 
 /// Returns [sources] sorted by quality high→low; unknown qualities last.
@@ -16,7 +24,8 @@ List<VideoSource> sortByQuality(List<VideoSource> sources) {
   indexed.sort((a, b) {
     final r = qualityRank(
       b.value.quality,
-    ).compareTo(qualityRank(a.value.quality));
+      b.value.label,
+    ).compareTo(qualityRank(a.value.quality, a.value.label));
     return r != 0 ? r : a.key.compareTo(b.key);
   });
   return indexed.map((e) => e.value).toList();
@@ -43,14 +52,27 @@ int? resolutionPx(String? label) {
   if (label == null) return null;
   final l = label.toLowerCase();
   if (l.contains('2160') || l.contains('4k') || l.contains('uhd')) return 2160;
-  if (l.contains('1440') || l.contains('2k')) return 1440;
+  if (l.contains('1440') || l.contains('2k') || l.contains('qhd')) return 1440;
   if (l.contains('1080') || l.contains('fhd')) return 1080;
-  if (l.contains('720')) return 720;
-  if (l.contains('480')) return 480;
+  if (l.contains('720') ||
+      (l.contains('hd') &&
+          !l.contains('hdhub') &&
+          !l.contains('fhd') &&
+          !l.contains('uhd'))) {
+    return 720;
+  }
+  if (l.contains('540')) return 540;
+  if (l.contains('480') || l.contains('sd')) return 480;
   if (l.contains('360')) return 360;
   if (l.contains('240')) return 240;
-  final m = RegExp(r'(\d{3,4})').firstMatch(l);
-  return m != null ? int.tryParse(m.group(1)!) : null;
+  final m = RegExp(r'\b(\d{3,4})p?\b').firstMatch(l);
+  if (m != null) {
+    final val = int.tryParse(m.group(1)!);
+    if (val != null && (val < 1900 || val > 2099 || l.contains('${val}p'))) {
+      return val;
+    }
+  }
+  return null;
 }
 
 /// Best default source: highest quality of [prefer]; if none of that kind,
