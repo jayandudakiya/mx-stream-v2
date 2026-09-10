@@ -245,7 +245,7 @@ class _SearchViewState extends State<_SearchView>
       {for (final s in _repo.loadedSources) s.id: s},
       mode,
       (s) => sourceTypeOf(s.id),
-    ).values.toList();
+    ).values.where((s) => !isBuiltInSource(s.id)).toList();
   }
 
   @override
@@ -843,7 +843,9 @@ class _SearchViewState extends State<_SearchView>
       builder: (context, state) {
         final currentOnly = state.currentSourceOnly;
         final scopedId = state.searchSourceId;
-        final value = (currentOnly && scopedId != null)
+        final isScopedValid =
+            scopedId != null && !isBuiltInSource(scopedId);
+        final value = (currentOnly && isScopedValid)
             ? _repo.displayName(scopedId)
             : context.l10n.allSources;
         return GestureDetector(
@@ -919,11 +921,7 @@ class _SearchViewState extends State<_SearchView>
     final bloc = context.read<SearchBloc>();
     final currentOnly = bloc.state.currentSourceOnly;
     final scopedId = bloc.state.searchSourceId;
-    final rows = sourcePickerRows(
-      _modeSources,
-      builtInLabel: context.l10n.builtIn,
-      installedLabel: context.l10n.installed,
-    );
+    final rows = sourcePickerRows(_modeSources);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.surface,
@@ -957,12 +955,8 @@ class _SearchViewState extends State<_SearchView>
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: rows.length + 1,
-                  // No hairline directly above a heading — the heading's own
-                  // top padding is the separation there, and a rule plus a gap
-                  // reads as a stray empty row.
-                  separatorBuilder: (_, i) => (rows[i].header != null)
-                      ? const SizedBox.shrink()
-                      : const Divider(height: 1, color: AppColors.hairline),
+                  separatorBuilder: (_, _) =>
+                      const Divider(height: 1, color: AppColors.hairline),
                   itemBuilder: (context, i) {
                     if (i == 0) {
                       return _sourcePickerRow(
@@ -2395,46 +2389,27 @@ typedef SourcePickerRow = ({
 /// user added.
 bool isBuiltInSource(String sourceId) => sourceId.startsWith('native:');
 
-/// Groups [sources] for the search source-picker sheet: built-in providers
-/// under one heading, installed extensions under another, each sorted
-/// alphabetically.
-///
-/// The app ships its own Dart providers for a few sites (the Hollywood and
-/// Bollywood Home channels) and a user can also install an extension scraping
-/// the SAME site. Those are two different engines, so both stay searchable and
-/// both get a row — but ungrouped they read as one provider listed twice. The
-/// headings are what make the pairing look deliberate.
+/// Sorts [sources] alphabetically by name into a single flat list for the
+/// search source-picker sheet (no "Built-in" / "Installed" headers).
 ///
 /// Deduplication is by source id only. Names are deliberately NOT deduped: a
 /// built-in and an extension for one site have similar names on purpose, and
 /// collapsing them would silently drop an engine the user can still pick.
-/// A heading is omitted when its group is empty, so a build with no extensions
-/// installed shows no "Installed" heading rather than an empty section.
 List<SourcePickerRow> sourcePickerRows(
   Iterable<({String id, String name})> sources, {
-  required String builtInLabel,
-  required String installedLabel,
+  String? builtInLabel,
+  String? installedLabel,
 }) {
   final seenIds = <String>{};
   final unique = [
     for (final s in sources)
-      if (seenIds.add(s.id)) s,
+      if (!isBuiltInSource(s.id) && seenIds.add(s.id)) s,
   ];
-  int byName(({String id, String name}) a, ({String id, String name}) b) =>
-      a.name.toLowerCase().compareTo(b.name.toLowerCase());
-  final builtIn = unique.where((s) => isBuiltInSource(s.id)).toList()
-    ..sort(byName);
-  final installed = unique.where((s) => !isBuiltInSource(s.id)).toList()
-    ..sort(byName);
+  unique.sort(
+    (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+  );
   return [
-    if (builtIn.isNotEmpty) ...[
-      (header: builtInLabel, source: null),
-      for (final s in builtIn) (header: null, source: s),
-    ],
-    if (installed.isNotEmpty) ...[
-      (header: installedLabel, source: null),
-      for (final s in installed) (header: null, source: s),
-    ],
+    for (final s in unique) (header: null, source: s),
   ];
 }
 
@@ -2991,7 +2966,7 @@ class _SearchFilterSheet extends StatelessWidget {
     SearchSourcePrefs prefs,
     ContentMode mode,
   ) {
-    final allIds = [for (final s in sections) ...s.rows.map((r) => r.id)];
+    final allIds = {for (final s in sections) ...s.rows.map((r) => r.id)};
     final onCount = allIds.where(prefs.isIncluded).length;
     return InkWell(
       onTap: () => _openSourcesSheet(context, sections, prefs, mode),
@@ -3027,9 +3002,9 @@ class _SearchFilterSheet extends StatelessWidget {
     );
   }
 
-  /// The "search in these sources" sub-sheet — same categorised
-  /// switches/"turn all on/off" behaviour as before, just moved off the main
-  /// sheet. [filterSheetContext] is the MAIN sheet's context, kept so the
+  /// The "search in these sources" sub-sheet — displays a unified flat list
+  /// of installed sources (alphabetically sorted) with a global turn all on/off toggle.
+  /// [filterSheetContext] is the MAIN sheet's context, kept so the
   /// empty-state's install CTA can close both sheets and push
   /// [OrcaBoxSourcesScreen], same as it always has.
   void _openSourcesSheet(
@@ -3039,6 +3014,16 @@ class _SearchFilterSheet extends StatelessWidget {
     SearchSourcePrefs prefs,
     ContentMode mode,
   ) {
+    final seen = <String>{};
+    final sources = [
+      for (final sec in sections)
+        for (final r in sec.rows)
+          if (seen.add(r.id)) r,
+    ]..sort(
+      (a, b) => a.label.toLowerCase().compareTo(b.label.toLowerCase()),
+    );
+    final allIds = [for (final s in sources) s.id];
+
     showModalBottomSheet<void>(
       context: filterSheetContext,
       backgroundColor: AppColors.surface,
@@ -3048,124 +3033,96 @@ class _SearchFilterSheet extends StatelessWidget {
       ),
       builder: (subCtx) => ListenableBuilder(
         listenable: prefs,
-        builder: (subCtx, _) => SafeArea(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(subCtx).size.height * 0.8,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 36,
-                  height: 4,
-                  margin: const EdgeInsets.fromLTRB(0, 12, 0, 12),
-                  decoration: BoxDecoration(
-                    color: AppColors.hairline,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      subCtx.l10n.searchInSources,
-                      style: AppText.headline,
+        builder: (subCtx, _) {
+          final onCount = allIds.where(prefs.isIncluded).length;
+          final allOn = onCount == allIds.length;
+          return SafeArea(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(subCtx).size.height * 0.8,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.hairline,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ),
-                Flexible(
-                  child: sections.isEmpty
-                      ? SearchSourcesEmptyView(
-                          mode: mode,
-                          onInstallSources: () {
-                            Navigator.of(subCtx).pop();
-                            Navigator.of(filterSheetContext).pop();
-                            Navigator.of(filterSheetContext).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => const OrcaBoxSourcesScreen(
-                                  openToRepos: true,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 12, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            subCtx.l10n.searchInSources,
+                            style: AppText.headline,
+                          ),
+                        ),
+                        if (sources.isNotEmpty)
+                          TextButton(
+                            onPressed: () => prefs.setManyIncluded(allIds, !allOn),
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(0, 32),
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                            child: Text(
+                              allOn ? subCtx.l10n.turnAllOff : subCtx.l10n.turnAllOn,
+                              style: AppText.caption.copyWith(color: AppColors.accent),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: sources.isEmpty
+                        ? SearchSourcesEmptyView(
+                            mode: mode,
+                            onInstallSources: () {
+                              Navigator.of(subCtx).pop();
+                              Navigator.of(filterSheetContext).pop();
+                              Navigator.of(filterSheetContext).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => const OrcaBoxSourcesScreen(
+                                    openToRepos: true,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        )
-                      : ListView(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          children: [
-                            for (final sec in sections) ...[
-                              _categoryHeader(
-                                subCtx,
-                                prefs,
-                                sec.title,
-                                sec.rows,
-                              ),
-                              for (final r in sec.rows) _sourceRow(prefs, r),
+                              );
+                            },
+                          )
+                        : ListView(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            children: [
+                              for (final r in sources) _sourceRow(prefs, r),
                             ],
-                          ],
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(subCtx),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () => Navigator.pop(subCtx),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        child: Text(subCtx.l10n.done),
                       ),
-                      child: Text(subCtx.l10n.done),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _categoryHeader(
-    BuildContext context,
-    SearchSourcePrefs prefs,
-    String title,
-    List<({String id, String label, String? repo})> rows,
-  ) {
-    final ids = rows.map((r) => r.id).toList();
-    final onCount = ids.where(prefs.isIncluded).length;
-    final allOn = onCount == ids.length;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 14, 12, 6),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              '${title.toUpperCase()}  ·  $onCount/${ids.length}',
-              style: AppText.caption.copyWith(
-                color: AppColors.textTertiary,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.5,
+                ],
               ),
             ),
-          ),
-          TextButton(
-            onPressed: () => prefs.setManyIncluded(ids, !allOn),
-            style: TextButton.styleFrom(
-              minimumSize: const Size(0, 32),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-            ),
-            child: Text(
-              allOn ? context.l10n.turnAllOff : context.l10n.turnAllOn,
-              style: AppText.caption.copyWith(color: AppColors.accent),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

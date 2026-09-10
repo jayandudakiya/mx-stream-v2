@@ -30,7 +30,7 @@ class SearchPrefs extends ChangeNotifier {
   static const String _sortKey = 'sort';
   static const String _genreKey = 'genre';
   static const String _decadeKey = 'decade';
-  static const String _currentSourceOnlyKey = 'currentSourceOnly';
+  static const String _currentSourceOnlyKey = 'currentSourceOnly_v2';
 
   /// Opens the box. Call once during app bootstrap before constructing.
   static Future<void> init() async {
@@ -60,9 +60,9 @@ class SearchPrefs extends ChangeNotifier {
 
   // ── Search scope (CloudStream-style "current source only") ────────────────
   /// When true, search queries ONLY the currently-active Home source instead of
-  /// fanning out to every enabled source. Defaults to true — the product pick.
+  /// fanning out to every enabled source. Defaults to false (all sources).
   bool get currentSourceOnly =>
-      _box.get(_currentSourceOnlyKey, defaultValue: true) as bool;
+      _box.get(_currentSourceOnlyKey, defaultValue: false) as bool;
 
   Future<void> setCurrentSourceOnly(bool value) async {
     if (value == currentSourceOnly) return;

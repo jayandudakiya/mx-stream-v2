@@ -268,3 +268,140 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
     );
   }
 }
+
+/// Loading placeholder shaped like [FeaturedCarousel].
+///
+/// Keeps the 540 px hero container stable during channel / source reloads so
+/// content below it (like Continue Watching) doesn't jump to the top of the
+/// screen during loading.
+class HeroSkeleton extends StatefulWidget {
+  const HeroSkeleton({super.key});
+
+  @override
+  State<HeroSkeleton> createState() => _HeroSkeletonState();
+}
+
+class _HeroSkeletonState extends State<HeroSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _anim,
+        builder: (context, _) {
+          final opacity = 0.3 + 0.25 * _anim.value;
+          final shimmerColor = AppColors.surface2.withValues(alpha: opacity);
+
+          return SizedBox(
+            height: kHeroHeight,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 90, 16, 40),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ColoredBox(color: shimmerColor),
+                    // Bottom gradient fade into page bg
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                const Color(0xB30B0B0F),
+                                AppColors.bg,
+                              ],
+                              stops: const [0.38, 0.72, 1.0],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Placeholder shapes for title, metadata & action buttons
+                    Positioned(
+                      left: 20,
+                      right: 20,
+                      bottom: 36,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Title skeleton
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              width: 180,
+                              height: 24,
+                              child: ColoredBox(color: shimmerColor),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Genres / metadata line skeleton
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: SizedBox(
+                              width: 120,
+                              height: 12,
+                              child: ColoredBox(color: shimmerColor),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          // Action buttons skeleton
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: SizedBox(
+                                  width: 110,
+                                  height: 42,
+                                  child: ColoredBox(color: shimmerColor),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: SizedBox(
+                                  width: 90,
+                                  height: 42,
+                                  child: ColoredBox(color: shimmerColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

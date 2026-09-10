@@ -32,8 +32,8 @@ import 'package:orcabox/features/search/bloc/search_bloc.dart';
 import 'package:orcabox/features/search/bloc/search_event.dart';
 import 'package:orcabox/features/search/bloc/search_state.dart';
 
-const _homeSource = 'native:vegamovies';
-const _otherSource = 'native:rogmovies';
+const _homeSource = 'cs:vegamovies';
+const _otherSource = 'cs:rogmovies';
 
 MediaItem _fakeItem(String sourceId) => MediaItem(
   id: 'id-$sourceId',
@@ -193,8 +193,7 @@ void main() {
     tempDir = await Directory.systemTemp.createTemp('search_home_isolation');
     Hive.init(tempDir.path);
 
-    // No box → the cubit reports its fallback, which is the Hollywood channel.
-    activeSource = ActiveSourceCubit();
+    activeSource = ActiveSourceCubit(fallback: _homeSource);
     modeCubit = await ContentModeCubit.create(activeSource);
 
     // Registered in the locator because that is how the bloc seeds its initial

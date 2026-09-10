@@ -294,6 +294,8 @@ flutter:
     - assets/icon/preview_classic.webp
     # OrcaBox mark — for the mode-switch transition.
     - assets/icon/logo_mark.png
+    # App intro splash sound.
+    - assets/audio/intro.mp3
 
   fonts:
     - family: Inter

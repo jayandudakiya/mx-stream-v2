@@ -37,6 +37,7 @@
   <a href="#️-download"><b>Download</b></a> ·
   <a href="#-tech-stack"><b>Tech Stack</b></a> ·
   <a href="#-faq"><b>FAQ</b></a> ·
+  <a href="#-disclaimer--terms"><b>Disclaimer & Terms</b></a> ·
   <a href="#-communities"><b>Communities</b></a> ·
   <a href="#-license"><b>License</b></a>
 </p>
@@ -176,7 +177,7 @@ Open an <a href="https://github.com/jayandudakiya8100/mx-stream-app/issues">issu
 
 ---
 
-## ⚠️ Disclaimer
+## ⚠️ Disclaimer & Terms
 
 > [!IMPORTANT]
 > **OrcaBox is a tracking and management tool only.** It does not host, provide, distribute, or maintain streaming content or extensions.
@@ -184,6 +185,23 @@ Open an <a href="https://github.com/jayandudakiya8100/mx-stream-app/issues">issu
 - **User Responsibility** — Users are solely responsible for how they use the app and any third-party services or extensions they choose to interact with, and must comply with all applicable laws, copyright, and intellectual property rights.
 - **No Liability** — The developer of OrcaBox disclaims all liability for misuse, legal issues, or violations arising from user actions. Legal concerns related to third-party services or extensions must be directed to their creators, not OrcaBox.
 - **Services** — OrcaBox integrates only with official APIs of supported services. Third-party extensions are the responsibility of their creators, not the OrcaBox developer.
+
+### 🎬 Premier Media Hub & Legal Discovery
+OrcaBox serves as your premier open-source hub for cinematic information, personal library tracking, and a comprehensive guide to legal streaming and media discovery. For both casual viewers and passionate aficionados of anime, movies, series, manga, and light novels, our extensive database and tracking engine are crafted to help you discover, investigate, organize, and legally watch media spanning every genre imaginable—from action and drama to comedy, sci-fi, and fantasy. We are your source for detailed film data, synopsis, community ratings, and official streaming availability.
+
+### 🎨 Sleek & Intuitive Design
+Built with a sleek, modern, and intuitive design, OrcaBox lets you effortlessly browse titles by genre, release date, community ratings, or even by your favorite actors, directors, and studios across Android, Android TV, and desktop. When you need information on a specific title, OrcaBox delivers everything you need: cast lists, plot summaries, critical reviews, viewer ratings, and information on where to legally stream on services like Netflix, Amazon Prime, Hulu, Disney+, Crunchyroll, and others.
+
+### 💖 A Community Built on Passion
+At OrcaBox, we cultivate a vibrant community where movie and media lovers can share insightful reviews and thoughtful recommendations. Our open-source ecosystem connects cinephiles and fans from all corners of the globe, sparking rich conversations about filmmaking, storytelling, and the magic of cinema while upholding high standards for a respectful environment.
+
+### 🛡️ Your Privacy and Security Matter
+We are deeply committed to protecting your privacy and data. OrcaBox operates on a local-first architecture: your personal watchlists, history, and bookmarks remain securely stored on your device. Our platform offers a clean, secure browsing experience free from personal data harvesting or invasive tracking, optimized for speed and seamless navigation on any device.
+
+### 🚀 Go Beyond the Screen
+OrcaBox is more than just a database. It brings you synchronized watch progress across devices, calendars for upcoming releases, customizable multi-mode interfaces (Streaming, Manga, Novel), and remote-friendly navigation built for television screens.
+
+*For the complete legal terms and conditions, see **[TERMS.md](TERMS.md)**.*
 
 ---
 

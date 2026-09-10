@@ -657,53 +657,111 @@ class _MyListViewState extends State<_MyListView> {
   /// and yours on My List. 30px — big enough to read as a face, small enough
   /// that the capsule stays one line.
   Widget _headerAvatar(BuildContext context, Tracker? pinned) {
-    final url = pinned != null
-        ? pinned.viewerAvatar
-        : (sl.isRegistered<AuthCubit>()
-              ? sl<AuthCubit>().state.avatarUrl
-              : null);
-    final letter = pinned?.displayName.isNotEmpty == true
-        ? pinned!.displayName[0]
-        : 'Z';
-    return Container(
-      width: 30,
-      height: 30,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.surface2,
-        border: Border.all(
-          color: AppColors.accent.withValues(alpha: 0.35),
-          width: 1.5,
-        ),
-      ),
-      child: ClipOval(
-        child: (url != null && url.isNotEmpty)
-            ? CachedNetworkImage(
-                imageUrl: url,
-                width: 30,
-                height: 30,
-                fit: BoxFit.cover,
-                errorWidget: (_, _, _) => _miniLetter(letter),
-              )
-            : _miniLetter(letter),
-      ),
+    if (pinned != null) {
+      return _buildTrackerAvatar(context, pinned);
+    }
+    if (sl.isRegistered<AuthCubit>()) {
+      return BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, auth) => _buildUserAvatar(context, auth),
+      );
+    }
+    return _buildUserAvatar(context, null);
+  }
+
+  Widget _buildTrackerAvatar(BuildContext context, Tracker pinned) {
+    final url = pinned.viewerAvatar;
+    final initial = pinned.displayName.isNotEmpty
+        ? pinned.displayName[0].toUpperCase()
+        : 'T';
+    return _avatarContainer(
+      child: (url != null && url.isNotEmpty)
+          ? CachedNetworkImage(
+              imageUrl: url,
+              width: 30,
+              height: 30,
+              fit: BoxFit.cover,
+              errorWidget: (_, _, _) => _miniLetter(initial),
+            )
+          : _miniLetter(initial),
     );
   }
 
+  Widget _buildUserAvatar(BuildContext context, AuthState? auth) {
+    final isLoggedIn = auth?.isLoggedIn ?? false;
+    final url = auth?.avatarUrl;
+    final displayName = auth?.displayName ?? '';
+
+    final Widget content;
+    if (isLoggedIn && url != null && url.isNotEmpty) {
+      content = CachedNetworkImage(
+        imageUrl: url,
+        width: 30,
+        height: 30,
+        fit: BoxFit.cover,
+        errorWidget: (_, _, _) => displayName.isNotEmpty
+            ? _miniLetter(displayName[0].toUpperCase())
+            : _profileIcon(),
+      );
+    } else if (isLoggedIn && displayName.isNotEmpty) {
+      content = _miniLetter(displayName[0].toUpperCase());
+    } else {
+      content = _profileIcon();
+    }
+
+    return GestureDetector(
+      onTap: () {
+        if (!AppFeatures.cloudAccounts) return;
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) =>
+                isLoggedIn ? const ProfileScreen() : const LoginScreen(),
+          ),
+        );
+      },
+      child: _avatarContainer(child: content),
+    );
+  }
+
+  Widget _avatarContainer({required Widget child}) => Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.surface2,
+          border: Border.all(
+            color: AppColors.accent.withValues(alpha: 0.35),
+            width: 1.5,
+          ),
+        ),
+        child: ClipOval(child: child),
+      );
+
+  Widget _profileIcon() => Container(
+        width: 30,
+        height: 30,
+        color: AppColors.accentSoft,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.person_rounded,
+          size: 16,
+          color: AppColors.accent,
+        ),
+      );
+
   Widget _miniLetter(String letter) => Container(
-    width: 20,
-    height: 20,
-    color: AppColors.accent,
-    alignment: Alignment.center,
-    child: Text(
-      letter,
-      style: const TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.w800,
-        fontSize: 10,
-      ),
-    ),
-  );
+        width: 30,
+        height: 30,
+        color: AppColors.accent,
+        alignment: Alignment.center,
+        child: Text(
+          letter,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+            fontSize: 12,
+          ),
+        ),
+      );
 
 
   // ── Filter sheet (type) ────────────────────────────────────────────────────

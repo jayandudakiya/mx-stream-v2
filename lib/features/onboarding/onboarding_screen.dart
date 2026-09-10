@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+
+import 'package:media_kit/media_kit.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../core/app_mode.dart';
 import '../../core/di/injector.dart';
@@ -42,27 +48,95 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1600),
+    duration: const Duration(milliseconds: 2200),
   )..forward();
 
-  // Glow eases in; the wordmark fades in and "draws" left→right (wipe reveal)
-  // while settling up to full scale; the loader appears last.
+  Player? _player;
+
+  // 1. Soft accent background glow
   late final Animation<double> _glow = CurvedAnimation(
     parent: _c,
-    curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
+    curve: const Interval(0.05, 0.55, curve: Curves.easeOut),
   );
-  late final Animation<double> _fade = CurvedAnimation(
+
+  // 2. Logo: scale pop + fade in
+  late final Animation<double> _logoScale = CurvedAnimation(
     parent: _c,
-    curve: const Interval(0.12, 0.5, curve: Curves.easeOut),
+    curve: const Interval(0.0, 0.48, curve: Curves.easeOutBack),
   );
-  late final Animation<double> _reveal = CurvedAnimation(
+  late final Animation<double> _logoFade = CurvedAnimation(
     parent: _c,
-    curve: const Interval(0.12, 1.0, curve: Curves.easeOutCubic),
+    curve: const Interval(0.0, 0.38, curve: Curves.easeOut),
   );
+
+  // 3. Wordmark / app title: subtle upward slide + smooth fade in
+  late final Animation<double> _titleFade = CurvedAnimation(
+    parent: _c,
+    curve: const Interval(0.30, 0.68, curve: Curves.easeOut),
+  );
+  late final Animation<double> _titleSlide = CurvedAnimation(
+    parent: _c,
+    curve: const Interval(0.30, 0.68, curve: Curves.easeOutCubic),
+  );
+
+  // 4. Subtle ambient breathing effect as the intro sound finishes
+  late final Animation<double> _ambient = CurvedAnimation(
+    parent: _c,
+    curve: const Interval(0.60, 1.0, curve: Curves.easeInOut),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _playIntroSound();
+  }
+
+  Future<void> _playIntroSound() async {
+    try {
+      final p = Player();
+      _player = p;
+
+      // Extract asset to temporary file so libmpv can play it directly without URL lookup
+      final tempDir = await getTemporaryDirectory();
+      final soundFile = File('${tempDir.path}/orcabox_intro.mp3');
+
+      if (!await soundFile.exists() || await soundFile.length() == 0) {
+        final byteData = await rootBundle.load('assets/audio/intro.mp3');
+        await soundFile.writeAsBytes(
+          byteData.buffer.asUint8List(
+            byteData.offsetInBytes,
+            byteData.lengthInBytes,
+          ),
+          flush: true,
+        );
+      }
+
+      await p.open(Media(soundFile.path), play: true);
+    } catch (e) {
+      debugPrint('[Splash] Intro sound via file error: $e');
+      // Direct asset URI fallback
+      try {
+        await _player?.open(Media('asset:///assets/audio/intro.mp3'), play: true);
+      } catch (e2) {
+        debugPrint('[Splash] Intro sound via asset URI error: $e2');
+      }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Warm the logo asset image into memory immediately
+    precacheImage(const AssetImage('assets/icon/logo_mark.png'), context);
+  }
+
 
   @override
   void dispose() {
     _c.dispose();
+    try {
+      _player?.dispose();
+    } catch (_) {}
     super.dispose();
   }
 
@@ -73,16 +147,15 @@ class _SplashScreenState extends State<SplashScreen>
       body: AnimatedBuilder(
         animation: _c,
         builder: (context, _) {
-          final r = _reveal.value;
           return Stack(
             children: [
-              // Soft coral glow behind the wordmark — echoes the logo's circle.
+              // Ambient radial glow behind the center brand mark
               Center(
                 child: Opacity(
-                  opacity: _glow.value,
+                  opacity: _glow.value * (0.8 + 0.2 * _ambient.value),
                   child: Container(
-                    width: 460,
-                    height: 460,
+                    width: 480,
+                    height: 480,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
@@ -97,34 +170,41 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-              // Wordmark — wipe reveal (left→right) + fade + slight scale settle.
+
+              // Centered Brand: App Icon + App Wordmark
               Center(
-                child: FractionallySizedBox(
-                  widthFactor: 0.62,
-                  child: Opacity(
-                    opacity: _fade.value,
-                    child: Transform.scale(
-                      scale: 0.94 + 0.06 * r,
-                      child: ShaderMask(
-                        blendMode: BlendMode.dstIn,
-                        shaderCallback: (rect) => LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: const [
-                            Colors.white,
-                            Colors.white,
-                            Colors.transparent,
-                          ],
-                          stops: [
-                            0.0,
-                            (r - 0.07).clamp(0.0, 1.0),
-                            r.clamp(0.0001, 1.0),
-                          ],
-                        ).createShader(rect),
-                        child: const AppWordmark(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // App Logo (Clean floating logo mark without box or shadow)
+                    Transform.scale(
+                      scale: (0.72 + 0.28 * _logoScale.value) *
+                          (1.0 + 0.02 * _ambient.value),
+                      child: Opacity(
+                        opacity: _logoFade.value,
+                        child: SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Image.asset(
+                            'assets/icon/logo_mark.png',
+                            fit: BoxFit.contain,
+                            gaplessPlayback: true,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+
+                    const SizedBox(height: 20),
+
+                    // App Wordmark ("OrcaBox" - smooth slide-up + fade-in)
+                    Opacity(
+                      opacity: _titleFade.value,
+                      child: Transform.translate(
+                        offset: Offset(0, 14 * (1.0 - _titleSlide.value)),
+                        child: const AppWordmark(height: 30),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -134,6 +214,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Onboarding — first launch. The app ships with NO sources installed; this

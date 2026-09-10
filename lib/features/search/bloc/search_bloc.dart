@@ -133,7 +133,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       {for (final s in _repo.loadedSources) s.id: s},
       mode,
       (s) => sourceTypeOf(s.id),
-    ).values.toList();
+    ).values.where((s) => !s.id.startsWith('native:')).toList();
   }
 
   /// Seeds the bloc with the user's remembered filter/sort choices so they
@@ -177,7 +177,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   static String? _initialScopeSourceId() {
     if (!sl.isRegistered<ActiveSourceCubit>()) return null;
     final id = sl<ActiveSourceCubit>().state;
-    return id.isEmpty ? null : id;
+    if (id.isEmpty || id.startsWith('native:')) return null;
+    return id;
   }
 
   /// Debounce for the LIGHTWEIGHT autocomplete only — never the heavy search.
@@ -441,11 +442,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       // Search's OWN scope — deliberately NOT ActiveSourceCubit, which Home
       // listens to. The fallback covers a bloc built before any source was
       // registered, so nothing seeded the scope.
-      final scopedId =
+      final rawId =
           state.searchSourceId ??
           (sl.isRegistered<ActiveSourceCubit>()
               ? sl<ActiveSourceCubit>().state
               : '');
+      final scopedId = rawId.startsWith('native:') ? '' : rawId;
       sources = scopedId.isEmpty
           ? const []
           : [(id: scopedId, name: _repo.displayName(scopedId))];

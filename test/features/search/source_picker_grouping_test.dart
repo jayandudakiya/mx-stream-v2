@@ -1,14 +1,6 @@
-// The search source picker listed "VegaMovies" and "VegaMovies (Hollywood)"
-// as adjacent rows (likewise "Rogmovies" / "RogMovies (Bollywood)"), which
-// read as the same provider duplicated.
-//
-// They are not duplicates: `native:vegamovies` is the app's own Dart provider
-// — the one driving the Hollywood Home channel — while "VegaMovies" is a
-// separately installed extension that happens to scrape the same site. Two
-// engines, both searchable on purpose.
-//
-// So nothing is renamed or hidden. The rows are grouped under "Built-in" and
-// "Installed" headings, which is what makes the pairing read as deliberate.
+// The search source picker lists all sources in a single flat alphabetical list
+// without "Built-in" / "Installed" headings, avoiding user confusion while
+// keeping all sources searchable.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orcabox/features/home/search_screen.dart';
 
@@ -59,12 +51,8 @@ void main() {
   });
 
   group('sourcePickerRows', () {
-    test('the reported list groups instead of looking duplicated', () {
+    test('the reported list displays as a single flat alphabetical list without headings or native home providers', () {
       expect(_asDisplayed(_rows(_reported)), [
-        '— Built-in —',
-        'RogMovies (Bollywood)',
-        'VegaMovies (Hollywood)',
-        '— Installed —',
         'CineStream',
         'CineTmdb',
         'MoviesDrive',
@@ -75,59 +63,49 @@ void main() {
       ]);
     });
 
-    test('both engines for one site survive — neither is hidden', () {
+    test('installed engines for sites survive, while native: providers are excluded from search picker', () {
       final ids = [
         for (final r in _rows(_reported))
           if (r.source != null) r.source!.id,
       ];
-      expect(ids, containsAll(['native:vegamovies', 'cs:VegaMovies']));
-      expect(ids, containsAll(['native:rogmovies', 'cs:Rogmovies']));
-      expect(ids, hasLength(_reported.length));
+      expect(ids, containsAll(['cs:VegaMovies', 'cs:Rogmovies']));
+      expect(ids, isNot(contains('native:vegamovies')));
+      expect(ids, isNot(contains('native:rogmovies')));
+      expect(ids, hasLength(7));
     });
 
-    test('each group is alphabetical, case-insensitively', () {
+    test('the list is alphabetical, case-insensitively', () {
       final rows = _rows(const [
         (id: 'cs:zeta', name: 'zeta'),
         (id: 'cs:Alpha', name: 'Alpha'),
-        (id: 'native:b', name: 'bravo'),
-        (id: 'native:A', name: 'Alfa'),
+        (id: 'cs:b', name: 'bravo'),
+        (id: 'cs:A', name: 'Alfa'),
       ]);
       expect(_asDisplayed(rows), [
-        '— Built-in —',
         'Alfa',
-        'bravo',
-        '— Installed —',
         'Alpha',
+        'bravo',
         'zeta',
       ]);
     });
 
     test('duplicate ids collapse, duplicate names do not', () {
-      // A source registered twice is one row; two engines that merely have
-      // similar names are two rows. That distinction is the whole point.
       final rows = _rows(const [
         (id: 'cs:A', name: 'Same'),
         (id: 'cs:A', name: 'Same'),
         (id: 'cs:B', name: 'Same'),
       ]);
-      expect(_asDisplayed(rows), ['— Installed —', 'Same', 'Same']);
+      expect(_asDisplayed(rows), ['Same', 'Same']);
     });
 
-    test('an empty group contributes no heading', () {
-      expect(_asDisplayed(_rows(const [(id: 'native:v', name: 'Vega')])), [
-        '— Built-in —',
-        'Vega',
-      ]);
-      expect(_asDisplayed(_rows(const [(id: 'cs:v', name: 'Vega')])), [
-        '— Installed —',
-        'Vega',
-      ]);
+    test('an empty list contributes no rows', () {
       expect(_rows(const []), isEmpty);
     });
 
-    test('every row is exactly one of a heading or a source', () {
+    test('every row has no heading and has a source', () {
       for (final r in _rows(_reported)) {
-        expect(r.header == null, r.source != null);
+        expect(r.header, isNull);
+        expect(r.source, isNotNull);
       }
     });
   });

@@ -173,13 +173,13 @@ class _NavTabsScreenState extends State<NavTabsScreen> {
     );
   }
 
-  /// The dock as it will actually look — same frosted capsule, same glyphs,
-  /// same outline→fill active state, redrawn as you edit.
+  /// The preview screen showing both the top Header and bottom Dock
+  /// as they will actually look on the phone.
   Widget _preview() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
       child: SizedBox(
-        height: 104,
+        height: 142,
         child: DecoratedBox(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -189,42 +189,131 @@ class _NavTabsScreenState extends State<NavTabsScreen> {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 7,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface.withValues(alpha: 0.55),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.07),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Split where _FloatingDock splits, so the centre
-                          // button sits exactly where it will on the phone.
-                          for (final t in _shown.take(_shown.length ~/ 2))
-                            Expanded(child: _previewItem(t, t == _start)),
-                          if (_hasSwitcher) _previewFab(),
-                          for (final t in _shown.skip(_shown.length ~/ 2))
-                            Expanded(child: _previewItem(t, t == _start)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                _previewHeader(),
+                _previewDock(),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Miniature representation of the Home screen header showing the
+  /// brand wordmark and dynamic shortcut icons for off-dock tabs.
+  Widget _previewHeader() {
+    final hidden = _hidden;
+    return Row(
+      children: [
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: 'Orca',
+                style: TextStyle(
+                  color: AppColors.accent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const TextSpan(
+                text: 'Box',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Spacer(),
+        for (final t in hidden)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: _previewHeaderIcon(t),
+          ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 3),
+          child: DockIcon(
+            DockGlyph.bell,
+            color: AppColors.textSecondary,
+            size: 14,
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 3),
+          child: DockIcon(
+            DockGlyph.search,
+            color: AppColors.textSecondary,
+            size: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _previewHeaderIcon(DockTab t) => switch (t) {
+    DockTab.myList => const DockIcon(
+        DockGlyph.bookmark,
+        color: AppColors.textSecondary,
+        size: 14,
+      ),
+    DockTab.downloads => const DockIcon(
+        DockGlyph.download,
+        color: AppColors.textSecondary,
+        size: 14,
+      ),
+    DockTab.sources => const Icon(
+        Icons.extension_outlined,
+        color: AppColors.textSecondary,
+        size: 14,
+      ),
+    DockTab.history => const Icon(
+        Icons.history_rounded,
+        color: AppColors.textSecondary,
+        size: 14,
+      ),
+    _ => Icon(
+        _iconFor(t, false),
+        color: AppColors.textSecondary,
+        size: 14,
+      ),
+  };
+
+  Widget _previewDock() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 4,
+            vertical: 7,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.07),
+            ),
+          ),
+          child: Row(
+            children: [
+              // Split where _FloatingDock splits, so the centre
+              // button sits exactly where it will on the phone.
+              for (final t in _shown.take(_shown.length ~/ 2))
+                Expanded(child: _previewItem(t, t == _start)),
+              if (_hasSwitcher) _previewFab(),
+              for (final t in _shown.skip(_shown.length ~/ 2))
+                Expanded(child: _previewItem(t, t == _start)),
+            ],
           ),
         ),
       ),
@@ -385,6 +474,8 @@ class _NavTabsScreenState extends State<NavTabsScreen> {
     DockTab.downloads =>
       active ? Icons.download_rounded : Icons.download_outlined,
     DockTab.history => active ? Icons.history_rounded : Icons.history_outlined,
+    DockTab.sources =>
+      active ? Icons.extension_rounded : Icons.extension_outlined,
     _ => active ? Icons.person_rounded : Icons.person_outline_rounded,
   };
 
@@ -422,12 +513,33 @@ class _NavTabsScreenState extends State<NavTabsScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              t.localizedLabel(context),
-              style: AppText.body.copyWith(color: tint, fontSize: 14.5),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: onBar
+                ? Text(
+                    t.localizedLabel(context),
+                    style: AppText.body.copyWith(color: tint, fontSize: 14.5),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        t.localizedLabel(context),
+                        style:
+                            AppText.body.copyWith(color: tint, fontSize: 14.5),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Shown in Home header',
+                        style: AppText.caption.copyWith(
+                          color: AppColors.textTertiary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
           ),
           if (t.isPinned)
             Padding(

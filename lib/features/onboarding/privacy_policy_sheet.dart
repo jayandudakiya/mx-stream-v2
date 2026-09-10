@@ -100,7 +100,7 @@ class TermsOfServiceSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return _DocumentSheet(
       title: 'Terms of Service',
-      subtitle: 'Guidelines for using $kAppName',
+      subtitle: 'Guidelines & Legal Disclaimer for $kAppName',
       icon: Icons.gavel_rounded,
       children: const [
         _Section(
@@ -113,36 +113,54 @@ class TermsOfServiceSheet extends StatelessWidget {
         _Section(
           title: '2. Nature of the Application',
           content:
-              '$kAppName is an open-source media aggregator and player interface. '
-              '$kAppName does not host, store, broadcast, or transmit any media or copyrighted files on its own servers. '
-              'All links and media metadata are retrieved dynamically from publicly available third-party internet sources.',
+              '$kAppName is a tracking and management tool only. It does not host, provide, '
+              'distribute, or maintain streaming content or extensions. All metadata and catalog information '
+              'are retrieved dynamically through supported APIs and client-side integrations.',
         ),
         _Section(
-          title: '3. Advertising & Project Support',
+          title: '3. Premier Media Hub & Legal Discovery',
           content:
-              'Advertisements enable $kAppName to remain free and accessible. By using this service, you agree to support '
-              'the ongoing development and maintenance by allowing non-intrusive advertisements to render as intended. '
-              'Users agree not to maliciously manipulate, reverse-engineer, or execute automated fraud against ad delivery integrations.',
+              '$kAppName serves as your premier open-source hub for cinematic information, personal library tracking, '
+              'and a comprehensive guide to legal streaming and media discovery. For casual viewers and cinephiles alike, '
+              'our platform helps you discover, organize, and track media spanning every genre imaginable, with cast lists, '
+              'plot summaries, ratings, and information on where to legally stream on services like Netflix, Amazon Prime, '
+              'Hulu, Disney+, Crunchyroll, and others.',
         ),
         _Section(
-          title: '4. User Responsibilities & Compliance',
+          title: '4. User Responsibility & Compliance',
           content:
-              'You are solely responsible for ensuring that your consumption of media complies with copyright laws '
-              'and applicable regulations within your jurisdiction. You agree to use $kAppName exclusively for personal, '
-              'non-commercial entertainment purposes.',
+              'Users are solely responsible for how they use the app and any third-party services or extensions '
+              'they choose to interact with, and must comply with all applicable laws, copyright, and intellectual '
+              'property rights. You agree to use $kAppName exclusively for personal, non-commercial entertainment and tracking.',
         ),
         _Section(
-          title: '5. Disclaimer of Warranties',
+          title: '5. Third-Party Services & Extensions',
+          content:
+              '$kAppName integrates only with official APIs of supported services. Third-party extensions are the '
+              'responsibility of their independent creators, not the $kAppName developer. Legal concerns related to '
+              'third-party services or extensions must be directed to their creators, not $kAppName.',
+        ),
+        _Section(
+          title: '6. Privacy, Security & Community',
+          content:
+              'We are deeply committed to protecting your privacy. $kAppName utilizes a local-first architecture where '
+              'your watch history, bookmarks, and preferences are kept securely on your device. We cultivate a respectful, '
+              'passionate community centered around the appreciation of cinema and storytelling.',
+        ),
+        _Section(
+          title: '7. Disclaimer of Warranties',
           content:
               '$kAppName is provided on an "as is" and "as available" basis without warranties of any kind, either '
               'expressed or implied. The developers and contributors do not guarantee uninterrupted streaming availability, '
-              'data accuracy, or host server uptime.',
+              'data accuracy, or external host uptime.',
         ),
         _Section(
-          title: '6. Limitation of Liability',
+          title: '8. Limitation of Liability',
           content:
-              'Under no circumstances shall the developers or contributors be held liable for any direct, indirect, '
-              'incidental, or consequential damages resulting from the use or inability to use the application or third-party sources.',
+              'The developer of $kAppName disclaims all liability for misuse, legal issues, or violations arising from '
+              'user actions. Under no circumstances shall developers or contributors be held liable for any direct, '
+              'indirect, incidental, or consequential damages resulting from the use or inability to use the application '
+              'or third-party services.',
         ),
       ],
     );

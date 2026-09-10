@@ -466,10 +466,9 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
     // of onboarding + fire-and-forget so it never delays launch.
     unawaited(PushService.instance.init());
     final elapsed = DateTime.now().difference(start);
-    // The intro animation is 1600ms, so anything past that is just dead
-    // waiting. Give it a hair over (1700) so the logo lands, then go — used
-    // to be 2000ms, which sat there doing nothing for ~400ms.
-    const minSplash = Duration(milliseconds: 1700);
+    // The intro animation + audio is ~2280ms. Give it 2300ms so the logo,
+    // wordmark, and signature intro chime conclude naturally.
+    const minSplash = Duration(milliseconds: 2300);
     if (elapsed < minSplash) await Future.delayed(minSplash - elapsed);
   }
 

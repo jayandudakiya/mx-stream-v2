@@ -39,8 +39,10 @@ import '../../core/tracker/tracker.dart';
 import '../../core/tracker/tracker_item_url.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text.dart';
+import '../../core/ui/nav_prefs.dart';
 import '../../core/zmode/zmode_prefs.dart';
 import '../../l10n/l10n.dart';
+import '../../l10n/ui_strings.dart';
 import '../../core/announce/announcement.dart';
 import '../announce/announcement_sheet.dart';
 import '../community/community_sheet.dart';
@@ -70,6 +72,7 @@ import '../auth/reconnect.dart';
 import '../detail/detail_screen.dart';
 import '../history/history_screen.dart';
 import '../player/player_screen.dart';
+import '../search/browse_sources_screen.dart';
 import '../shell/dock_icons.dart';
 import '../../core/zmode/source_matcher.dart';
 import '../../core/zmode/metadata_repository.dart';
@@ -124,10 +127,12 @@ class _HomeViewState extends State<_HomeView>
   // Auto update-check runs at most once per app process (not on every rebuild
   // or tab revisit). Static so it survives this widget being recreated.
   static bool _updateChecked = false;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     // Swap the content mode at the slash's peak (hidden behind the scrim), then
     // tear the overlay down once it finishes.
     _slashCtrl =
@@ -180,6 +185,7 @@ class _HomeViewState extends State<_HomeView>
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _slashCtrl.dispose();
     super.dispose();
   }
@@ -563,7 +569,7 @@ class _HomeViewState extends State<_HomeView>
               ),
             ),
             const _IncognitoChip(),
-            _headerDownloadButton(),
+            _headerDynamicShortcuts(),
             _notificationBell(context),
             const HomeSearchAction(),
           ],
@@ -572,21 +578,83 @@ class _HomeViewState extends State<_HomeView>
     );
   }
 
-  /// Header download shortcut → [DownloadsScreen]. Same shape as
-  /// [HomeSearchAction]: flat icon, no badge — the screen itself is the
-  /// progress view, so there's nothing to surface here. Pushed as a normal
-  /// route (with back), unlike the dock tab which suppresses it.
-  Widget _headerDownloadButton() {
-    return IconButton(
-      icon: const DockIcon(
-        DockGlyph.download,
-        color: AppColors.textSecondary,
-        size: 22,
+  /// Tabs that are not on the bottom dock and should be accessible via
+  /// the Home screen header. Excludes Home itself and Profile (pinned to dock).
+  List<DockTab> _offDockTabs(List<DockTab> shownTabs) {
+    return DockTab.values.where((t) {
+      if (t == DockTab.home || t == DockTab.profile) return false;
+      return !shownTabs.contains(t);
+    }).toList();
+  }
+
+  /// Dynamic header shortcuts adapting to the user's dock configuration in [NavPrefs].
+  /// Any tab not on the bottom dock is surfaced in the top header so the user
+  /// never loses access to any destination.
+  Widget _headerDynamicShortcuts() {
+    final navPrefs = sl.isRegistered<NavPrefs>() ? sl<NavPrefs>() : null;
+    if (navPrefs == null) {
+      return _buildHeaderShortcutButton(DockTab.downloads);
+    }
+    return ListenableBuilder(
+      listenable: navPrefs,
+      builder: (context, _) {
+        final offDock = _offDockTabs(navPrefs.tabs);
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final tab in offDock) _buildHeaderShortcutButton(tab),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildHeaderShortcutButton(DockTab tab) {
+    final (Widget icon, VoidCallback onTap) = switch (tab) {
+      DockTab.myList => (
+        const DockIcon(
+          DockGlyph.bookmark,
+          color: AppColors.textSecondary,
+          size: 22,
+        ),
+        () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const MyListScreen()),
+        ),
       ),
-      tooltip: context.l10n.downloads,
-      onPressed: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute<void>(builder: (_) => const DownloadsScreen())),
+      DockTab.sources => (
+        const Icon(
+          Icons.extension_outlined,
+          color: AppColors.textSecondary,
+          size: 22,
+        ),
+        () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const BrowseSourcesScreen()),
+        ),
+      ),
+      DockTab.history => (
+        const Icon(
+          Icons.history_rounded,
+          color: AppColors.textSecondary,
+          size: 22,
+        ),
+        _openHistory,
+      ),
+      _ => (
+        const DockIcon(
+          DockGlyph.download,
+          color: AppColors.textSecondary,
+          size: 22,
+        ),
+        () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const DownloadsScreen()),
+        ),
+      ),
+    };
+
+    return IconButton(
+      icon: icon,
+      tooltip: tab.localizedLabel(context),
+      onPressed: onTap,
     );
   }
 
@@ -1026,6 +1094,9 @@ class _HomeViewState extends State<_HomeView>
       listenWhen: (prev, curr) => prev != curr,
       listener: (context, _) {
         if (!mounted) return;
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(0);
+        }
         _metaCache.clear();
         _heroPrewarmed = false;
         // reset:true clears the old source's rows so the switch is visible
@@ -1078,6 +1149,7 @@ class _HomeViewState extends State<_HomeView>
                           ContentMode.anime => false,
                         };
                   return CustomScrollView(
+                    controller: _scrollController,
                     slivers: [
                       // ── Hero + floating header (first sliver) ─────────────────
                       SliverToBoxAdapter(
@@ -1109,6 +1181,20 @@ class _HomeViewState extends State<_HomeView>
                                     style: HeroTransition.cinematic,
                                   ),
                                   // Floating header sits on top
+                                  Positioned(
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: _buildHeader(),
+                                  ),
+                                ],
+                              );
+                            }
+
+                            if (showSkeletons && !noSourceForMode) {
+                              return Stack(
+                                children: [
+                                  const HeroSkeleton(),
                                   Positioned(
                                     top: 0,
                                     left: 0,

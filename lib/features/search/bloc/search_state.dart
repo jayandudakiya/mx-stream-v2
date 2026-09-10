@@ -347,7 +347,7 @@ class SearchState extends Equatable {
     this.groups = const [],
     this.sourceFilter = kAllSources,
     this.searchSourceId,
-    this.currentSourceOnly = true,
+    this.currentSourceOnly = false,
     this.sort = SearchSort.bestMatch,
     this.contentFilter = SearchContentFilter.all,
     this.audioFilter = SearchAudioFilter.any,
