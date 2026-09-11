@@ -10,7 +10,7 @@ const String kAppName = String.fromEnvironment(
 /// pre-boot fallback.
 String kAppVersion = const String.fromEnvironment(
   'APP_VERSION',
-  defaultValue: '2.0.0',
+  defaultValue: '1.0.1',
 );
 
 /// Stable application id embedded in default provider-repo manifests and
@@ -41,7 +41,7 @@ const int kManifestSchemaVersion = 2;
 /// to exist on this repo's default branch.
 const String kAppRepo = String.fromEnvironment(
   'APP_REPO',
-  defaultValue: 'jayandudakiya8100/mx-stream-app',
+  defaultValue: 'orcabox21/orcabox-releases',
 );
 
 /// Browsable URL for [kAppRepo] — the About screen's "source code" link.

@@ -22,7 +22,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # accept an update whose versionCode is HIGHER than what's installed (v1 was
 # +3, this app's last OrcaBox build was +11105), so a reset to +1 would make
 # 2.0.0 uninstallable as an update over either one.
-version: 2.0.0+11106
+version: 1.0.1+11107
 
 environment:
   sdk: ">=3.10.0 <4.0.0"
