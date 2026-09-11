@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:orcabox/core/hive/safe_box.dart';
 
 import 'package:hive/hive.dart';
 
+import '../analytics/analytics.dart';
 import '../privacy/incognito_mode.dart';
 import '../supabase/supabase_service.dart';
 
@@ -125,6 +127,13 @@ class WatchHistory {
   String _key(String sourceId, String showId) => '$sourceId::$showId';
   final Map<String, int> _lastCloudPush = {};
 
+  // Analytics de-dupe. [save] runs ~1x/second during playback, so logging from
+  // it directly would bury GA4 in thousands of identical events per episode
+  // (and blow the 500-distinct-event-params budget). Instead each episode
+  // contributes at most one `video_play` and one `video_complete` per session.
+  final Set<String> _playLogged = {};
+  final Set<String> _completeLogged = {};
+
   /// Persist progress. The local write is ALWAYS immediate (instant resume);
   /// the cloud push is throttled unless [flush] is true, which forces it on the
   /// moments that matter for an accurate cross-device resume — pause, stop,
@@ -149,10 +158,38 @@ class WatchHistory {
       'updatedAt': e.updatedAt,
       'malId': e.malId,
     });
+    _logPlaybackMilestones(key, e);
     if (flush) {
       await _pushToCloud(key, e, force: true);
     } else {
       _pushToCloud(key, e);
+    }
+  }
+
+  /// One `video_play` when an episode first reports progress, and one
+  /// `video_complete` once [HistoryEntry.finished] flips. Both are no-ops
+  /// without consent, and [save]'s incognito guard already returned above.
+  ///
+  /// Deliberately carries no title or show id — GA4 is not the place for a
+  /// record of what an individual watched, and source/category is all the
+  /// engagement reporting actually needs.
+  void _logPlaybackMilestones(String key, HistoryEntry e) {
+    final epKey = '$key::${e.episodeId}';
+    if (_playLogged.add(epKey)) {
+      unawaited(
+        Analytics.log('video_play', {
+          'source_id': e.sourceId,
+          'category': e.category,
+        }),
+      );
+    }
+    if (e.finished && _completeLogged.add(epKey)) {
+      unawaited(
+        Analytics.log('video_complete', {
+          'source_id': e.sourceId,
+          'category': e.category,
+        }),
+      );
     }
   }
 

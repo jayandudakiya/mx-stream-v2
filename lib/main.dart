@@ -10,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 import 'core/analytics/analytics.dart';
+import 'core/analytics/presence_service.dart';
 import 'core/app_config.dart';
 import 'core/app_features.dart';
 import 'core/app_mode.dart';
@@ -83,7 +84,11 @@ Future<void> main() async {
     // device without Play Services) still boots — analytics just stays off.
     try {
       await Firebase.initializeApp().timeout(const Duration(seconds: 8));
-      Analytics.enabled = true;
+      Analytics.available = true;
+      // NOTE: collection stays OFF here. The manifest ships
+      // firebase_analytics_collection_enabled=false, and it is only switched on
+      // once the privacy consent has been read — which needs Hive, initialized
+      // later in initDependencies(). See _run() for the actual opt-in.
     } catch (e, st) {
       AppLogger.instance.logError(e, st);
     }
@@ -357,6 +362,8 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       discord?.onForeground();
       _syncOnResume();
+      // Restart the live-count heartbeat (no-op if it never stopped).
+      PresenceService.start();
       // The wallpaper may have changed while we were away. No-op unless
       // Material You is on, and only rebuilds if the colours actually moved.
       ThemeController.refresh();
@@ -366,6 +373,10 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
       discord?.onPaused();
     } else if (state == AppLifecycleState.detached) {
       discord?.onDetached();
+      // Only stop here, never on `paused`: as noted above, the in-app player
+      // fires paused while the user is very much still watching, and dropping
+      // the heartbeat there would undercount the live figure badly.
+      PresenceService.stop();
     }
   }
 
@@ -395,6 +406,24 @@ class _WatchAppState extends State<WatchApp> with WidgetsBindingObserver {
     final start = DateTime.now();
     await initDependencies();
     await PrivacyConsentPrefs.init();
+    // Hive is up, so the consent flag is now readable: open (or keep shut) the
+    // analytics gate. The listener re-applies it the instant a first-run user
+    // accepts, so their session is counted without waiting for a restart.
+    unawaited(
+      Analytics.applyConsent().then((_) async {
+        await Analytics.setDeviceClass(
+          sl.isRegistered<AppMode>() && sl<AppMode>().isTv ? 'tv' : 'phone',
+        );
+        await Analytics.log('app_open');
+      }),
+    );
+    PrivacyConsentPrefs.notifier.addListener(() {
+      unawaited(Analytics.applyConsent());
+      // Same gate for the live counter: starts the moment consent is given,
+      // and PresenceService._ping re-checks it so a withdrawal stops the pings.
+      PresenceService.start();
+    });
+    PresenceService.start();
     if (mounted) {
       setState(() => _depsReady = true);
       if (_bootReady) {
