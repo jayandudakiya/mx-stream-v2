@@ -1,8 +1,10 @@
-import '../cs_domains.dart';
+import 'package:html/dom.dart' as dom;
+
 import '../cs_dom.dart';
 import '../cs_http.dart';
 import '../cs_main_api.dart';
 import '../cs_models.dart';
+import '../cs_spec.dart';
 import '../cs_types.dart';
 import '../cs_utils.dart';
 import '../extractors/packed_host_extractor.dart';
@@ -25,25 +27,34 @@ import '../extractors/packed_host_extractor.dart';
 /// Season/episode numbers come from the episode permalink's `-<season>x<ep>`
 /// suffix rather than Kotlin's positional `mapIndexed`, which mis-numbers any
 /// show whose seasons are not listed in order.
-class MultiMoviesProvider implements CsMainApi {
-  @override
-  Future<String> get mainUrl => CsDomains.resolve('multimovies');
+///
+/// This is also the **DooPlay engine** for user-added sources: the theme is
+/// used by dozens of the sites in `url-sources.json`, so a custom source
+/// pointed at one of them runs this exact scraper against its own base URL.
+class MultiMoviesProvider extends CsSpecApi {
+  MultiMoviesProvider({CsSourceSpec? spec}) : super(spec ?? _default);
 
-  @override
-  String get providerKey => 'multimovies';
-
-  @override
-  String get name => 'MultiMovies';
-
-  @override
-  String get lang => 'hi';
+  static const CsSourceSpec _default = CsSourceSpec(
+    engineId: CsEngineId.dooplay,
+    key: 'multimovies',
+    name: 'MultiMovies',
+  );
 
   @override
   Set<TvType> get supportedTypes =>
       {TvType.movie, TvType.tvSeries, TvType.anime, TvType.animeMovie, TvType.cartoon};
 
+  /// Rows that exist on any DooPlay install, for a site nobody has checked the
+  /// genre paths of.
   @override
-  List<CsMainPageEntry> get mainPage => mainPageOf(const {
+  List<CsMainPageEntry> get familyMainPage => mainPageOf(const {
+        'trending/': 'Trending',
+        'movies/': 'Movies',
+        'tvshows/': 'TV Shows',
+      });
+
+  @override
+  List<CsMainPageEntry> get builtInMainPage => mainPageOf(const {
         'trending/': 'Trending',
         'genre/hindi-dubbed/': 'Hindi Dubbed',
         'genre/bollywood-movies/': 'Bollywood Movies',
@@ -84,7 +95,11 @@ class MultiMoviesProvider implements CsMainApi {
         .toList();
   }
 
-  CsSearchResponse? _toSearchResult(dynamic article, String base) {
+  // `dom.Element`, not `dynamic`: the selectors below are extension members
+  // from `cs_dom.dart`, and Dart resolves extensions statically — on a
+  // `dynamic` receiver every one of them is a NoSuchMethodError at runtime,
+  // which the adapter's catch-all would have turned into a silently empty row.
+  CsSearchResponse? _toSearchResult(dom.Element article, String base) {
     final anchor = article.selectFirst('div.data > h3 > a') ??
         article.selectFirst('h3 > a') ??
         article.selectFirst('a');
@@ -125,39 +140,60 @@ class MultiMoviesProvider implements CsMainApi {
 
     return res.document
         .select('div.result-item')
-        .map((item) {
-          final anchor = item.selectFirst('div.details > div.title > a') ??
-              item.selectFirst('div.title > a');
-          if (anchor == null) return null;
-          final href = fixUrl(anchor.attr('href'), base);
-          final title = anchor.textTrim;
-          if (href.isEmpty || title.isEmpty) return null;
-
-          // The thumbnail's `span` says "Movie" or "TV" — trusted over the
-          // path when present, because a series' search row can link to an
-          // episode permalink.
-          final badge = item.selectFirst('div.thumbnail > a > span')?.textTrim ?? '';
-          final type = badge.toLowerCase().contains('movie')
-              ? TvType.movie
-              : badge.isEmpty
-                  ? _typeFor(href)
-                  : TvType.tvSeries;
-
-          return CsSearchResponse(
-            name: title,
-            url: href,
-            type: type,
-            posterUrl: fixUrlNull(item.selectFirst('img')?.imageAttr, base),
-            year: int.tryParse(
-              RegExp(r'\b(19|20)\d{2}\b')
-                      .firstMatch(item.selectFirst('span.year')?.textTrim ?? '')
-                      ?.group(0) ??
-                  '',
-            ),
-          );
-        })
+        .map((item) => _toSearchRow(item, base))
         .whereType<CsSearchResponse>()
         .toList();
+  }
+
+  /// One `div.result-item`, across the DooPlay search templates in the wild.
+  ///
+  /// The classic theme nests the link as `div.details > div.title > a` with the
+  /// type in `div.thumbnail > a > span`. Newer installs (hdmovie2, and others in
+  /// `url-sources.json`) render `article > div.result-details > h2.result-title
+  /// > a` with `span.result-type` instead. Both are tried, classic first, because
+  /// this engine is what a custom source points at an arbitrary DooPlay site —
+  /// and one missing selector there is an empty source, which reads to the user
+  /// as a dead site rather than as an unsupported template.
+  CsSearchResponse? _toSearchRow(dom.Element item, String base) {
+    final anchor = item.selectFirst('div.details > div.title > a') ??
+        item.selectFirst('div.title > a') ??
+        item.selectFirst('h2.result-title > a') ??
+        item.selectFirst('div.result-details a[href]') ??
+        item.selectFirst('a.result-thumb');
+    if (anchor == null) return null;
+    final href = fixUrl(anchor.attr('href'), base);
+    // `a.result-thumb` carries the title in `aria-label`, not as text.
+    final title = anchor.textTrim.isNotEmpty
+        ? anchor.textTrim
+        : anchor.attr('aria-label');
+    if (href.isEmpty || title.isEmpty) return null;
+
+    // The type badge says "Movie" or "TV" — trusted over the path when present,
+    // because a series' search row can link to an episode permalink.
+    final badge = item.selectFirst('div.thumbnail > a > span')?.textTrim ??
+        item.selectFirst('span.result-type')?.textTrim ??
+        '';
+    final type = badge.toLowerCase().contains('movie')
+        ? TvType.movie
+        : badge.isEmpty
+            ? _typeFor(href)
+            : TvType.tvSeries;
+
+    // `span.year` on the classic theme; the newer one puts the year in an
+    // unclassed span inside `div.result-meta` next to the IMDb rating.
+    final yearText = item.selectFirst('span.year')?.textTrim ??
+        item.selectFirst('div.result-meta')?.textTrim ??
+        '';
+
+    return CsSearchResponse(
+      name: title,
+      url: href,
+      type: type,
+      posterUrl: fixUrlNull(item.selectFirst('img')?.imageAttr, base),
+      year: int.tryParse(
+        RegExp(r'\b(19|20)\d{2}\b').firstMatch(yearText)?.group(0) ?? '',
+      ),
+    );
   }
 
   @override
@@ -224,7 +260,7 @@ class MultiMoviesProvider implements CsMainApi {
 
   static final RegExp _permalinkSeasonEpisode = RegExp(r'-(\d+)x(\d+)/?$');
 
-  List<CsEpisode> _episodes(dynamic doc, String base) {
+  List<CsEpisode> _episodes(dom.Document doc, String base) {
     final out = <CsEpisode>[];
     for (final li in doc.select('#seasons ul.episodios li')) {
       final anchor = li.selectFirst('div.episodiotitle > a');
@@ -284,7 +320,7 @@ class MultiMoviesProvider implements CsMainApi {
         .toList();
     if (options.isEmpty) return CsLinkResult.empty;
 
-    final batches = await amap<dynamic, CsLinkResult>(
+    final batches = await amap<({String post, String nume, String type}), CsLinkResult>(
       options,
       (o) async {
         try {

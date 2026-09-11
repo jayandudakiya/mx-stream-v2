@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:html/dom.dart' as dom;
 
-import '../cs_domains.dart';
 import '../cs_dom.dart';
 import '../cs_http.dart';
 import '../cs_main_api.dart';
 import '../cs_models.dart';
+import '../cs_spec.dart';
 import '../cs_types.dart';
 import '../cs_utils.dart';
 import '../extractors/packed_host_extractor.dart';
@@ -30,24 +30,26 @@ import '../extractors/packed_host_extractor.dart';
 /// Series pages carry both season packs (in `download-item`) and per-episode
 /// files (in `episode-item`); only the latter become episodes, because a pack
 /// is one archive rather than something the player can open.
-class FourKHdHubProvider implements CsMainApi {
-  @override
-  Future<String> get mainUrl => CsDomains.resolve('4khdhub');
+class FourKHdHubProvider extends CsSpecApi {
+  FourKHdHubProvider({CsSourceSpec? spec}) : super(spec ?? _default);
 
-  @override
-  String get providerKey => '4khdhub';
-
-  @override
-  String get name => '4KHDHub';
-
-  @override
-  String get lang => 'hi';
+  static const CsSourceSpec _default = CsSourceSpec(
+    engineId: CsEngineId.fourKHdHub,
+    key: '4khdhub',
+    name: '4KHDHub',
+  );
 
   @override
   Set<TvType> get supportedTypes => {TvType.movie, TvType.tvSeries, TvType.anime};
 
   @override
-  List<CsMainPageEntry> get mainPage => mainPageOf(const {
+  List<CsMainPageEntry> get familyMainPage => mainPageOf(const {
+        'category/movies': 'Latest Movies',
+        'category/series': 'Latest Series',
+      });
+
+  @override
+  List<CsMainPageEntry> get builtInMainPage => mainPageOf(const {
         'category/hindi-movies': 'Hindi Movies',
         'category/movies': 'Latest Movies',
         'category/series': 'Latest Series',

@@ -7,6 +7,7 @@ import '../cs_dom.dart';
 import '../cs_http.dart';
 import '../cs_main_api.dart';
 import '../cs_models.dart';
+import '../cs_spec.dart';
 import '../cs_types.dart';
 import '../cs_utils.dart';
 import '../extractors/packed_host_extractor.dart';
@@ -28,18 +29,14 @@ import '../extractors/packed_host_extractor.dart';
 ///    yields no episodes rather than one fake episode that fails at the player;
 ///    per-episode pages (an `EPiSODE N` heading followed by one `<h4>` of links
 ///    per quality) are parsed properly.
-class HdHub4uProvider implements CsMainApi {
-  @override
-  Future<String> get mainUrl => CsDomains.resolve('hdhub4u');
+class HdHub4uProvider extends CsSpecApi {
+  HdHub4uProvider({CsSourceSpec? spec}) : super(spec ?? _default);
 
-  @override
-  String get providerKey => 'hdhub4u';
-
-  @override
-  String get name => 'HDHub4u';
-
-  @override
-  String get lang => 'hi';
+  static const CsSourceSpec _default = CsSourceSpec(
+    engineId: CsEngineId.hdhub4u,
+    key: 'hdhub4u',
+    name: 'HDHub4u',
+  );
 
   @override
   Set<TvType> get supportedTypes => {TvType.movie, TvType.tvSeries, TvType.anime};
@@ -55,11 +52,21 @@ class HdHub4uProvider implements CsMainApi {
       'https://search.pingora.fyi/collections/post/documents/search';
 
   @override
-  List<CsMainPageEntry> get mainPage => mainPageOf(const {
+  List<CsMainPageEntry> get builtInMainPage => mainPageOf(const {
         '': 'Latest',
         'category/hindi-dubbed/': 'Hindi Dubbed',
         'category/bollywood-movies/': 'Bollywood',
         'category/south-hindi-movies/': 'South (Hindi Dubbed)',
+        'category/hollywood-movies/': 'Hollywood',
+        'category/web-series/': 'Web Series',
+      });
+
+  /// A clone site keeps the theme but rarely the exact category slugs, so a
+  /// user-added source gets only the rows that are part of the layout itself.
+  @override
+  List<CsMainPageEntry> get familyMainPage => mainPageOf(const {
+        '': 'Latest',
+        'category/bollywood-movies/': 'Bollywood',
         'category/hollywood-movies/': 'Hollywood',
         'category/web-series/': 'Web Series',
       });
@@ -76,29 +83,57 @@ class HdHub4uProvider implements CsMainApi {
       referer: base,
     );
     if (!res.isOk) return const [];
-
-    return res.document
-        .select('.recent-movies > li.thumb')
-        .map((post) {
-          final raw = post.selectFirst('figcaption a p')?.textTrim ??
-              post.selectFirst('figcaption')?.textTrim ??
-              '';
-          final href = post.select('figure a').eachAttr('href').firstOrNull ?? '';
-          if (raw.isEmpty || href.isEmpty) return null;
-          return CsSearchResponse(
-            name: raw,
-            url: fixUrl(href, base),
-            type: _looksLikeSeries(raw) ? TvType.tvSeries : TvType.movie,
-            posterUrl: fixUrlNull(post.selectFirst('figure img')?.imageAttr, base),
-            quality: getSearchQuality(raw),
-          );
-        })
-        .whereType<CsSearchResponse>()
-        .toList();
+    return _parseListing(res.document, base);
   }
+
+  /// The archive/search markup, shared by [getMainPage] and [_searchOnSite].
+  List<CsSearchResponse> _parseListing(dom.Document doc, String base) => doc
+      .select('.recent-movies > li.thumb')
+      .map((post) {
+        final raw = post.selectFirst('figcaption a p')?.textTrim ??
+            post.selectFirst('figcaption')?.textTrim ??
+            '';
+        final href = post.select('figure a').eachAttr('href').firstOrNull ?? '';
+        if (raw.isEmpty || href.isEmpty) return null;
+        return CsSearchResponse(
+          name: raw,
+          url: fixUrl(href, base),
+          type: _looksLikeSeries(raw) ? TvType.tvSeries : TvType.movie,
+          posterUrl: fixUrlNull(post.selectFirst('figure img')?.imageAttr, base),
+          quality: getSearchQuality(raw),
+        );
+      })
+      .whereType<CsSearchResponse>()
+      .toList();
 
   @override
   Future<List<CsSearchResponse>> search(String query) async {
+    // The hosted index below is hdhub4u's OWN catalogue. A clone added as a
+    // custom source is not in it, and querying it anyway would show the real
+    // site's results — with links into the real site — under the custom
+    // source's name. So a custom source only ever searches its own site.
+    if (!spec.isCustom) {
+      final viaIndex = await _searchIndex(query);
+      if (viaIndex.isNotEmpty) return viaIndex;
+    }
+    return _searchOnSite(query);
+  }
+
+  /// WordPress' own `?s=` search. Slower and fuzzier than the index, but it is
+  /// the only thing that works for a clone — and the fallback for when the
+  /// index is down.
+  Future<List<CsSearchResponse>> _searchOnSite(String query) async {
+    final base = await mainUrl;
+    final res = await app.get(
+      '$base/?s=${Uri.encodeQueryComponent(query)}',
+      headers: _headers,
+      referer: base,
+    );
+    if (!res.isOk) return const [];
+    return _parseListing(res.document, base);
+  }
+
+  Future<List<CsSearchResponse>> _searchIndex(String query) async {
     final res = await app.get(
       _searchApi,
       params: {

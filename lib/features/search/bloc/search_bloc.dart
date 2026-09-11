@@ -119,6 +119,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   /// the same narrowing here the bloc searched everything regardless of mode,
   /// so the picker and the results disagreed.
   ///
+  /// Only the two Home *channels* are held back ([kHomeChannelSourceIds]),
+  /// because each duplicates an installed extension for the same site. Every
+  /// other `native:` source — the ported CloudStream engines and the user's own
+  /// custom sources — is searched like any other: they have no channel button,
+  /// so search is the only way into them.
+  ///
   /// Every mode narrows, anime included. Anime used to short-circuit to the
   /// unfiltered list — harmless when the only sources were video ones, but once
   /// Mihon (`mihon:`) and LNReader (`lnr:`) became installable it meant an
@@ -133,7 +139,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       {for (final s in _repo.loadedSources) s.id: s},
       mode,
       (s) => sourceTypeOf(s.id),
-    ).values.where((s) => !s.id.startsWith('native:')).toList();
+    ).values.where((s) => !isHomeChannelSource(s.id)).toList();
   }
 
   /// Seeds the bloc with the user's remembered filter/sort choices so they
@@ -163,10 +169,18 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       audioFilter: audio,
       genreFilter: prefs.genre,
       statusFilter: statusFilter,
-      currentSourceOnly: prefs.currentSourceOnly,
-      // Seeded ONCE from the active source so Search opens scoped to whatever
-      // the user was browsing. From here on it is Search's own state: the
-      // picker moves it via SearchScopeSourceChanged and Home is never told.
+      // Search ALWAYS opens on "All sources", whatever the last session ended
+      // on. Scoping to one source is a thing you do to a particular search, not
+      // a mode to be left switched on: a user who narrowed to one provider last
+      // week and then finds today's search returning only that provider's hits
+      // reads it as the app being broken, not as a setting they left behind.
+      // `SearchPrefs.currentSourceOnly` still records the last session's scope,
+      // but is deliberately not consulted here.
+      currentSourceOnly: false,
+      // Still seeded from the active source: it is the sensible default for the
+      // moment the user DOES switch to a single source without naming one.
+      // Never read while `currentSourceOnly` is false, which is how Search now
+      // starts, and the picker overwrites it the moment a source is chosen.
       searchSourceId: _initialScopeSourceId(),
     );
   }
@@ -177,7 +191,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   static String? _initialScopeSourceId() {
     if (!sl.isRegistered<ActiveSourceCubit>()) return null;
     final id = sl<ActiveSourceCubit>().state;
-    if (id.isEmpty || id.startsWith('native:')) return null;
+    // A Home channel must never seed the search scope — that is the channel the
+    // user is browsing, not a choice they made about search. Any other source
+    // they set active (including a custom one) is exactly the "whatever you
+    // were browsing" this seeds from.
+    if (id.isEmpty || isHomeChannelSource(id)) return null;
     return id;
   }
 
@@ -447,7 +465,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           (sl.isRegistered<ActiveSourceCubit>()
               ? sl<ActiveSourceCubit>().state
               : '');
-      final scopedId = rawId.startsWith('native:') ? '' : rawId;
+      // A Home channel is blanked rather than searched: the fallback above can
+      // hand back whatever Home is browsing, and "search only this source"
+      // must not silently become "search the Hollywood channel". Every other
+      // native source — a ported engine, or one added under Settings → Custom
+      // sources — is a legitimate scope the user picked from the sheet, and
+      // blanking those (as the old `startsWith('native:')` test did) turned a
+      // deliberate pick into "No sources are switched on for search."
+      final scopedId = isHomeChannelSource(rawId) ? '' : rawId;
       sources = scopedId.isEmpty
           ? const []
           : [(id: scopedId, name: _repo.displayName(scopedId))];

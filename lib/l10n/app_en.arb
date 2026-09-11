@@ -147,6 +147,71 @@
 	"sourceHealthSubtitle": "Test which sources are working",
 	"sourceUpdates": "Source updates",
 	"sourceUpdatesSubtitle": "Notify when installed sources have updates",
+	"customSources": "Custom sources",
+	"customSourcesSubtitle": "Add your own movie sites",
+	"customSourcesNoneYet": "No custom sources yet",
+	"customSourcesAddedCount": "{count} added",
+	"@customSourcesAddedCount": {
+		"placeholders": {
+			"count": {
+				"type": "int"
+			}
+		}
+	},
+	"customSourcesIntro": "Point one of the built-in site engines at any movie site. Custom sources behave exactly like the built-in ones: they appear in search, on the detail screen and in the player.",
+	"customSourcesYourSources": "Your sources",
+	"customSourcesBuiltIn": "Built-in sources",
+	"customSourcesBuiltInHint": "Override the address a built-in source uses when its own has stopped working.",
+	"customSourceAdd": "Add source",
+	"customSourceEdit": "Edit source",
+	"customSourceName": "Name",
+	"customSourceNameHint": "Shown in search and the source picker",
+	"customSourceUrl": "Site address",
+	"customSourceUrlHint": "example.com",
+	"customSourceEngine": "Site type",
+	"customSourceEngineHint": "Which layout this site uses",
+	"customSourceLanguage": "Audio language",
+	"customSourceTest": "Test source",
+	"customSourceTesting": "Testing…",
+	"customSourceDelete": "Delete source",
+	"customSourceDeleteConfirm": "Remove this source? Your watch history for it is kept.",
+	"customSourceSaved": "Source saved",
+	"customSourceDuplicate": "You already added a source with this address",
+	"customSourceNameRequired": "Give the source a name",
+	"customSourceUrlRequired": "Enter the site address",
+	"customSourceTestWorking": "Working",
+	"customSourceTestWrongEngine": "Wrong site type",
+	"customSourceTestCloudflare": "Behind Cloudflare",
+	"customSourceTestUnreachable": "No response",
+	"customSourceTestFound": "Found {browse} on browse, {search} on search",
+	"@customSourceTestFound": {
+		"placeholders": {
+			"browse": {
+				"type": "int"
+			},
+			"search": {
+				"type": "int"
+			}
+		}
+	},
+	"customSourceImport": "Import from list",
+	"customSourceImportSubtitle": "Pick from known movie sites",
+	"customSourceImportBundled": "Bundled list",
+	"customSourceImportUrl": "From a manifest URL",
+	"customSourceImportEmpty": "No sources found in that list",
+	"customSourceImportAdd": "Add {count} sources",
+	"@customSourceImportAdd": {
+		"placeholders": {
+			"count": {
+				"type": "int"
+			}
+		}
+	},
+	"customSourceImportPickEngine": "Pick a site type",
+	"customSourceImportUnknownEngine": "Unknown layout — choose one",
+	"customSourceOverride": "Custom address",
+	"customSourceOverrideClear": "Use the source's own address",
+	"customSourceOverrideSet": "Using a custom address",
 	"autoUpdateExtensions": "Auto-update extensions",
 	"autoUpdateExtensionsSubtitle": "Update installed sources automatically on launch",
 	"playback": "Playback",

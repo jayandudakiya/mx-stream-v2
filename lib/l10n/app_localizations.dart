@@ -865,6 +865,252 @@ abstract class AppLocalizations {
   /// **'Notify when installed sources have updates'**
   String get sourceUpdatesSubtitle;
 
+  /// No description provided for @customSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom sources'**
+  String get customSources;
+
+  /// No description provided for @customSourcesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your own movie sites'**
+  String get customSourcesSubtitle;
+
+  /// No description provided for @customSourcesNoneYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom sources yet'**
+  String get customSourcesNoneYet;
+
+  /// No description provided for @customSourcesAddedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} added'**
+  String customSourcesAddedCount(int count);
+
+  /// No description provided for @customSourcesIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Point one of the built-in site engines at any movie site. Custom sources behave exactly like the built-in ones: they appear in search, on the detail screen and in the player.'**
+  String get customSourcesIntro;
+
+  /// No description provided for @customSourcesYourSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sources'**
+  String get customSourcesYourSources;
+
+  /// No description provided for @customSourcesBuiltIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in sources'**
+  String get customSourcesBuiltIn;
+
+  /// No description provided for @customSourcesBuiltInHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Override the address a built-in source uses when its own has stopped working.'**
+  String get customSourcesBuiltInHint;
+
+  /// No description provided for @customSourceAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add source'**
+  String get customSourceAdd;
+
+  /// No description provided for @customSourceEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit source'**
+  String get customSourceEdit;
+
+  /// No description provided for @customSourceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get customSourceName;
+
+  /// No description provided for @customSourceNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown in search and the source picker'**
+  String get customSourceNameHint;
+
+  /// No description provided for @customSourceUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Site address'**
+  String get customSourceUrl;
+
+  /// No description provided for @customSourceUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'example.com'**
+  String get customSourceUrlHint;
+
+  /// No description provided for @customSourceEngine.
+  ///
+  /// In en, this message translates to:
+  /// **'Site type'**
+  String get customSourceEngine;
+
+  /// No description provided for @customSourceEngineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Which layout this site uses'**
+  String get customSourceEngineHint;
+
+  /// No description provided for @customSourceLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio language'**
+  String get customSourceLanguage;
+
+  /// No description provided for @customSourceTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Test source'**
+  String get customSourceTest;
+
+  /// No description provided for @customSourceTesting.
+  ///
+  /// In en, this message translates to:
+  /// **'Testing…'**
+  String get customSourceTesting;
+
+  /// No description provided for @customSourceDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete source'**
+  String get customSourceDelete;
+
+  /// No description provided for @customSourceDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this source? Your watch history for it is kept.'**
+  String get customSourceDeleteConfirm;
+
+  /// No description provided for @customSourceSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Source saved'**
+  String get customSourceSaved;
+
+  /// No description provided for @customSourceDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'You already added a source with this address'**
+  String get customSourceDuplicate;
+
+  /// No description provided for @customSourceNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the source a name'**
+  String get customSourceNameRequired;
+
+  /// No description provided for @customSourceUrlRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the site address'**
+  String get customSourceUrlRequired;
+
+  /// No description provided for @customSourceTestWorking.
+  ///
+  /// In en, this message translates to:
+  /// **'Working'**
+  String get customSourceTestWorking;
+
+  /// No description provided for @customSourceTestWrongEngine.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong site type'**
+  String get customSourceTestWrongEngine;
+
+  /// No description provided for @customSourceTestCloudflare.
+  ///
+  /// In en, this message translates to:
+  /// **'Behind Cloudflare'**
+  String get customSourceTestCloudflare;
+
+  /// No description provided for @customSourceTestUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'No response'**
+  String get customSourceTestUnreachable;
+
+  /// No description provided for @customSourceTestFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {browse} on browse, {search} on search'**
+  String customSourceTestFound(int browse, int search);
+
+  /// No description provided for @customSourceImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from list'**
+  String get customSourceImport;
+
+  /// No description provided for @customSourceImportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from known movie sites'**
+  String get customSourceImportSubtitle;
+
+  /// No description provided for @customSourceImportBundled.
+  ///
+  /// In en, this message translates to:
+  /// **'Bundled list'**
+  String get customSourceImportBundled;
+
+  /// No description provided for @customSourceImportUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'From a manifest URL'**
+  String get customSourceImportUrl;
+
+  /// No description provided for @customSourceImportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No sources found in that list'**
+  String get customSourceImportEmpty;
+
+  /// No description provided for @customSourceImportAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {count} sources'**
+  String customSourceImportAdd(int count);
+
+  /// No description provided for @customSourceImportPickEngine.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a site type'**
+  String get customSourceImportPickEngine;
+
+  /// No description provided for @customSourceImportUnknownEngine.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown layout — choose one'**
+  String get customSourceImportUnknownEngine;
+
+  /// No description provided for @customSourceOverride.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom address'**
+  String get customSourceOverride;
+
+  /// No description provided for @customSourceOverrideClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the source\'s own address'**
+  String get customSourceOverrideClear;
+
+  /// No description provided for @customSourceOverrideSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Using a custom address'**
+  String get customSourceOverrideSet;
+
   /// No description provided for @autoUpdateExtensions.
   ///
   /// In en, this message translates to:

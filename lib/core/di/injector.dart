@@ -40,6 +40,8 @@ import '../playback/watch_history.dart';
 import '../provider/cf_clearance_store.dart';
 import '../provider/cloudstream_provider.dart';
 import '../provider/default_sources_seeder.dart';
+import '../provider/cloudstream_kt/cs_bindings.dart';
+import '../provider/cloudstream_kt/custom_source_store.dart';
 import '../provider/native/native_provider_manager.dart';
 import '../provider/provider_downloader.dart';
 import '../provider/provider_manager.dart';
@@ -451,10 +453,27 @@ Future<void> initDependencies() async {
   final mihonManager = MihonManager();
   sl.registerSingleton<MihonManager>(mihonManager);
 
-  // Native movie-provider registry (VegaMovies/RogMovies) — pre-installed,
+  // Native movie-provider registry (VegaMovies/RogMovies, the ported
+  // CloudStream engines, and the user's own custom sources) — pre-installed,
   // no repo/download step, no Platform gate: pure Dart + http, same as every
   // platform this app already ships to.
-  final nativeManager = NativeProviderManager();
+  //
+  // The custom-source store is opened first because the registry reads it to
+  // know which user sources to register, and stays attached to it afterwards so
+  // an add/edit/delete in Settings reaches the source picker without a restart.
+  await CustomSourceStore.init();
+  final customSources = CustomSourceStore();
+  sl.registerSingleton<CustomSourceStore>(customSources);
+
+  // Hands the ported CloudStream engines the two things they cannot import:
+  // the app's Cloudflare solver (shared with the JS engine, so one site is
+  // never verified twice) and the user's per-source base-URL overrides.
+  installCsBindings(
+    providerManager: manager,
+    overrides: sl<SourceDomainOverrides>(),
+  );
+
+  final nativeManager = NativeProviderManager(customSources: customSources);
   sl.registerSingleton<NativeProviderManager>(nativeManager);
 
   // LNReader novel-extension registry — the novel twin of MihonManager above.
@@ -793,7 +812,12 @@ Future<void> initDependencies() async {
   // actually loaded (so a removed/disabled source falls back to allanime).
   await ActiveSourceCubit.init();
   final activeBox = Hive.box(ActiveSourceCubit.boxName);
-  await activeBox.put('active_source', 'native:vegamovies');
+  // NOT overwritten to a fixed source here. This line used to force
+  // `native:vegamovies` on every launch, which threw away the user's pick
+  // before ActiveSourceCubit could restore it — so choosing any other source
+  // (now including a custom one) lasted only until the next cold start. The
+  // cubit already falls back to `fallback` when the saved id is not in `valid`,
+  // which is the case this was standing in for.
   sl.registerSingleton<ActiveSourceCubit>(
     ActiveSourceCubit(
       box: activeBox,

@@ -245,6 +245,32 @@ ProviderType sourceTypeOf(String id) {
   return ProviderType.values.asNameMap()[t] ?? ProviderType.anime;
 }
 
+/// The `native:` sources that are Home *channels* — the two the centre button
+/// switches between (`modeChoices` in `features/shell/mode_bar.dart`).
+///
+/// These are the only native sources hidden from search. The reason is
+/// specific: each duplicates a CloudStream extension for the same site that the
+/// user has installed ("VegaMovies (Hollywood)" beside "VegaMovies"), and a
+/// picker listing both read as one source listed twice.
+///
+/// Every OTHER native source — the ported CloudStream engines and anything
+/// added under Settings → Custom sources — has no channel button and no
+/// installed twin, so hiding it would leave it with no way into the app at all.
+/// The search exclusion used to key on the whole `native:` prefix, which did
+/// exactly that.
+///
+/// `search_native_sources_test.dart` pins this against `modeChoices`, so adding
+/// a channel there without updating this set fails rather than silently leaking
+/// a duplicate row into search.
+const Set<String> kHomeChannelSourceIds = {
+  'native:vegamovies',
+  'native:rogmovies',
+};
+
+/// True for a Home channel — see [kHomeChannelSourceIds].
+bool isHomeChannelSource(String sourceId) =>
+    kHomeChannelSourceIds.contains(sourceId);
+
 /// Same resolution as [sourceTypeOf], but reads a precomputed id->type map
 /// (see [ProviderRegistry.typeMapOf]) instead of hitting the registry per
 /// call. Used by callers that resolve many ids in one pass — the repo

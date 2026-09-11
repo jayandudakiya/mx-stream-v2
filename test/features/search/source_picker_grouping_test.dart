@@ -1,8 +1,16 @@
-// The search source picker lists all sources in a single flat alphabetical list
-// without "Built-in" / "Installed" headings, avoiding user confusion while
-// keeping all sources searchable.
+// The search source picker lists sources in a single flat alphabetical list
+// without "Built-in" / "Installed" headings.
+//
+// Exactly one kind of source is held back: a Home *channel*. Those duplicate an
+// installed CloudStream extension for the same site ("VegaMovies (Hollywood)"
+// beside "VegaMovies"), which is what made the sheet read as listing one source
+// twice. Every other `native:` source — the ported CloudStream engines, and
+// anything the user adds under Settings → Custom sources — is an ordinary row,
+// because nothing else in the app opens those.
 import 'package:flutter_test/flutter_test.dart';
+import 'package:orcabox/core/ui/source_switcher.dart';
 import 'package:orcabox/features/home/search_screen.dart';
+import 'package:orcabox/features/shell/mode_bar.dart';
 
 typedef _Source = ({String id, String name});
 
@@ -33,11 +41,18 @@ List<String> _asDisplayed(List<SourcePickerRow> rows) => [
 ];
 
 void main() {
-  group('isBuiltInSource', () {
-    test('only the native: prefix counts as built-in', () {
-      expect(isBuiltInSource('native:vegamovies'), isTrue);
-      expect(isBuiltInSource('native:rogmovies'), isTrue);
+  group('isHomeChannelSource', () {
+    test('only the two Home channels count as channels', () {
+      expect(isHomeChannelSource('native:vegamovies'), isTrue);
+      expect(isHomeChannelSource('native:rogmovies'), isTrue);
       for (final id in [
+        // Ported CloudStream engines: native, but not channels.
+        'native:multimovies',
+        'native:hdhub4u',
+        'native:uhdmovies',
+        'native:4khdhub',
+        // A user-added custom source.
+        'native:custom_k3f9a1',
         'cs:VegaMovies',
         'ani:1',
         'mihon:1',
@@ -45,13 +60,24 @@ void main() {
         'allanime',
         '',
       ]) {
-        expect(isBuiltInSource(id), isFalse, reason: '$id is user-installed');
+        expect(isHomeChannelSource(id), isFalse, reason: '$id is not a channel');
       }
+    });
+
+    test('the channel set matches what the mode bar actually offers', () {
+      // Adding a channel to `modeChoices` without listing it here would leak a
+      // duplicate row back into search — the exact bug the exclusion exists for.
+      final fromBar = {
+        for (final c in modeChoices)
+          if (c.sourceId != null) c.sourceId!,
+      };
+      expect(fromBar, kHomeChannelSourceIds);
     });
   });
 
   group('sourcePickerRows', () {
-    test('the reported list displays as a single flat alphabetical list without headings or native home providers', () {
+    test('the reported list displays as a single flat alphabetical list without '
+        'headings or the Home channels', () {
       expect(_asDisplayed(_rows(_reported)), [
         'CineStream',
         'CineTmdb',
@@ -63,7 +89,7 @@ void main() {
       ]);
     });
 
-    test('installed engines for sites survive, while native: providers are excluded from search picker', () {
+    test('installed engines survive while the Home channels are excluded', () {
       final ids = [
         for (final r in _rows(_reported))
           if (r.source != null) r.source!.id,
@@ -72,6 +98,18 @@ void main() {
       expect(ids, isNot(contains('native:vegamovies')));
       expect(ids, isNot(contains('native:rogmovies')));
       expect(ids, hasLength(7));
+    });
+
+    test('ported engines and custom sources ARE listed', () {
+      // Without this they have no way into the app at all: no channel button,
+      // and search was filtering every `native:` id out.
+      final rows = _rows(const [
+        (id: 'native:vegamovies', name: 'VegaMovies (Hollywood)'),
+        (id: 'native:multimovies', name: 'MultiMovies'),
+        (id: 'native:custom_k3f9a1', name: 'My Site'),
+        (id: 'cs:CineStream', name: 'CineStream'),
+      ]);
+      expect(_asDisplayed(rows), ['CineStream', 'MultiMovies', 'My Site']);
     });
 
     test('the list is alphabetical, case-insensitively', () {

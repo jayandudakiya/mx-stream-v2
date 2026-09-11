@@ -494,6 +494,39 @@ class _JsHost {
     return _cfCookie.containsKey(host);
   }
 
+  /// The clearance held for [host], for an engine that does its own HTTP.
+  ///
+  /// The ported CloudStream providers (`lib/core/provider/cloudstream_kt/`)
+  /// scrape over their own client, but a `cf_clearance` cookie is per-host, not
+  /// per-client: sharing this cache means a site cleared by either engine is
+  /// cleared for both, and neither pops a second WebView at the user.
+  ({String cookie, String? ua})? clearanceFor(String host) {
+    _ensureCfRestored();
+    final cookie = _cfCookie[host];
+    return cookie == null ? null : (cookie: cookie, ua: _cfUa[host]);
+  }
+
+  /// Solve for [host] on behalf of another engine, with the same staleness
+  /// rule, negative cache and in-flight de-dupe the JS fetch path uses.
+  ///
+  /// [staleClearanceSent] means the challenged request already carried a
+  /// clearance, so that one is expired and is dropped before re-solving.
+  Future<({String cookie, String? ua})?> clearanceForRetry(
+    String url,
+    String host, {
+    required bool staleClearanceSent,
+  }) async {
+    _ensureCfRestored();
+    if (staleClearanceSent && _cfCookie.containsKey(host)) {
+      _cfCookie.remove(host);
+      _cfStore.forget(host);
+    }
+    if (!_cfCookie.containsKey(host) && !_cfRecentlyFailed(host)) {
+      await _solveCf(url, host);
+    }
+    return clearanceFor(host);
+  }
+
   Future<void> _solveCfImpl(String url, String host) async {
     try {
       final res = await _cf.invokeMapMethod<String, dynamic>(
@@ -963,6 +996,20 @@ class ProviderManager implements ProviderRuntimeLoader {
   /// a clearance is obtained.
   Future<bool> solveCloudflareForHost(String host, String url) =>
       _host.solveForUi(host, url);
+
+  /// The per-host Cloudflare clearance cache, shared with the ported
+  /// CloudStream providers through `CsCloudflareGate` — see
+  /// [_JsHost.clearanceFor].
+  ({String cookie, String? ua})? cfClearanceFor(String host) =>
+      _host.clearanceFor(host);
+
+  /// See [_JsHost.clearanceForRetry].
+  Future<({String cookie, String? ua})?> cfClearanceForRetry(
+    String url,
+    String host, {
+    required bool staleClearanceSent,
+  }) =>
+      _host.clearanceForRetry(url, host, staleClearanceSent: staleClearanceSent);
 
   void disposeAll() {
     _host.providers.clear();

@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:html/dom.dart' as dom;
 
-import '../cs_domains.dart';
 import '../cs_dom.dart';
 import '../cs_http.dart';
 import '../cs_main_api.dart';
 import '../cs_models.dart';
+import '../cs_spec.dart';
 import '../cs_types.dart';
 import '../cs_utils.dart';
 import '../extractors/driveseed_extractor.dart';
@@ -33,24 +33,29 @@ import '../extractors/packed_host_extractor.dart';
 /// Zip/Pack buttons are dropped: they resolve to a `.zip` of the season, which
 /// cannot be streamed and would otherwise appear as a playable source that
 /// fails at the player.
-class UhdMoviesProvider implements CsMainApi {
-  @override
-  Future<String> get mainUrl => CsDomains.resolve('uhdmovies');
+class UhdMoviesProvider extends CsSpecApi {
+  UhdMoviesProvider({CsSourceSpec? spec}) : super(spec ?? _default);
 
-  @override
-  String get providerKey => 'uhdmovies';
-
-  @override
-  String get name => 'UHDMovies';
-
-  @override
-  String get lang => 'hi';
+  static const CsSourceSpec _default = CsSourceSpec(
+    engineId: CsEngineId.uhdmovies,
+    key: 'uhdmovies',
+    name: 'UHDMovies',
+  );
 
   @override
   Set<TvType> get supportedTypes => {TvType.movie, TvType.tvSeries};
 
+  /// Only the front page is guaranteed on a clone; the category slugs below
+  /// are UHDMovies' own.
   @override
-  List<CsMainPageEntry> get mainPage => mainPageOf(const {
+  List<CsMainPageEntry> get familyMainPage => mainPageOf(const {
+        '': 'Latest',
+        'movies/': 'Movies',
+        'tv-shows/': 'TV Shows',
+      });
+
+  @override
+  List<CsMainPageEntry> get builtInMainPage => mainPageOf(const {
         '': 'Latest',
         'movies/dual-audio-movies/': 'Dual Audio (Hindi)',
         'movies/': 'Movies',

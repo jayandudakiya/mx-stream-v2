@@ -403,6 +403,139 @@ class AppLocalizationsEs extends AppLocalizations {
       'Avisar cuando las fuentes instaladas tengan actualizaciones';
 
   @override
+  String get customSources => 'Custom sources';
+
+  @override
+  String get customSourcesSubtitle => 'Add your own movie sites';
+
+  @override
+  String get customSourcesNoneYet => 'No custom sources yet';
+
+  @override
+  String customSourcesAddedCount(int count) {
+    return '$count added';
+  }
+
+  @override
+  String get customSourcesIntro =>
+      'Point one of the built-in site engines at any movie site. Custom sources behave exactly like the built-in ones: they appear in search, on the detail screen and in the player.';
+
+  @override
+  String get customSourcesYourSources => 'Your sources';
+
+  @override
+  String get customSourcesBuiltIn => 'Built-in sources';
+
+  @override
+  String get customSourcesBuiltInHint =>
+      'Override the address a built-in source uses when its own has stopped working.';
+
+  @override
+  String get customSourceAdd => 'Add source';
+
+  @override
+  String get customSourceEdit => 'Edit source';
+
+  @override
+  String get customSourceName => 'Name';
+
+  @override
+  String get customSourceNameHint => 'Shown in search and the source picker';
+
+  @override
+  String get customSourceUrl => 'Site address';
+
+  @override
+  String get customSourceUrlHint => 'example.com';
+
+  @override
+  String get customSourceEngine => 'Site type';
+
+  @override
+  String get customSourceEngineHint => 'Which layout this site uses';
+
+  @override
+  String get customSourceLanguage => 'Audio language';
+
+  @override
+  String get customSourceTest => 'Test source';
+
+  @override
+  String get customSourceTesting => 'Testing…';
+
+  @override
+  String get customSourceDelete => 'Delete source';
+
+  @override
+  String get customSourceDeleteConfirm =>
+      'Remove this source? Your watch history for it is kept.';
+
+  @override
+  String get customSourceSaved => 'Source saved';
+
+  @override
+  String get customSourceDuplicate =>
+      'You already added a source with this address';
+
+  @override
+  String get customSourceNameRequired => 'Give the source a name';
+
+  @override
+  String get customSourceUrlRequired => 'Enter the site address';
+
+  @override
+  String get customSourceTestWorking => 'Working';
+
+  @override
+  String get customSourceTestWrongEngine => 'Wrong site type';
+
+  @override
+  String get customSourceTestCloudflare => 'Behind Cloudflare';
+
+  @override
+  String get customSourceTestUnreachable => 'No response';
+
+  @override
+  String customSourceTestFound(int browse, int search) {
+    return 'Found $browse on browse, $search on search';
+  }
+
+  @override
+  String get customSourceImport => 'Import from list';
+
+  @override
+  String get customSourceImportSubtitle => 'Pick from known movie sites';
+
+  @override
+  String get customSourceImportBundled => 'Bundled list';
+
+  @override
+  String get customSourceImportUrl => 'From a manifest URL';
+
+  @override
+  String get customSourceImportEmpty => 'No sources found in that list';
+
+  @override
+  String customSourceImportAdd(int count) {
+    return 'Add $count sources';
+  }
+
+  @override
+  String get customSourceImportPickEngine => 'Pick a site type';
+
+  @override
+  String get customSourceImportUnknownEngine => 'Unknown layout — choose one';
+
+  @override
+  String get customSourceOverride => 'Custom address';
+
+  @override
+  String get customSourceOverrideClear => 'Use the source\'s own address';
+
+  @override
+  String get customSourceOverrideSet => 'Using a custom address';
+
+  @override
   String get autoUpdateExtensions => 'Actualizar extensiones auto';
 
   @override

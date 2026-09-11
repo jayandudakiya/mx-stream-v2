@@ -1,60 +1,47 @@
 import '../base_provider.dart';
 import 'cs_adapter.dart';
-import 'cs_extractor.dart';
-import 'extractors/driveseed_extractor.dart';
-import 'extractors/gdmirror_extractor.dart';
-import 'extractors/hubcloud_extractor.dart';
-import 'extractors/packed_host_extractor.dart';
-import 'extractors/vidstack_extractor.dart';
-import 'providers/fourkhdhub_provider.dart';
-import 'providers/hdhub4u_provider.dart';
-import 'providers/multimovies_provider.dart';
-import 'providers/uhdmovies_provider.dart';
+import 'cs_engines.dart';
+import 'cs_spec.dart';
 
 /// The registration point for the CloudStream→Dart layer — Kotlin's
 /// `@CloudstreamPlugin class …Plugin : BasePlugin { registerMainAPI(...) }`,
 /// collapsed into one place because these providers ship with the app rather
 /// than being installed from a repo.
 ///
-/// Adding a provider is two lines: write its `CsMainApi`, then list it in
-/// [buildCloudStreamProviders]. Nothing in the repository, the source picker,
-/// the detail screen or the player needs to change — [CsProviderAdapter]
-/// already presents it as a `native:` source like VegaMovies and RogMovies.
-class CloudStreamKt {
-  CloudStreamKt._();
-
-  static bool _extractorsRegistered = false;
-
-  /// Extractors are shared: MultiMovies' GDMirror fan-out lands on the same
-  /// hosts 4KHDHub links to directly, so they are registered once globally
-  /// rather than per provider.
-  static void registerExtractors() {
-    if (_extractorsRegistered) return;
-    _extractorsRegistered = true;
-    CsExtractorRegistry.instance.registerAll([
-      HubCloudExtractor(),
-      HubDriveExtractor(),
-      HubCdnExtractor(),
-      DriveseedExtractor(),
-      GdMirrorExtractor(),
-      VidStackExtractor(),
-      // Last: its patterns are the broadest, and a more specific extractor
-      // above should win when both match.
-      PackedHostExtractor(),
-    ]);
-  }
-}
-
+/// Two kinds of source come out of here and they are otherwise identical:
+///
+///  * the built-in four ([builtInCsSpecs]), whose domains keep resolving
+///    through the remote manifests;
+///  * whatever the user added under Settings → Custom sources, which pin their
+///    own base URL and run one of the same engines against it.
+///
+/// Nothing downstream can tell them apart: both arrive as `native:` sources
+/// through [CsProviderAdapter], the same way VegaMovies and RogMovies do, so
+/// the repository, the source picker, the detail screen and the player need no
+/// knowledge of either.
 /// Every ported CloudStream provider, adapted to this app's `BaseProvider`.
 ///
+/// [customSpecs] are the user's own sources, read from `CustomSourceStore` at
+/// boot and passed in rather than read here — this file stays free of storage
+/// so it can be exercised with a hand-made list in tests.
+///
 /// Ordering is the order they appear in the source picker and in cross-source
-/// search, so the Hindi-dubbed catalogues lead.
-List<BaseProvider> buildCloudStreamProviders() {
-  CloudStreamKt.registerExtractors();
+/// search: the built-in Hindi-dubbed catalogues lead, and the user's own
+/// sources follow in the order they added them.
+List<BaseProvider> buildCloudStreamProviders({
+  List<CsSourceSpec> customSpecs = const [],
+}) {
+  registerCsExtractors();
   return [
-    CsProviderAdapter(MultiMoviesProvider()),
-    CsProviderAdapter(HdHub4uProvider()),
-    CsProviderAdapter(UhdMoviesProvider()),
-    CsProviderAdapter(FourKHdHubProvider()),
+    for (final spec in builtInCsSpecs) CsProviderAdapter(buildCsApi(spec)),
+    for (final spec in customSpecs) CsProviderAdapter(buildCsApi(spec)),
   ];
+}
+
+/// One user-added source, built the same way the built-ins are. Used when a
+/// source is added or edited at runtime, so the new provider is live without an
+/// app restart.
+BaseProvider buildCustomCloudStreamProvider(CsSourceSpec spec) {
+  registerCsExtractors();
+  return CsProviderAdapter(buildCsApi(spec));
 }

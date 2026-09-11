@@ -42,6 +42,12 @@ class SettingsBackup {
     'zmode_source', // which source plays each kind in OrcaBox Mode
     'metadata_provider', // AniList vs MAL for anime metadata
     'home_rows_prefs', // per-layout home row order + visibility
+    // The user's own sources (Settings → Custom sources). Backed up rather than
+    // excluded as a "source id" box: a custom source is not a reference to an
+    // installed extension, it IS its own definition — a name, a URL and which
+    // built-in engine reads it — so it restores meaningfully on another device,
+    // exactly like `source_domain_overrides` above. Nothing secret in it.
+    'custom_sources',
   ];
 
   /// Returns a map of `{boxName: {key: value, ...}}` for every open box.

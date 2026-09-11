@@ -296,6 +296,11 @@ flutter:
     - assets/icon/logo_mark.png
     # App intro splash sound.
     - assets/audio/intro.mp3
+    # Known movie-site domains, offered as a starting list in Settings → Custom
+    # sources so adding one is a tap rather than a hunt for a working URL.
+    # A snapshot, not a source of truth: the screen can also fetch a live
+    # manifest, and every entry is editable after import.
+    - assets/catalogue/url_sources.json
 
   fonts:
     - family: Inter

@@ -56,6 +56,8 @@ import '../update/update_dialog.dart';
 import '../../core/ui/settings_widgets.dart';
 import '../../core/tv/tv_list_focusable.dart';
 import '../../core/ui/dock_visibility.dart';
+import '../../core/provider/cloudstream_kt/custom_source_store.dart';
+import 'custom_sources_screen.dart';
 import 'donate_screen.dart';
 import '../auth/auth_cubit.dart';
 import '../backup/backup_screen.dart';
@@ -679,6 +681,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     if (sl<AppMode>().isTv) return const SettingsScreenTv();
     final enabledCount = _registry.getAll().where((e) => e.enabled).length;
+    // Guarded like [_providerPrefs] below: this screen is built eagerly as the
+    // dock's Profile tab, so it can render before the store is registered (and
+    // does exactly that in widget tests, which register only what they need).
+    final customSourceCount = sl.isRegistered<CustomSourceStore>()
+        ? sl<CustomSourceStore>().all.length
+        : 0;
     final activeId = context.watch<ActiveSourceCubit>().state;
     final l10n = context.l10n;
     final connectedCount = <Tracker>[
@@ -823,6 +831,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
         onTap: _pickActiveSource,
+      ),
+      _SettingsEntry(
+        section: SettingsSection.sources,
+        icon: Icons.add_link_rounded,
+        title: l10n.customSources,
+        subtitle: customSourceCount == 0
+            ? l10n.customSourcesSubtitle
+            : l10n.customSourcesAddedCount(customSourceCount),
+        keywords: 'custom source add site url domain engine manual own provider',
+        onTap: () async {
+          await _push(const CustomSourcesScreen());
+          if (mounted) setState(() {});
+        },
       ),
       _SettingsEntry(
         section: SettingsSection.sources,

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 
 /// Centralized configuration for the native movie-provider engine —
@@ -116,7 +116,7 @@ class ProviderConfig {
       _lastFailedFetch = DateTime.now();
     } catch (e) {
       _lastFailedFetch = DateTime.now();
-      debugPrint('Error fetching dynamic urls: $e');
+      developer.log('Error fetching dynamic urls: $e', name: 'ProviderConfig');
     }
     return _resolvedBaseUrlCache;
   }

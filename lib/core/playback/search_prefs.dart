@@ -59,8 +59,14 @@ class SearchPrefs extends ChangeNotifier {
   }
 
   // ── Search scope (CloudStream-style "current source only") ────────────────
-  /// When true, search queries ONLY the currently-active Home source instead of
-  /// fanning out to every enabled source. Defaults to false (all sources).
+  /// The scope the last search session ended on: true when it was narrowed to a
+  /// single source, false for all sources.
+  ///
+  /// **Not** what Search opens with — `SearchBloc._restoredState` deliberately
+  /// starts every session on all sources, because a scope left switched on from
+  /// a previous session reads as missing results rather than as a setting. This
+  /// is kept as the record of that last choice (and so the value stays truthful
+  /// in a settings backup); nothing seeds from it.
   bool get currentSourceOnly =>
       _box.get(_currentSourceOnlyKey, defaultValue: false) as bool;
 

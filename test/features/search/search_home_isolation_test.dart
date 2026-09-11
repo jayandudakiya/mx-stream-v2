@@ -10,6 +10,10 @@
 // the active source when the bloc is built and thereafter moved only by
 // `SearchScopeSourceChanged`. These tests pin both halves — the search really
 // does follow its own scope, and the global cubit really is left alone.
+//
+// They also pin what Search OPENS on: all sources, every time. The scope is
+// per-session; a narrowing left on from a previous session reads as missing
+// results rather than as a setting the user chose.
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -32,8 +36,12 @@ import 'package:orcabox/features/search/bloc/search_bloc.dart';
 import 'package:orcabox/features/search/bloc/search_event.dart';
 import 'package:orcabox/features/search/bloc/search_state.dart';
 
-const _homeSource = 'cs:vegamovies';
-const _otherSource = 'cs:rogmovies';
+// Two ordinary sources. `native:` ids on purpose: they resolve their type by
+// prefix, where a `cs:` id needs CloudStreamManager — which this harness does
+// not register, and which the all-sources fan-out would now ask for. Neither is
+// a Home channel, so both take part in search normally.
+const _homeSource = 'native:multimovies';
+const _otherSource = 'native:hdhub4u';
 
 MediaItem _fakeItem(String sourceId) => MediaItem(
   id: 'id-$sourceId',
@@ -43,8 +51,10 @@ MediaItem _fakeItem(String sourceId) => MediaItem(
   sourceId: sourceId,
 );
 
-/// Scoped search ("current source only") is the mode under test, so this fake
-/// pins it on — that is the branch that used to read the global cubit.
+/// `currentSourceOnly` is pinned ON here deliberately: Search must still open
+/// on all sources, which is what proves the stored value is not what seeds the
+/// session. The scoped branch — the one that used to read the global cubit — is
+/// reached by dispatching `SearchScopeSourceChanged`, as the picker does.
 class _FakeSearchPrefs extends SearchPrefs {
   @override
   String? get contentFilterName => null;
@@ -223,16 +233,36 @@ void main() {
     } catch (_) {}
   });
 
-  test('the scope is seeded from the active source, so Search opens where '
-      'the user was browsing', () {
+  test('Search opens on All sources, whatever the last session ended on', () {
+    // A scope is something you apply to a particular search, not a mode left
+    // switched on: a user who narrowed to one provider last week and finds
+    // today's search returning only that provider reads it as broken results,
+    // not as their own setting. `_FakeSearchPrefs.currentSourceOnly` is true
+    // here precisely to prove the stored value is not consulted.
+    expect(bloc.state.currentSourceOnly, isFalse);
+    expect(bloc.state.scopedSourceId, isNull);
+    // The active source is still remembered, as the default for the moment the
+    // user does narrow to a single source.
     expect(bloc.state.searchSourceId, _homeSource);
-    expect(bloc.state.scopedSourceId, _homeSource);
   });
 
-  test('a scoped search queries the seeded source', () async {
+  test('the first search fans out instead of querying one source', () async {
     bloc.add(const SearchRunRequested('naruto'));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+
+    expect(repo.searchedSourceIds, containsAll([_homeSource, _otherSource]));
+  });
+
+  test('picking a source from All sources narrows to it', () async {
+    bloc.add(const SearchScopeSourceChanged(_homeSource));
     await Future<void>.delayed(const Duration(milliseconds: 20));
 
+    expect(bloc.state.currentSourceOnly, isTrue);
+    expect(bloc.state.scopedSourceId, _homeSource);
+
+    repo.searchedSourceIds.clear();
+    bloc.add(const SearchRunRequested('naruto'));
+    await Future<void>.delayed(const Duration(milliseconds: 20));
     expect(repo.searchedSourceIds, [_homeSource]);
   });
 
@@ -256,12 +286,14 @@ void main() {
 
   test('the search then runs against the newly scoped source', () async {
     bloc.add(const SearchRunRequested('naruto'));
-    await Future<void>.delayed(const Duration(milliseconds: 20));
+    // Long enough for the whole all-sources fan-out to land, so nothing from it
+    // arrives after the clear below and pollutes the assertion.
+    await Future<void>.delayed(const Duration(milliseconds: 80));
     repo.searchedSourceIds.clear();
 
     // Scoping to a new source re-runs the current query on its own.
     bloc.add(const SearchScopeSourceChanged(_otherSource));
-    await Future<void>.delayed(const Duration(milliseconds: 20));
+    await Future<void>.delayed(const Duration(milliseconds: 40));
 
     expect(repo.searchedSourceIds, [_otherSource]);
     expect(activeSource.state, _homeSource);
@@ -290,13 +322,16 @@ void main() {
     },
   );
 
-  test('scoping to the source already scoped is a no-op', () async {
+  test('re-picking the source already scoped is a no-op', () async {
+    // From All sources, picking a source is never a no-op — it narrows. The
+    // no-op only applies once that source is already the scope.
+    bloc.add(const SearchScopeSourceChanged(_homeSource));
     bloc.add(const SearchRunRequested('naruto'));
-    await Future<void>.delayed(const Duration(milliseconds: 20));
+    await Future<void>.delayed(const Duration(milliseconds: 60));
     repo.searchedSourceIds.clear();
 
     bloc.add(const SearchScopeSourceChanged(_homeSource));
-    await Future<void>.delayed(const Duration(milliseconds: 20));
+    await Future<void>.delayed(const Duration(milliseconds: 40));
 
     expect(repo.searchedSourceIds, isEmpty);
   });

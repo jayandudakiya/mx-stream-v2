@@ -245,7 +245,7 @@ class _SearchViewState extends State<_SearchView>
       {for (final s in _repo.loadedSources) s.id: s},
       mode,
       (s) => sourceTypeOf(s.id),
-    ).values.where((s) => !isBuiltInSource(s.id)).toList();
+    ).values.where((s) => !isHomeChannelSource(s.id)).toList();
   }
 
   @override
@@ -861,7 +861,7 @@ class _SearchViewState extends State<_SearchView>
         final currentOnly = state.currentSourceOnly;
         final scopedId = state.searchSourceId;
         final isScopedValid =
-            scopedId != null && !isBuiltInSource(scopedId);
+            scopedId != null && !isHomeChannelSource(scopedId);
         final value = (currentOnly && isScopedValid)
             ? _repo.displayName(scopedId)
             : context.l10n.allSources;
@@ -2421,21 +2421,19 @@ typedef SourcePickerRow = ({
   ({String id, String name})? source,
 });
 
-/// Whether [sourceId] is one of the app's own bundled providers rather than
-/// something the user installed.
-///
-/// The `native:` prefix is the whole test: NativeProviderManager is the only
-/// registrar that mints those ids, and every other manager (JS, CloudStream,
-/// Aniyomi, Mihon, LNReader) hands out sources that arrived from a repo the
-/// user added.
-bool isBuiltInSource(String sourceId) => sourceId.startsWith('native:');
-
 /// Sorts [sources] alphabetically by name into a single flat list for the
 /// search source-picker sheet (no "Built-in" / "Installed" headers).
 ///
 /// Deduplication is by source id only. Names are deliberately NOT deduped: a
 /// built-in and an extension for one site have similar names on purpose, and
 /// collapsing them would silently drop an engine the user can still pick.
+///
+/// The only rows held back are the two Home channels
+/// ([kHomeChannelSourceIds]) — each duplicates an installed extension for the
+/// same site, which is what made the sheet read as listing one source twice.
+/// The ported CloudStream engines and the user's custom sources are ordinary
+/// rows here: they have no channel button, so this sheet (and the all-sources
+/// search behind it) is how they are reached at all.
 List<SourcePickerRow> sourcePickerRows(
   Iterable<({String id, String name})> sources, {
   String? builtInLabel,
@@ -2444,7 +2442,7 @@ List<SourcePickerRow> sourcePickerRows(
   final seenIds = <String>{};
   final unique = [
     for (final s in sources)
-      if (!isBuiltInSource(s.id) && seenIds.add(s.id)) s,
+      if (!isHomeChannelSource(s.id) && seenIds.add(s.id)) s,
   ];
   unique.sort(
     (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),

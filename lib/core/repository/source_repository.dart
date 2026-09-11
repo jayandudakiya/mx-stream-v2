@@ -299,8 +299,10 @@ class SourceRepository implements CatalogueRepository {
       ..._lnrManager.installedSources.map(
         (s) => (id: s.id, name: s.name, lang: null),
       ),
-    // Native movie sources (VegaMovies/RogMovies) — always on, no NSFW/lang
-    // concept, same as the plain JS sources above.
+    // Native movie sources — VegaMovies/RogMovies, the ported CloudStream
+    // engines, and the user's own custom sources. Always on, no NSFW/lang
+    // concept, same as the plain JS sources above. Read live from the manager,
+    // so a source added in Settings is searchable without a restart.
     ..._nativeManager.all.map(
       (p) => (id: p.sourceId, name: p.displayName, lang: null),
     ),
@@ -329,6 +331,13 @@ class SourceRepository implements CatalogueRepository {
     if (l != null) return l.site;
     final a = _aniManager.get(sourceId);
     if (a is AniyomiProvider) return a.info.baseUrl;
+    // The ported CloudStream engines (built-in and user-added alike) know their
+    // own site synchronously — a custom source pins it, a built-in has resolved
+    // it. Without this a `native:` source reported no site at all, so "open in
+    // browser" and the Cloudflare-solve action were both hidden for exactly the
+    // sources most likely to need them.
+    final n = _nativeManager.get(sourceId);
+    if (n is CsProviderAdapter) return n.cachedBaseUrl ?? '';
     // CloudStream plugins declare their own site as `MainAPI.mainUrl`. Their
     // item urls are already absolute (unlike the three above), so this value
     // is used only for the Cloudflare/browser actions, never for turning an

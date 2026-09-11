@@ -1,3 +1,5 @@
+import 'package:html/dom.dart' as dom;
+
 import '../cs_dom.dart';
 import '../cs_extractor.dart';
 import '../cs_http.dart';
@@ -45,7 +47,7 @@ class HubCloudExtractor extends CsExtractor {
         .where((a) => a.attr('class').contains('btn') && a.attr('href').isNotEmpty)
         .toList();
 
-    final links = await amapSafe<dynamic, CsExtractorLink>(
+    final links = await amapSafe<dom.Element, CsExtractorLink>(
       buttons,
       (a) => _fromButton(a.attr('href'), a.textTrim, quality, label),
       concurrency: 6,

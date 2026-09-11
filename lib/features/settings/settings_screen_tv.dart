@@ -15,6 +15,7 @@ import '../../core/playback/search_prefs.dart';
 import '../../core/playback/watch_history.dart';
 import '../../core/provider/cloudstream_provider.dart';
 import '../../core/provider/cs_dns.dart';
+import '../../core/provider/cloudstream_kt/custom_source_store.dart';
 import '../../core/provider/provider_registry.dart';
 import '../../core/state/active_source_cubit.dart';
 import '../../core/theme/app_colors.dart';
@@ -32,6 +33,7 @@ import '../history/history_screen.dart';
 import '../notify/subscriptions_screen.dart';
 import '../sources/source_health_screen.dart';
 import '../sources/sources_screen.dart';
+import 'custom_sources_screen.dart';
 import 'connections_screen_tv.dart';
 import 'discord_settings_screen.dart';
 import 'settings_screen.dart';
@@ -224,6 +226,9 @@ class _SettingsScreenTvState extends State<SettingsScreenTv> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final enabledCount = _registry.getAll().where((e) => e.enabled).length;
+    final customSourceCount = sl.isRegistered<CustomSourceStore>()
+        ? sl<CustomSourceStore>().all.length
+        : 0;
     final activeId = context.watch<ActiveSourceCubit>().state;
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -301,6 +306,17 @@ class _SettingsScreenTvState extends State<SettingsScreenTv> {
                         title: l10n.activeSource,
                         subtitle: _activeLabel(activeId),
                         onTap: _pickActiveSourceTv,
+                      ),
+                      SettingsTile(
+                        icon: Icons.add_link_rounded,
+                        title: l10n.customSources,
+                        subtitle: customSourceCount == 0
+                            ? l10n.customSourcesSubtitle
+                            : l10n.customSourcesAddedCount(customSourceCount),
+                        onTap: () async {
+                          await _push(const CustomSourcesScreen());
+                          if (mounted) setState(() {});
+                        },
                       ),
                       SettingsTile(
                         icon: Icons.health_and_safety_outlined,

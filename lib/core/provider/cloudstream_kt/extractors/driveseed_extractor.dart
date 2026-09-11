@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
+
+import 'package:html/dom.dart' as dom;
 
 import '../cs_dom.dart';
 import '../cs_extractor.dart';
@@ -37,6 +40,24 @@ class DriveseedExtractor extends CsExtractor {
 
     final res = await app.get(pageUrl, referer: referer);
     if (!res.isOk) return CsLinkResult.empty;
+
+    // Driveseed started requiring an account for file pages: the mirror list is
+    // replaced by a "Login to Download" button. Verified against every button on
+    // a live UHDMovies post — all six file pages answer 200 and all six are
+    // gated, so this is the site's policy, not a per-file quirk, and it breaks
+    // the upstream Kotlin plugin the same way.
+    //
+    // Called out explicitly instead of falling through to "no buttons matched",
+    // because the two look identical from the outside and only one of them is
+    // something a selector fix could ever recover.
+    if (_isLoginWalled(res.text)) {
+      developer.log(
+        'file page requires login, no mirrors available: $pageUrl',
+        name: 'Driveseed',
+      );
+      return CsLinkResult.empty;
+    }
+
     final doc = res.document;
 
     final rawName = (doc.selectFirst('li.list-group-item')?.textTrim ?? '')
@@ -58,7 +79,7 @@ class DriveseedExtractor extends CsExtractor {
         .where((a) => a.attr('href').isNotEmpty)
         .toList();
 
-    final links = await amapSafe<dynamic, CsExtractorLink>(
+    final links = await amapSafe<dom.Element, CsExtractorLink>(
       buttons,
       (a) async {
         final href = fixUrl(a.attr('href'), base);
@@ -195,10 +216,14 @@ class DriveseedExtractor extends CsExtractor {
 ///
 /// Not a [CsExtractor] — it produces a URL for one, not a playable link.
 Future<String?> bypassHrefli(String url) async {
-  String? formAction(dynamic doc) =>
-      doc.selectFirst('form#landing')?.attr('action') as String?;
+  // Typed, not `dynamic`: `selectFirst`/`select`/`attr` are extension members
+  // from `cs_dom.dart`, and Dart never applies an extension to a `dynamic`
+  // receiver — every call here was a runtime NoSuchMethodError, which the
+  // caller's catch-all turned into "this mirror has no links".
+  String? formAction(dom.Document doc) =>
+      doc.selectFirst('form#landing')?.attr('action');
 
-  Map<String, String> formData(dynamic doc) {
+  Map<String, String> formData(dom.Document doc) {
     final out = <String, String>{};
     for (final input in doc.select('form#landing input')) {
       final n = input.attr('name');
@@ -244,3 +269,8 @@ Future<String?> bypassHrefli(String url) async {
     return null;
   }
 }
+
+/// True when a Driveseed/Driveleech file page is the signed-out wall rather
+/// than the mirror list.
+bool _isLoginWalled(String body) =>
+    body.contains('/login?ref=') || body.contains('Login to Download');
